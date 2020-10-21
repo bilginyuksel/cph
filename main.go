@@ -8,7 +8,7 @@ import (
 
 func main() {
 	fmt.Println(hello())
-	fmt.Println(filePathWalkDir("."))
+	fmt.Println(filePathWalkDir("test"))
 }
 
 func hello() string {
