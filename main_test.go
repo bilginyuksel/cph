@@ -79,7 +79,7 @@ func TestFilePathFinder_ReturnFilesOnlySubdirectory(t *testing.T) {
 }
 
 func TestFilePathFinder_NotFound(t *testing.T) {
-	_, err := filePathWalkDir("empty/")
+	_, err := filePathWalkDir("empty")
 	if err == nil {
 		t.Errorf("Expected error.")
 	}

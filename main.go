@@ -1,14 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
+	// parser "github.com/bilginyuksel/cordova-plugin-helper/parser"
 )
 
 func main() {
-	fmt.Println(hello())
-	fmt.Println(filePathWalkDir("test"))
+	// parser.Run()
 }
 
 func hello() string {
