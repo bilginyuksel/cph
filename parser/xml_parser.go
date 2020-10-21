@@ -7,6 +7,26 @@ import (
 	"os"
 )
 
+// Cordova plugin.xml
+type Plugin struct {
+	Name        string   `xml:"name"`
+	Description string   `xml:"description"`
+	Author      string   `xml:"author"`
+	Keywords    []string `xml:"keywords"`
+	License     string   `xml:"license"`
+	JsModule    JSModule `xml:"js-module"`
+	SourceFile  SourceFile
+}
+
+type SourceFile struct {
+	Src       string
+	TargetDir string
+}
+type JSModule struct {
+	clobbers string `xml:"clobbers"`
+}
+
+// -------------
 type Users struct {
 	XMLName xml.Name `xml::"users"`
 	Users   []User   `xml:"user"`
