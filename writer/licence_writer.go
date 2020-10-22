@@ -1,10 +1,10 @@
 package writer
 
 import (
-	"io"
-	"log"
+	"bufio"
+	"fmt"
 	"os"
-	"path/filepath"
+	"strings"
 )
 
 const LICENCE = `/*
@@ -24,46 +24,33 @@ const LICENCE = `/*
 */
 `
 
-func Run(files []string) {
-	for _, file := range files {
-		WriteLicence(file)
+func CheckIfLicenceExists(fileName string) (bool, error) {
+	file, err := os.OpenFile(fileName, os.O_RDONLY, 0644)
+	if err != nil {
+		return false, err
 	}
+	scanner := bufio.NewScanner(file)
+	fileContent := ""
+	for scanner.Scan() {
+		fileContent += scanner.Text() + "\n"
+	}
+	return strings.Contains(fileContent, LICENCE), err
 }
 
-func WriteLicence(file string) {
-	filename := filepath.Base(file)
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
+func CheckIfLicenceFormatIsValid(file *os.File) bool {
+	firstLine := "Copyright 2020. Huawei Technologies Co., Ltd. All rights reserved."
+	scanner := bufio.NewScanner(file)
+	fileContent := ""
+	for scanner.Scan() {
+		fileContent += scanner.Text() + "\n"
 	}
-	if _, err := f.Write([]byte(LICENCE)); err != nil {
-		log.Fatal(err)
-	}
-	javaFile, err := os.Open(file)
-	if err != nil {
-		panic(err)
-	}
-	// close fi on exit and check for its returned error
-	defer func() {
-		if err := javaFile.Close(); err != nil {
-			panic(err)
+	if strings.Contains(fileContent, firstLine) {
+		index := strings.Index(fileContent, firstLine)
+		tempLicence := ""
+		for i := index; fileContent[i-1] != '*' || fileContent[i] != '/'; i++ {
+			tempLicence += string(fileContent[i])
 		}
-	}()
-	buf := make([]byte, 1024)
-	for {
-		n, err := javaFile.Read(buf)
-		if err != nil && err != io.EOF {
-			panic(err)
-		}
-		if n == 0 {
-			break
-		}
-		if _, err := f.Write(buf[:n]); err != nil {
-			panic(err)
-		}
+		fmt.Println(tempLicence)
 	}
-
-	if err := f.Close(); err != nil {
-		log.Fatal(err)
-	}
+	return true
 }

@@ -1,29 +1,41 @@
 package writer
 
 import (
-	"io/ioutil"
-	"log"
 	"os"
-	"strings"
 	"testing"
 )
 
-func TestWriteLicence_LicenseGivenFile(t *testing.T)  {
-	WriteLicence("test/test2/HmsPushMessaging.java")
-	f, err := os.OpenFile("HmsPushMessaging.java", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func TestCheckIfLicenceExists_LicenceExists(t *testing.T) {
+	ok, err := CheckIfLicenceExists("test.java")
 	if err != nil {
-		log.Fatal(err)
+		t.Error()
 	}
-	rawBytes, err := ioutil.ReadAll(f)
+	if !ok {
+		t.Error()
+	}
+}
+
+func TestCheckIfLicenceExists_LicenceNotFound(t *testing.T) {
+	ok, err := CheckIfLicenceExists("test1.java")
 	if err != nil {
-		panic(err)
+		t.Error()
 	}
-	lines := strings.Split(string(rawBytes), "\n")
-	actualLicence := ""
-	for i:=0; i<16; i++ {
-		actualLicence += lines[i]
+	if ok {
+		t.Error()
 	}
-	if actualLicence != LICENCE {
-		t.Errorf("Licences should be same.Actual licence: %s, Expected licence: %s ", actualLicence, LICENCE)
+}
+
+func TestCheckIfLicenceExists_FileNotFound(t *testing.T) {
+	_, err := CheckIfLicenceExists("notFound.java")
+	if err == nil {
+		t.Error()
 	}
+}
+
+func TestCheckIfLicenceExists_LicenceExistWithWrongFormat(t *testing.T) {
+	file, err := os.OpenFile("HmsPushMessaging.java",os.O_RDONLY,0644)
+	if err != nil {
+		t.Error()
+	}
+	CheckIfLicenceFormatIsValid(file)
 }
