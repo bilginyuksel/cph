@@ -1,9 +1,7 @@
 package parser
 
 import (
-	"encoding/xml"
 	"fmt"
-	"io/ioutil"
 	"os"
 )
 
@@ -46,14 +44,14 @@ func Run() {
 	fmt.Println("Successfully Opened test.xml")
 	defer xmlFile.Close()
 
-	byteValue, _ := ioutil.ReadAll(xmlFile)
+	// byteValue, _ := ioutil.ReadAll(xmlFile)
 
-	var users Users
-	xml.Unmarshal(byteValue, &users)
+	// var users interface{}
+	// xml.Unmarshal(byteValue, &users)
 
-	for i := 0; i < len(users.Users); i++ {
-		fmt.Println("User Type: " + users.Users[i].Type)
-		fmt.Println("User Name: " + users.Users[i].Name)
-		fmt.Println("Facebook Url: " + users.Users[i].Social.Facebook)
-	}
+	// for i := 0; i < len(users.Users); i++ {
+	// 	fmt.Println("User Type: " + users.Users[i].Type)
+	// 	fmt.Println("User Name: " + users.Users[i].Name)
+	// 	fmt.Println("Facebook Url: " + users.Users[i].Social.Facebook)
+	// }
 }
