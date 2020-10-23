@@ -25,8 +25,7 @@ func TestFilePathFinder_ReturnFilesIncludedSubDirectories(t *testing.T) {
 		t.Errorf("Files length should be greater than 0")
 	}
 
-	expectedFiles := [5]string{"test\\test.go", "test\\test.java",
-		"test\\test1\\test1.cpp", "test\\test1\\test1.java", "test\\test1\\test1.go"}
+	expectedFiles := [3]string{"test\\test.go", "test\\test1\\test1.cpp", "test\\test1\\test1.go"}
 
 	if len(expectedFiles) != len(files) {
 		t.Errorf("Expected files length= %d, Actual files length= %d", len(expectedFiles), len(files))
@@ -57,7 +56,7 @@ func TestFilePathFinder_ReturnFilesOnlySubdirectory(t *testing.T) {
 		t.Errorf("Files length should be greater than 0")
 	}
 
-	expectedFiles := [3]string{"test\\test1\\test1.cpp", "test\\test1\\test1.java", "test\\test1\\test1.go"}
+	expectedFiles := [2]string{"test\\test1\\test1.cpp", "test\\test1\\test1.go"}
 
 	if len(expectedFiles) != len(files) {
 		t.Errorf("Expected files= %v, Actual files= %v", expectedFiles, files)
