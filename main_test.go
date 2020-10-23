@@ -25,23 +25,26 @@ func TestFilePathFinder_ReturnFilesIncludedSubDirectories(t *testing.T) {
 		t.Errorf("Files length should be greater than 0")
 	}
 
-	expectedFiles := [3]string{"test\\test.go", "test\\test1\\test1.cpp", "test\\test1\\test1.go"}
+	expectedFilesWindows := [3]string{"test\\test.go", "test\\test1\\test1.cpp", "test\\test1\\test1.go"}
+	expectedFilesLinux := [3]string{"test/test.go", "test/test1/test1.cpp", "test/test1/test1.go"}
 
-	if len(expectedFiles) != len(files) {
-		t.Errorf("Expected files length= %d, Actual files length= %d", len(expectedFiles), len(files))
+	if len(expectedFilesWindows) != len(files) {
+		t.Errorf("Expected files length= %d, Actual files length= %d", len(expectedFilesWindows), len(files))
 	}
 
-	fmt.Println(expectedFiles)
+	fmt.Println(expectedFilesWindows)
+	fmt.Println(expectedFilesLinux)
 	actualFilesMap := make(map[string]bool)
 
 	for i := 0; i < len(files); i++ {
 		actualFilesMap[files[i]] = true
 	}
 
-	for i := 0; i < len(expectedFiles); i++ {
-		_, ok := actualFilesMap[expectedFiles[i]]
-		if !ok {
-			t.Errorf("Expected files= %v, Actual files= %v", expectedFiles, files)
+	for i := 0; i < len(expectedFilesWindows); i++ {
+		_, okWindows := actualFilesMap[expectedFilesWindows[i]]
+		_, okLinux := actualFilesMap[expectedFilesLinux[i]]
+		if !okWindows && !okLinux {
+			t.Errorf("Expected files= %v, Actual files= %v", expectedFilesWindows, files)
 		}
 	}
 }
@@ -56,10 +59,11 @@ func TestFilePathFinder_ReturnFilesOnlySubdirectory(t *testing.T) {
 		t.Errorf("Files length should be greater than 0")
 	}
 
-	expectedFiles := [2]string{"test\\test1\\test1.cpp", "test\\test1\\test1.go"}
+	expectedFilesWindows := [2]string{"test\\test1\\test1.cpp", "test\\test1\\test1.go"}
+	expectedFilesLinux := [2]string{"test/test1/test1.cpp", "test/test1/test1.go"}
 
-	if len(expectedFiles) != len(files) {
-		t.Errorf("Expected files= %v, Actual files= %v", expectedFiles, files)
+	if len(expectedFilesWindows) != len(files) {
+		t.Errorf("Expected files= %v, Actual files= %v", expectedFilesWindows, files)
 	}
 
 	actualFilesMap := make(map[string]bool)
@@ -68,10 +72,11 @@ func TestFilePathFinder_ReturnFilesOnlySubdirectory(t *testing.T) {
 		actualFilesMap[files[i]] = true
 	}
 
-	for i := 0; i < len(expectedFiles); i++ {
-		_, ok := actualFilesMap[expectedFiles[i]]
-		if !ok {
-			t.Errorf("File %s should be in found files. But actual files are %v", expectedFiles[i], actualFilesMap)
+	for i := 0; i < len(expectedFilesWindows); i++ {
+		_, okWindows := actualFilesMap[expectedFilesWindows[i]]
+		_, okLinux := actualFilesMap[expectedFilesLinux[i]]
+		if !okWindows && !okLinux {
+			t.Errorf("File %s should be in found files. But actual files are %v", expectedFilesWindows[i], actualFilesMap)
 		}
 	}
 
