@@ -3,13 +3,13 @@ package main
 import (
 	"os"
 	"path/filepath"
-	// parser "github.com/bilginyuksel/cordova-plugin-helper/parser"
+
+	parser "github.com/bilginyuksel/cordova-plugin-helper/parser"
 )
 
 func main() {
-	// parser.Run()
-	// files, _ := filePathWalkDir("test/test2")
-	// writer.Run(files)
+	plg, _ := parser.ParseXML("parser/plugin.xml")
+	parser.CreateXML(plg, "plg.xml")
 }
 
 func hello() string {
