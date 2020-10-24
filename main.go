@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/bilginyuksel/cordova-plugin-helper/writer"
 	"os"
 	"path/filepath"
 	// parser "github.com/bilginyuksel/cordova-plugin-helper/parser"
@@ -9,8 +8,8 @@ import (
 
 func main() {
 	// parser.Run()
-	files, _ := filePathWalkDir("test/test2")
-	writer.Run(files)
+	// files, _ := filePathWalkDir("test/test2")
+	// writer.Run(files)
 }
 
 func hello() string {
