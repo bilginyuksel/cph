@@ -34,13 +34,6 @@ github.com/bilginyuksel/cordova-plugin-helper/writer/licence_writer.go:109.16,11
 github.com/bilginyuksel/cordova-plugin-helper/writer/licence_writer.go:113.16,115.3 1 0
 github.com/bilginyuksel/cordova-plugin-helper/writer/licence_writer.go:118.16,120.3 1 0
 github.com/bilginyuksel/cordova-plugin-helper/writer/licence_writer.go:122.16,124.3 1 0
-github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:12.49,14.33 1 1
-github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:17.2,18.16 2 1
-github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:22.2,27.21 5 1
-github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:14.33,16.3 1 1
-github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:18.16,20.3 1 1
-github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:31.55,37.2 4 0
-github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:177.45,180.2 2 1
 github.com/bilginyuksel/cordova-plugin-helper/main.go:11.13,14.2 2 0
 github.com/bilginyuksel/cordova-plugin-helper/main.go:16.21,18.2 1 1
 github.com/bilginyuksel/cordova-plugin-helper/main.go:20.53,22.82 2 1
@@ -50,3 +43,10 @@ github.com/bilginyuksel/cordova-plugin-helper/main.go:26.3,26.20 1 1
 github.com/bilginyuksel/cordova-plugin-helper/main.go:29.3,29.13 1 1
 github.com/bilginyuksel/cordova-plugin-helper/main.go:23.17,25.4 1 1
 github.com/bilginyuksel/cordova-plugin-helper/main.go:26.20,28.4 1 1
+github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:12.49,14.33 1 1
+github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:17.2,18.16 2 1
+github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:22.2,27.21 5 1
+github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:14.33,16.3 1 1
+github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:18.16,20.3 1 1
+github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:31.55,37.2 4 0
+github.com/bilginyuksel/cordova-plugin-helper/parser/xml_parser.go:177.45,180.2 2 1
