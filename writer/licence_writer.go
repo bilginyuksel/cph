@@ -59,7 +59,7 @@ func CheckIfLicenceFormatIsValid(file *os.File) bool {
 	return true
 }
 
-func WriteToFileLicence(fileName string) (bool, error) {
+func WriteLicenceToFile(fileName string) (bool, error) {
 	ok, err := CheckIfFileContainsLicenceAlready(fileName)
 
 	if ok {
