@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -15,7 +17,32 @@ func TestHello(t *testing.T) {
 	}
 }
 
+func beforeTestFilePathFinderCreateFileStructure(t *testing.T) {
+	os.Mkdir("test", 0755)
+	os.Mkdir("test/test1", 0755)
+
+	createEmptyFileForTesting := func(filename string) {
+		d := []byte("")
+		err := ioutil.WriteFile(filename, d, 0644)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+	createEmptyFileForTesting("test/test.go")
+	createEmptyFileForTesting("test/test1/test1.cpp")
+	createEmptyFileForTesting("test/test1/test1.go")
+}
+
+func afterTestFilePathFinderDestroyFileStructure(t *testing.T) {
+	err := os.RemoveAll("test")
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestFilePathFinder_ReturnFilesIncludedSubDirectories(t *testing.T) {
+	beforeTestFilePathFinderCreateFileStructure(t)
+
 	files, err := filePathWalkDir("test")
 	if err != nil {
 		t.Errorf("Shouldn't error")
@@ -47,9 +74,11 @@ func TestFilePathFinder_ReturnFilesIncludedSubDirectories(t *testing.T) {
 			t.Errorf("Expected files= %v, Actual files= %v", expectedFilesWindows, files)
 		}
 	}
+	afterTestFilePathFinderDestroyFileStructure(t)
 }
 
 func TestFilePathFinder_ReturnFilesOnlySubdirectory(t *testing.T) {
+	beforeTestFilePathFinderCreateFileStructure(t)
 	files, err := filePathWalkDir("test/test1")
 	if err != nil {
 		t.Error("Shouldn't error")
@@ -79,7 +108,7 @@ func TestFilePathFinder_ReturnFilesOnlySubdirectory(t *testing.T) {
 			t.Errorf("File %s should be in found files. But actual files are %v", expectedFilesWindows[i], actualFilesMap)
 		}
 	}
-
+	afterTestFilePathFinderDestroyFileStructure(t)
 }
 
 func TestFilePathFinder_NotFound(t *testing.T) {

@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -10,8 +9,6 @@ func TestParseFile_ReturnCorrectFileInformation(t *testing.T) {
 	if err != nil {
 		t.Error()
 	}
-
-	fmt.Println(xmlResult)
 
 	if xmlResult.ID != "cordova-plugin-hms-push" && xmlResult.Author != "" &&
 		xmlResult.License != "Apache 2.0" && xmlResult.Description != "Cordova Plugin HMS Push" &&
