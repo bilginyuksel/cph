@@ -4,17 +4,12 @@ import (
 	//"github.com/bilginyuksel/cordova-plugin-helper/writer"
 	"os"
 	"path/filepath"
-
-	parser "github.com/bilginyuksel/cordova-plugin-helper/parser"
+	// "github.com/bilginyuksel/cordova-plugin-helper/parser"
 )
 
 func main() {
-	plg, _ := parser.ParseXML("parser/plugin.xml")
-	parser.CreateXML(plg, "plg.xml")
-}
-
-func hello() string {
-	return "Hello, World"
+	// plg, _ := parser.ParseXML("parser/plugin.xml")
+	// parser.CreateXML(plg, "plg.xml")
 }
 
 func filePathWalkDir(root string) ([]string, error) {

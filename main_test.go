@@ -7,16 +7,6 @@ import (
 	"testing"
 )
 
-func TestHello(t *testing.T) {
-	resultFromHello := hello()
-
-	if resultFromHello != "Hello, World" {
-		t.Errorf("Expected result is 'Hello, World' but %s is given", resultFromHello)
-	} else {
-		t.Logf("Success.")
-	}
-}
-
 func beforeTestFilePathFinderCreateFileStructure(t *testing.T) {
 	os.Mkdir("test", 0755)
 	os.Mkdir("test/test1", 0755)

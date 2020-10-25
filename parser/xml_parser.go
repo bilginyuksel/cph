@@ -30,6 +30,10 @@ func ParseXML(filename string) (*Plugin, error) {
 // CreateXML ...
 func CreateXML(plugin *Plugin, filename string) error {
 
+	if !checkIsAnXMLFile(filename) {
+		filename += ".xml"
+	}
+
 	file, _ := xml.MarshalIndent(plugin, "", "\t")
 	file = []byte(xml.Header + string(file))
 	error := ioutil.WriteFile(filename, file, 0644)
@@ -38,6 +42,7 @@ func CreateXML(plugin *Plugin, filename string) error {
 
 // Plugin ...
 type Plugin struct {
+	XMLName      xml.Name   `xml:"plugin"`
 	ID           string     `xml:"id,attr"`
 	Version      string     `xml:"version,attr"`
 	Xmlns        string     `xml:"xmlns,attr"`
