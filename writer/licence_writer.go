@@ -25,7 +25,7 @@ const LICENCE = `/*
 `
 
 func CheckIfFileContainsLicenceAlready(fileName string) (bool, error) {
-	file, err := os.OpenFile(fileName, os.O_RDONLY, 0644)
+	file, err := os.Open(fileName)
 	if err != nil {
 		return false, err
 	}
@@ -34,9 +34,9 @@ func CheckIfFileContainsLicenceAlready(fileName string) (bool, error) {
 	for scanner.Scan() {
 		fileContent += scanner.Text() + "\n"
 	}
-	err2 := file.Close()
-	if err2 != nil {
-		return false, err2
+	err = file.Close()
+	if err != nil {
+		return false, err
 	}
 	return strings.Contains(fileContent, LICENCE), err
 }
@@ -66,6 +66,15 @@ func WriteToFileLicence(fileName string) (bool, error) {
 		return false, err
 	}
 
+	// open the file to be appended to for read
+	f, err := os.Open(fileName)
+
+	if err != nil {
+		return false, err
+	}
+
+	defer f.Close()
+
 	// make a temporary outfile
 	outfile, err := os.Create("temp.java")
 
@@ -75,14 +84,6 @@ func WriteToFileLicence(fileName string) (bool, error) {
 
 	defer outfile.Close()
 
-	// open the file to be appended to for read
-	f, err := os.Open(fileName)
-
-	if err != nil {
-		return false, err
-	}
-
-	defer f.Close()
 
 	// append at the start
 	_, err = outfile.WriteString(LICENCE)
