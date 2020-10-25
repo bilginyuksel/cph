@@ -61,7 +61,7 @@ func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
 		file.WriteString("This is a test file.\n")
 	}
 	_ = file.Close()
-	_, _ = WriteToFileLicence(file.Name())
+	_, _ = WriteLicenceToFile(file.Name())
 	b, err := ioutil.ReadFile(file.Name())
 	if err != nil {
 		panic(err)
@@ -74,7 +74,7 @@ func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
 }
 
 func TestWriteToFileLicence_LicenceIsNotWrittenProperly(t *testing.T) {
-	ok, _ := WriteToFileLicence("test.java")
+	ok, _ := WriteLicenceToFile("test.java")
 	if ok{
 		t.Error()
 	}
