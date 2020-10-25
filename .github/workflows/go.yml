@@ -37,3 +37,12 @@ jobs:
     
     - name: TestCoverage
       run: go test -v ./... -coverprofile cover.out | go tool cover -html='cover.out' -o 'cover.html'
+    
+    - name: ExamineFiles
+      run: ls
+      
+    - name: UploadTestCoverage
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-coverage
+        path: ./cover.html
