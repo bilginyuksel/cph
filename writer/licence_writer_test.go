@@ -1,12 +1,14 @@
 package writer
 
 import (
+	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 )
 
-func TestCheckIfLicenceExists_LicenceExists(t *testing.T) {
-	ok, err := CheckIfLicenceExists("test.java")
+func TestCheckIfFileContainsLicenceAlready_LicenceExists(t *testing.T) {
+	ok, err := CheckIfFileContainsLicenceAlready("test.java")
 	if err != nil {
 		t.Error()
 	}
@@ -15,8 +17,8 @@ func TestCheckIfLicenceExists_LicenceExists(t *testing.T) {
 	}
 }
 
-func TestCheckIfLicenceExists_LicenceNotFound(t *testing.T) {
-	ok, err := CheckIfLicenceExists("test1.java")
+func TestCheckIfFileContainsLicenceAlready_LicenceNotFound(t *testing.T) {
+	ok, err := CheckIfFileContainsLicenceAlready("test1.java")
 	if err != nil {
 		t.Error()
 	}
@@ -25,17 +27,37 @@ func TestCheckIfLicenceExists_LicenceNotFound(t *testing.T) {
 	}
 }
 
-func TestCheckIfLicenceExists_FileNotFound(t *testing.T) {
-	_, err := CheckIfLicenceExists("notFound.java")
+func TestCheckIfFileContainsLicenceAlready_FileNotFound(t *testing.T) {
+	_, err := CheckIfFileContainsLicenceAlready("notFound.java")
 	if err == nil {
 		t.Error()
 	}
 }
 
-func TestCheckIfLicenceExists_LicenceExistWithWrongFormat(t *testing.T) {
-	file, err := os.OpenFile("HmsPushMessaging.java",os.O_RDONLY,0644)
+func TestCheckIfFileContainsLicenceAlready_LicenceExistWithWrongFormat(t *testing.T) {
+	file, err := os.OpenFile("HmsPushMessaging.java", os.O_RDONLY, 0644)
 	if err != nil {
 		t.Error()
 	}
+	_ = file.Close()
 	CheckIfLicenceFormatIsValid(file)
+}
+
+func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
+	_, _ = WriteToFileLicence("HmsPushMessaging.java")
+	b, err := ioutil.ReadFile("HmsPushMessaging.java")
+	if err != nil {
+		panic(err)
+	}
+	s := string(b)
+	if !strings.Contains(s, LICENCE) {
+		t.Error()
+	}
+}
+
+func TestWriteToFileLicence_LicenceIsNotWrittenProperly(t *testing.T) {
+	ok, _ := WriteToFileLicence("test.java")
+	if ok{
+		t.Error()
+	}
 }

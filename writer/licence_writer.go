@@ -24,7 +24,7 @@ const LICENCE = `/*
 */
 `
 
-func CheckIfLicenceExists(fileName string) (bool, error) {
+func CheckIfFileContainsLicenceAlready(fileName string) (bool, error) {
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0644)
 	if err != nil {
 		return false, err
@@ -33,6 +33,10 @@ func CheckIfLicenceExists(fileName string) (bool, error) {
 	fileContent := ""
 	for scanner.Scan() {
 		fileContent += scanner.Text() + "\n"
+	}
+	err2 := file.Close()
+	if err2 != nil {
+		return false, err2
 	}
 	return strings.Contains(fileContent, LICENCE), err
 }
@@ -53,4 +57,69 @@ func CheckIfLicenceFormatIsValid(file *os.File) bool {
 		fmt.Println(tempLicence)
 	}
 	return true
+}
+
+func WriteToFileLicence(fileName string) (bool, error) {
+	ok, err := CheckIfFileContainsLicenceAlready(fileName)
+
+	if ok {
+		return false, err
+	}
+
+	// make a temporary outfile
+	outfile, err := os.Create("temp.java")
+
+	if err != nil {
+		return false, err
+	}
+
+	defer outfile.Close()
+
+	// open the file to be appended to for read
+	f, err := os.Open(fileName)
+
+	if err != nil {
+		return false, err
+	}
+
+	defer f.Close()
+
+	// append at the start
+	_, err = outfile.WriteString(LICENCE)
+	if err != nil {
+		return false, err
+	}
+
+	scanner := bufio.NewScanner(f)
+
+	// read the file to be appended to and output all of it
+	for scanner.Scan() {
+		_, err = outfile.WriteString(scanner.Text())
+		_, err = outfile.WriteString("\n")
+	}
+
+	if err := scanner.Err(); err != nil {
+		return false, err
+	}
+	// ensure all lines are written
+	outfile.Sync()
+	//close the file to rename it, otherwise error will be thrown
+	err = outfile.Close()
+	if err != nil {
+		return false, err
+	}
+	err = f.Close()
+	if err != nil {
+		return false, err
+	}
+	// overwrite the old file with the new one
+	err = os.Remove(fileName)
+	if err != nil {
+		return false, err
+	}
+	err = os.Rename(outfile.Name(), fileName)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
