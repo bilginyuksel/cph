@@ -1,6 +1,9 @@
 package writer
 
 import (
+	"fmt"
+	"github.com/bilginyuksel/cordova-plugin-helper/parser"
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -76,4 +79,56 @@ func TestWriteToFileLicence_LicenceIsNotWrittenProperly(t *testing.T) {
 	if ok {
 		t.Error()
 	}
+}
+
+func TestReadSourceFiles_AllJavaFilesAdded(t *testing.T) {
+	file, err := os.Create("test1.java")
+	plg, _ := parser.ParseXML("../parser/plugin.xml")
+	parser.CreateXML(plg, "plg.xml")
+	_, err = os.Stat("test1.java")
+	if err != nil {
+		if os.IsNotExist(err) {
+			t.Error()
+		}
+	}
+	file.Close()
+	os.Remove(file.Name())
+}
+
+func TestReadJsModules_AllJsFilesAdded(t *testing.T) {
+	file1, err := os.Create("test1.js")
+	file2, err := os.Create("test2.js")
+	file3, err := os.Create("test3.js")
+	plg, _ := parser.ParseXML("../parser/plugin.xml")
+	parser.CreateXML(plg, "plg.xml")
+	for i := 1; i <= 3; i++ {
+		_, err = os.Stat(fmt.Sprintf("test%d.js", i))
+		if err != nil {
+			if os.IsNotExist(err) {
+				t.Error()
+			}
+		}
+	}
+	file1.Close()
+	file2.Close()
+	file3.Close()
+	os.Remove(file1.Name())
+	os.Remove(file2.Name())
+	os.Remove(file3.Name())
+}
+
+func TestReadJsModules_PluginXmlDoesntContainNonExistFile(t *testing.T) {
+	file1, _ := os.Create("test1.js")
+	plg, _ := parser.ParseXML("../parser/plugin.xml")
+	parser.CreateXML(plg, "plg.xml")
+	file1.Close()
+	os.Remove(file1.Name())
+	resultPlugin, _ := parser.ParseXML("plg.xml")
+	parser.CreateXML(resultPlugin, "plg.xml")
+	b, _ := ioutil.ReadFile("plg.xml")
+	content  := string(b)
+	if strings.Contains(content,"test1.js") {
+		t.Error()
+	}
+	os.Remove("plg.xml")
 }
