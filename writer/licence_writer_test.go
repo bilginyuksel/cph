@@ -82,33 +82,33 @@ func TestWriteToFileLicence_LicenceIsNotWrittenProperly(t *testing.T) {
 }
 
 func TestReadSourceFiles_AllJavaFilesAdded(t *testing.T) {
-	os.Mkdir("../src", 0755)
-	os.Mkdir("../www", 0755)
-	file, err := os.Create("../src/test1.java")
-	plg, _ := parser.ParseXML("../parser/plugin.xml")
+	os.Mkdir("src", 0755)
+	os.Mkdir("www", 0755)
+	file, err := os.Create("src/test1.java")
+	plg, _ := parser.ParseXML("plugin.xml")
 	parser.CreateXML(plg, "plg.xml")
-	_, err = os.Stat("../src/test1.java")
+	_, err = os.Stat("src/test1.java")
 	if err != nil {
 		if os.IsNotExist(err) {
 			t.Error()
 		}
 	}
 	file.Close()
-	os.Remove("../src")
-	os.Remove("../www")
 	os.Remove(file.Name())
+	os.RemoveAll("src")
+	os.RemoveAll("www")
 }
 
 func TestReadJsModules_AllJsFilesAdded(t *testing.T) {
-	os.Mkdir("../src", 0755)
-	os.Mkdir("../www", 0755)
-	file1, err := os.Create("../www/test1.js")
-	file2, err := os.Create("../www/test2.js")
-	file3, err := os.Create("../www/test3.js")
-	plg, _ := parser.ParseXML("../parser/plugin.xml")
+	os.Mkdir("src", 0755)
+	os.Mkdir("www", 0755)
+	file1, err := os.Create("www/test1.js")
+	file2, err := os.Create("www/test2.js")
+	file3, err := os.Create("www/test3.js")
+	plg, _ := parser.ParseXML("plugin.xml")
 	parser.CreateXML(plg, "plg.xml")
 	for i := 1; i <= 3; i++ {
-		_, err = os.Stat(fmt.Sprintf("../www/test%d.js", i))
+		_, err = os.Stat(fmt.Sprintf("www/test%d.js", i))
 		if err != nil {
 			if os.IsNotExist(err) {
 				t.Error()
@@ -121,15 +121,15 @@ func TestReadJsModules_AllJsFilesAdded(t *testing.T) {
 	os.Remove(file1.Name())
 	os.Remove(file2.Name())
 	os.Remove(file3.Name())
-	os.Remove("../src")
-	os.Remove("../www")
+	os.RemoveAll("src")
+	os.RemoveAll("www")
 }
 
 func TestReadJsModules_PluginXmlDoesntContainNonExistFile(t *testing.T) {
-	os.Mkdir("../src", 0755)
-	os.Mkdir("../www", 0755)
-	file1, _ := os.Create("../www/test1.js")
-	plg, _ := parser.ParseXML("../parser/plugin.xml")
+	os.Mkdir("src", 0755)
+	os.Mkdir("www", 0755)
+	file1, _ := os.Create("www/test1.js")
+	plg, _ := parser.ParseXML("plugin.xml")
 	parser.CreateXML(plg, "plg.xml")
 	file1.Close()
 	os.Remove(file1.Name())
@@ -137,10 +137,10 @@ func TestReadJsModules_PluginXmlDoesntContainNonExistFile(t *testing.T) {
 	parser.CreateXML(resultPlugin, "plg.xml")
 	b, _ := ioutil.ReadFile("plg.xml")
 	content  := string(b)
-	if strings.Contains(content,"../www/test1.js") {
+	if strings.Contains(content,"www/test1.js") {
 		t.Error()
 	}
 	os.Remove("plg.xml")
-	os.Remove("../src")
-	os.Remove("../www")
+	os.RemoveAll("src")
+	os.RemoveAll("www")
 }
