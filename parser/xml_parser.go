@@ -4,9 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"io/ioutil"
-	"log"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -35,64 +33,15 @@ func CreateXML(plugin *Plugin, filename string) error {
 	if !checkIsAnXMLFile(filename) {
 		filename += ".xml"
 	}
-	plugin.Platform.SourceFiles = readSourceFiles("src")
-	plugin.JsModule = readJsModules("www")
 	file, _ := xml.MarshalIndent(plugin, "", "\t")
 	file = []byte(xml.Header + string(file))
 	error := ioutil.WriteFile(filename, file, 0644)
 	return error
 }
 
-func readJsModules(root string) []JSModule {
-	var jsModules []JSModule
-	err := filepath.Walk(root,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() {
-				_, name := filepath.Split(path)
-				ext := filepath.Ext(path)
-				if ext == ".js" {
-					jsModule := JSModule{
-						Name: strings.TrimSuffix(name, filepath.Ext(path)),
-						Src:  path,
-					}
-					if name[0] > 'A' && name[0] < 'Z' {
-						jsModule.Clobbers = &Clobbers{Target: name}
-					}else {
-					}
-					jsModules = append(jsModules, jsModule)
-				}
-			}
-			return nil
-		})
-	if err != nil {
-		log.Println(err)
-	}
-	return jsModules
-}
-
-func readSourceFiles(root string) []SourceFile {
-	var sourceFiles []SourceFile
-	err := filepath.Walk(root,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() {
-				dir, _ := filepath.Split(path)
-				sourceFiles = append(sourceFiles, SourceFile{
-					Src:       path,
-					TargetDir: dir,
-				})
-			}
-			return nil
-		})
-	if err != nil {
-		log.Println(err)
-	}
-	return sourceFiles
+// NewSourceFile ...
+func (platform *Platform) NewSourceFile(src string, target string) SourceFile {
+	return SourceFile{Src: src, TargetDir: target}
 }
 
 // Plugin ...
@@ -109,7 +58,7 @@ type Plugin struct {
 	Author       string     `xml:"author,omitempty"`
 	Engines      *Engines   `xml:"engines,omitempty"`
 	JsModule     []JSModule `xml:"js-module"`
-	Platform     Platform   `xml:"platform"`
+	Platform     *Platform  `xml:"platform"`
 }
 
 // Engines ...
@@ -224,8 +173,8 @@ type SourceFile struct {
 
 // JSModule ...
 type JSModule struct {
-	Name     string   `xml:"name,attr"`
-	Src      string   `xml:"src,attr"`
+	Name     string    `xml:"name,attr"`
+	Src      string    `xml:"src,attr"`
 	Clobbers *Clobbers `xml:"clobbers,omitempty"`
 }
 

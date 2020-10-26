@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	 //plg, _ := parser.ParseXML("parser/plugin.xml")
-	 //parser.CreateXML(plg, "plg.xml")
+	//plg, _ := parser.ParseXML("parser/plugin.xml")
+	//parser.CreateXML(plg, "plg.xml")
 	//ctx := kong.Parse(&cli)
 	// Call the Run() method of the selected parsed command.
 	//err := ctx.Run(&Context{Debug: cli.Debug})
