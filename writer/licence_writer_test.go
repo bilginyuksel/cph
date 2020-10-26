@@ -1,7 +1,6 @@
 package writer
 
 import (
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -9,9 +8,9 @@ import (
 
 func TestCheckIfFileContainsLicenceAlready_LicenceExists(t *testing.T) {
 	file, err := os.Create("test.java")
-	_,err = file.WriteString(LICENCE)
+	_, err = file.WriteString(ReadFile("licence.java"))
 	_ = file.Close()
-	ok, err := CheckIfFileContainsLicenceAlready("test.java")
+	ok, err := CheckIfFileContainsLicenceAlready("test.java", "licence.java")
 	if err != nil {
 		t.Error()
 	}
@@ -24,7 +23,7 @@ func TestCheckIfFileContainsLicenceAlready_LicenceExists(t *testing.T) {
 func TestCheckIfFileContainsLicenceAlready_LicenceNotFound(t *testing.T) {
 	file, err := os.Create("test1.java")
 	_ = file.Close()
-	ok, err := CheckIfFileContainsLicenceAlready("test1.java")
+	ok, err := CheckIfFileContainsLicenceAlready("test1.java", "licence.java")
 	if err != nil {
 		t.Error()
 	}
@@ -35,15 +34,15 @@ func TestCheckIfFileContainsLicenceAlready_LicenceNotFound(t *testing.T) {
 }
 
 func TestCheckIfFileContainsLicenceAlready_FileNotFound(t *testing.T) {
-	_, err := CheckIfFileContainsLicenceAlready("notFound.java")
+	_, err := CheckIfFileContainsLicenceAlready("notFound.java", "licence.java")
 	if err == nil {
 		t.Error()
 	}
 }
 
 func TestCheckIfFileContainsLicenceAlready_LicenceExistWithWrongFormat(t *testing.T) {
-	file, err := os.Create("licence.java")
-	_, _ = file.WriteString(LICENCE)
+	file, err := os.Create("test.java")
+	_, _ = file.WriteString(ReadFile("licence.java"))
 	_, _ = file.WriteString("test string")
 	_ = file.Close()
 	file, err = os.OpenFile("licence.java", os.O_RDONLY, 0644)
@@ -52,30 +51,29 @@ func TestCheckIfFileContainsLicenceAlready_LicenceExistWithWrongFormat(t *testin
 	}
 	_ = file.Close()
 	CheckIfLicenceFormatIsValid(file)
-	os.Remove(file.Name())
+	os.Remove("test.java")
 }
 
 func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
-	file, err := os.Create("javaFileWithoutLicence.java")
-	for i := 1; i<100; i++{
+	file, err := os.Create("test.java")
+	for i := 1; i < 100; i++ {
 		file.WriteString("This is a test file.\n")
 	}
 	_ = file.Close()
-	_, _ = WriteLicenceToFile(file.Name())
-	b, err := ioutil.ReadFile(file.Name())
+	_, _ = WriteLicenceToFile(file.Name(), "licence.java")
 	if err != nil {
 		panic(err)
 	}
-	s := string(b)
-	if !strings.Contains(s, LICENCE) {
+	s := ReadFile(file.Name())
+	if !strings.Contains(s, ReadFile("licence.java")) {
 		t.Error()
 	}
 	os.Remove(file.Name())
 }
 
 func TestWriteToFileLicence_LicenceIsNotWrittenProperly(t *testing.T) {
-	ok, _ := WriteLicenceToFile("test.java")
-	if ok{
+	ok, _ := WriteLicenceToFile("test.java", "licence.java")
+	if ok {
 		t.Error()
 	}
 }
