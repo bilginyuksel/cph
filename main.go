@@ -5,18 +5,15 @@ import (
 
 	"os"
 	"path/filepath"
-
-	// "github.com/bilginyuksel/cordova-plugin-helper/parser"
-	"github.com/alecthomas/kong"
 )
 
 func main() {
-	// plg, _ := parser.ParseXML("parser/plugin.xml")
-	// parser.CreateXML(plg, "plg.xml")
-	ctx := kong.Parse(&cli)
+	 //plg, _ := parser.ParseXML("parser/plugin.xml")
+	 //parser.CreateXML(plg, "plg.xml")
+	//ctx := kong.Parse(&cli)
 	// Call the Run() method of the selected parsed command.
-	err := ctx.Run(&Context{Debug: cli.Debug})
-	ctx.FatalIfErrorf(err)
+	//err := ctx.Run(&Context{Debug: cli.Debug})
+	//ctx.FatalIfErrorf(err)
 }
 
 func filePathWalkDir(root string) ([]string, error) {
