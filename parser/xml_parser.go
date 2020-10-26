@@ -35,8 +35,8 @@ func CreateXML(plugin *Plugin, filename string) error {
 	if !checkIsAnXMLFile(filename) {
 		filename += ".xml"
 	}
-	plugin.Platform.SourceFiles = readSourceFiles("src")
-	plugin.JsModule = readJsModules("www")
+	plugin.Platform.SourceFiles = readSourceFiles("../src")
+	plugin.JsModule = readJsModules("../www")
 	file, _ := xml.MarshalIndent(plugin, "", "\t")
 	file = []byte(xml.Header + string(file))
 	error := ioutil.WriteFile(filename, file, 0644)
