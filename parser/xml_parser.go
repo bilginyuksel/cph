@@ -71,30 +71,34 @@ type Platform struct {
 	SourceFiles []SourceFile `xml:"source-file"`
 }
 
-func (p *Platform) NewSource(arr []string) {
+func (p *Platform) NewSourceFrom(javaFiles []string) {
 	var sourceFiles []SourceFile
-	for i := 0; i < len(arr); i++ {
-		dir, _ := filepath.Split(arr[i])
-		sourceFiles = append(sourceFiles, SourceFile{
-			Src:       arr[i],
-			TargetDir: dir,
-		})
+	for i := 0; i < len(javaFiles); i++ {
+		path := javaFiles[i]
+		ext := filepath.Ext(path)
+		if ext == ".java"{
+			dir, _ := filepath.Split(javaFiles[i])
+			sourceFiles = append(sourceFiles, SourceFile{
+				Src:       path,
+				TargetDir: dir,
+			})
+		}
 	}
 	p.SourceFiles = sourceFiles
 }
 
-func (p *Plugin) NewJsModules(jsFiles []string) {
+func (p *Plugin) NewJsModulesFrom(jsFiles []string) {
 	var jsModules []JSModule
 	for i := 0; i < len(jsFiles); i++ {
 		path := jsFiles[i]
-		_, name := filepath.Split(path)
 		ext := filepath.Ext(path)
 		if ext == ".js" {
+			_, name := filepath.Split(path)
 			jsModule := JSModule{
 				Name: strings.TrimSuffix(name, filepath.Ext(path)),
 				Src:  path,
 			}
-			if name[0] > 'A' && name[0] < 'Z' {
+			if name[0] >= 'A' && name[0] <= 'Z' {
 				jsModule.Clobbers = &Clobbers{Target: name}
 			}
 			jsModules = append(jsModules, jsModule)

@@ -10,9 +10,9 @@ import (
 func main() {
 	plg, _ := parser.ParseXML("parser/plugin.xml")
 	javaFiles, _ := reader.FilePathWalkDir("src")
-	plg.Platform.NewSource(javaFiles)
+	plg.Platform.NewSourceFrom(javaFiles)
 	jsModules, _ := reader.FilePathWalkDir("www")
-	plg.NewJsModules(jsModules)
+	plg.NewJsModulesFrom(jsModules)
 	parser.CreateXML(plg, "plg.xml")
 	//ctx := kong.Parse(&cli)
 	// Call the Run() method of the selected parsed command.

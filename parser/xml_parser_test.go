@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -267,10 +269,43 @@ func TestCreateXMLFilenameNotXML_CreateFileWithXMLExtension(t *testing.T) {
 	afterTestParseFileRemovePluginXML("test.xml")
 }
 
-func TestNewSourceFileAddExistsSourceFile_AddSourceFile(t *testing.T) {
+func TestNewSourceFrom_AddSourceFile(t *testing.T) {
 	plg := Plugin{Platform: &Platform{}}
-	sfile := plg.Platform.NewSourceFile("test/test1.lol", "test")
-	if sfile.Src != "test/test1.lol" || sfile.TargetDir != "test" {
+	var javaFiles []string
+	for i:=1; i<30; i++ {
+		file := fmt.Sprintf("src/test%d.java",i)
+		javaFiles = append(javaFiles, file)
+	}
+	plg.Platform.NewSourceFrom(javaFiles)
+	if len(javaFiles) != len(plg.Platform.SourceFiles) {
 		t.Error()
+	}
+	for i := 0; i < len(javaFiles); i++ {
+		dir, _ := filepath.Split(javaFiles[i])
+		isSourceFileEqual := javaFiles[i] == plg.Platform.SourceFiles[i].Src && dir == plg.Platform.SourceFiles[i].TargetDir
+		if !isSourceFileEqual {
+			t.Error()
+		}
+	}
+}
+
+func TestNewJsModulesFrom_AddJsFile(t *testing.T) {
+	plg := Plugin{Platform: &Platform{}}
+	var jsFiles []string
+	for i:=1; i<30; i++ {
+		file := fmt.Sprintf("www/test%d.js",i)
+		jsFiles = append(jsFiles, file)
+	}
+	plg.NewJsModulesFrom(jsFiles)
+	if len(jsFiles) != len(plg.JsModule) {
+		t.Error()
+	}
+	for i := 0; i < len(jsFiles); i++ {
+		_, name := filepath.Split(jsFiles[i])
+		name = strings.TrimSuffix(name, filepath.Ext(jsFiles[i]))
+		isJsFileEqual := jsFiles[i] == plg.JsModule[i].Src && name == plg.JsModule[i].Name
+		if !isJsFileEqual {
+			t.Error()
+		}
 	}
 }
