@@ -184,10 +184,9 @@ func beforeTestParseFileCreateSampleCordovaPluginXMLFile(filename string, t *tes
 func TestCheckIfFileContainsLicenceAlready_LicenceExists(t *testing.T) {
 	file := createFile("test.java")
 	file, _ = os.OpenFile(file.Name(), os.O_RDWR, 0644)
-	_, err := file.WriteString(ReadFile("licence.java"))
-
+	_, err := file.WriteString(ReadFile("licence"))
 	_ = file.Close()
-	ok, err := CheckIfFileContainsLicenceAlready("test.java", "licence.java")
+	ok, err := CheckIfFileContainsLicenceAlready("test.java", "licence")
 	if err != nil {
 		t.Error()
 	}
@@ -199,7 +198,7 @@ func TestCheckIfFileContainsLicenceAlready_LicenceExists(t *testing.T) {
 
 func TestCheckIfFileContainsLicenceAlready_LicenceNotFound(t *testing.T) {
 	file := createFile("test1.java")
-	ok, err := CheckIfFileContainsLicenceAlready("test1.java", "licence.java")
+	ok, err := CheckIfFileContainsLicenceAlready("test1.java", "licence")
 	if err != nil {
 		t.Error()
 	}
@@ -210,7 +209,7 @@ func TestCheckIfFileContainsLicenceAlready_LicenceNotFound(t *testing.T) {
 }
 
 func TestCheckIfFileContainsLicenceAlready_FileNotFound(t *testing.T) {
-	_, err := CheckIfFileContainsLicenceAlready("notFound.java", "licence.java")
+	_, err := CheckIfFileContainsLicenceAlready("notFound.java", "licence")
 	if err == nil {
 		t.Error()
 	}
@@ -218,9 +217,9 @@ func TestCheckIfFileContainsLicenceAlready_FileNotFound(t *testing.T) {
 
 func TestCheckIfFileContainsLicenceAlready_LicenceExistWithWrongFormat(t *testing.T) {
 	file := createFile("test.java")
-	_, _ = file.WriteString(ReadFile("licence.java"))
+	_, _ = file.WriteString(ReadFile("licence"))
 	_, _ = file.WriteString("test string")
-	file, err := os.OpenFile("licence.java", os.O_RDONLY, 0644)
+	file, err := os.OpenFile("licence", os.O_RDONLY, 0644)
 	if err != nil {
 		t.Error()
 	}
@@ -234,16 +233,16 @@ func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
 	for i := 1; i < 100; i++ {
 		_, _ = file.WriteString("This is a test file.\n")
 	}
-	_, _ = WriteLicenceToFile(file.Name(), "licence.java")
+	_, _ = WriteLicenceToFile(file.Name(), "licence")
 	s := ReadFile(file.Name())
-	if !strings.Contains(s, ReadFile("licence.java")) {
+	if !strings.Contains(s, ReadFile("licence")) {
 		t.Error()
 	}
 	os.Remove(file.Name())
 }
 
 func TestWriteToFileLicence_LicenceIsNotWrittenProperly(t *testing.T) {
-	ok, _ := WriteLicenceToFile("test.java", "licence.java")
+	ok, _ := WriteLicenceToFile("test.java", "licence")
 	if ok {
 		t.Error()
 	}
@@ -252,6 +251,8 @@ func TestWriteToFileLicence_LicenceIsNotWrittenProperly(t *testing.T) {
 func TestReadSourceFiles_AllJavaFilesAdded(t *testing.T) {
 	createFolder("src")
 	_ = createFile("src/test1.java")
+	_ = createFile("src/test2.java")
+	_ = createFile("src/test3.java")
 	beforeTestParseFileCreateSampleCordovaPluginXMLFile("plugin.xml", t)
 	plg, _ := parser.ParseXML("plugin.xml")
 	javaFiles, _ := reader.FilePathWalkDir("src")
@@ -259,8 +260,11 @@ func TestReadSourceFiles_AllJavaFilesAdded(t *testing.T) {
 	_ = parser.CreateXML(plg, "plg.xml")
 	newPlugin, _ := parser.ParseXML("plg.xml")
 	newSourceFile := newPlugin.Platform.SourceFiles
-	if newSourceFile[0].Src != "src\\test1.java" {
-		t.Error()
+	for i := 1; i <= 3; i++ {
+		file := fmt.Sprintf("src\\test%d.java", i)
+		if newSourceFile[i-1].Src != file {
+			t.Error()
+		}
 	}
 	os.Remove("plugin.xml")
 	os.Remove("plg.xml")
