@@ -20,6 +20,42 @@ func prepareCliParser() {
 	ctx.FatalIfErrorf(err)
 }
 
+// SyncPluginXML ...
+func SyncPluginXML(path string) error {
+	if path == "" {
+		path = "."
+	}
+
+	plugin, err := parser.ParseXML(fmt.Sprintf("%s/plugin.xml", path))
+	if err != nil {
+		return err
+	}
+	sourceFiles, _ := reader.FilePathWalkDir("src")
+	plugin.Platform.NewSourceFrom(sourceFiles)
+	jsModules, _ := reader.FilePathWalkDir("www")
+	plugin.NewJsModulesFrom(jsModules)
+
+	err = parser.CreateXML(plugin, "plugin.xml")
+	return err
+}
+
+// AddLicenceTo ...
+func AddLicenceTo(path string, extension string) error {
+
+	return nil
+}
+
+// Run ...
+func (pl *PluginXMLCmd) Run(ctx *Context) error {
+	return SyncPluginXML(pl.Path)
+}
+
+// Run ...
+func (l *AddLicenseCmd) Run(ctx *Context) error {
+	fmt.Println(l)
+	return AddLicenceTo(l.Paths[0], l.FileExtensions[0])
+}
+
 // Context ...
 type Context struct {
 	Debug bool
@@ -36,30 +72,6 @@ type AddLicenseCmd struct {
 	FileExtensions []string `name:"extension" help:"Instead of giving every files path, just give file extensions here."`
 	License        string   `help:"License file path to use."`
 }
-
-// Run ...
-func (pl *PluginXMLCmd) Run(ctx *Context) error {
-	if pl.Path == "" {
-		pl.Path = "."
-	}
-	files, _ := reader.FilePathWalkDir(pl.Path)
-	fmt.Println(files)
-	plg, _ := parser.ParseXML(fmt.Sprintf("%s/plugin.xml", pl.Path))
-	fmt.Println(plg)
-	// javaFiles, _ := reader.FilePathWalkDir("src")
-	// plg.Platform.NewSourceFrom(javaFiles)
-	// jsModules, _ := reader.FilePathWalkDir("www")
-	// plg.NewJsModulesFrom(jsModules)
-	// parser.CreateXML(plg, "plugin.xml")
-	// fmt.Println(pl)
-	return nil
-}
-
-// Run ...
-// func (l *AddLicenseCmd) Run(ctx *Context) error {
-// 	fmt.Println("ls", l.Paths)
-// 	return nil
-// }
 
 var cli struct {
 	Debug bool `help:"Enable debug mode."`
