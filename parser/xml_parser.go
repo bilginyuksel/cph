@@ -54,7 +54,7 @@ type Plugin struct {
 	Author       string     `xml:"author,omitempty"`
 	Engines      *Engines   `xml:"engines,omitempty"`
 	JsModule     []JSModule `xml:"js-module"`
-	Platform     Platform   `xml:"platform"`
+	Platform     *Platform  `xml:"platform"`
 }
 
 // Engines ...

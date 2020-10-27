@@ -101,11 +101,10 @@ func WriteLicenceToFile(fileName string, licenceFile string) (bool, error) {
 	return true, nil
 }
 
+// ReadFile ...
 func ReadFile(fileName string) string {
 	file, err := os.Open(fileName)
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 	scanner := bufio.NewScanner(file)
 	content := ""
 	for scanner.Scan() {
@@ -113,4 +112,10 @@ func ReadFile(fileName string) string {
 	}
 	file.Close()
 	return content
+}
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

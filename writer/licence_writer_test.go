@@ -183,8 +183,9 @@ func beforeTestParseFileCreateSampleCordovaPluginXMLFile(filename string, t *tes
 
 func TestCheckIfFileContainsLicenceAlready_LicenceExists(t *testing.T) {
 	file := createFile("test.java")
-	file, _ = os.OpenFile(file.Name(),os.O_RDWR,0644)
+	file, _ = os.OpenFile(file.Name(), os.O_RDWR, 0644)
 	_, err := file.WriteString(ReadFile("licence.java"))
+
 	_ = file.Close()
 	ok, err := CheckIfFileContainsLicenceAlready("test.java", "licence.java")
 	if err != nil {
@@ -256,7 +257,7 @@ func TestReadSourceFiles_AllJavaFilesAdded(t *testing.T) {
 	javaFiles, _ := reader.FilePathWalkDir("src")
 	plg.Platform.NewSource(javaFiles)
 	_ = parser.CreateXML(plg, "plg.xml")
-	newPlugin,_ := parser.ParseXML("plg.xml")
+	newPlugin, _ := parser.ParseXML("plg.xml")
 	newSourceFile := newPlugin.Platform.SourceFiles
 	if newSourceFile[0].Src != "src\\test1.java" {
 		t.Error()
@@ -277,10 +278,10 @@ func TestReadJsModules_AllJsFilesAdded(t *testing.T) {
 	jsFiles, _ := reader.FilePathWalkDir("www")
 	plg.NewJsModules(jsFiles)
 	_ = parser.CreateXML(plg, "plg.xml")
-	newPlugin,_ := parser.ParseXML("plg.xml")
+	newPlugin, _ := parser.ParseXML("plg.xml")
 	newJsModules := newPlugin.JsModule
 	for i := 1; i <= 3; i++ {
-		file := fmt.Sprintf("www\\test%d.js",i)
+		file := fmt.Sprintf("www\\test%d.js", i)
 		if newJsModules[i-1].Src != file {
 			t.Error()
 		}
@@ -305,8 +306,8 @@ func TestReadJsModules_PluginXmlDoesntContainNonExistFile(t *testing.T) {
 	resultPlugin.NewJsModules(jsFiles)
 	_ = parser.CreateXML(resultPlugin, "plg.xml")
 	b, _ := ioutil.ReadFile("plg.xml")
-	content  := string(b)
-	if strings.Contains(content,"www/test1.js") {
+	content := string(b)
+	if strings.Contains(content, "www/test1.js") {
 		t.Error()
 	}
 	os.Remove("plugin.xml")
@@ -314,7 +315,7 @@ func TestReadJsModules_PluginXmlDoesntContainNonExistFile(t *testing.T) {
 	os.RemoveAll("www")
 }
 
-func createFolder(fileName string)  {
+func createFolder(fileName string) {
 	err := os.Mkdir(fileName, 0755)
 	if err != nil {
 		panic(err)

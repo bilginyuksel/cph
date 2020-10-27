@@ -266,3 +266,11 @@ func TestCreateXMLFilenameNotXML_CreateFileWithXMLExtension(t *testing.T) {
 
 	afterTestParseFileRemovePluginXML("test.xml")
 }
+
+func TestNewSourceFileAddExistsSourceFile_AddSourceFile(t *testing.T) {
+	plg := Plugin{Platform: &Platform{}}
+	sfile := plg.Platform.NewSourceFile("test/test1.lol", "test")
+	if sfile.Src != "test/test1.lol" || sfile.TargetDir != "test" {
+		t.Error()
+	}
+}
