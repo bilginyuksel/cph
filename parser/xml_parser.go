@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -39,11 +40,6 @@ func CreateXML(plugin *Plugin, filename string) error {
 	return error
 }
 
-// NewSourceFile ...
-func (platform *Platform) NewSourceFile(src string, target string) SourceFile {
-	return SourceFile{Src: src, TargetDir: target}
-}
-
 // Plugin ...
 type Plugin struct {
 	XMLName      xml.Name   `xml:"plugin"`
@@ -73,6 +69,42 @@ type Platform struct {
 	ConfigFiles []ConfigFile `xml:"config-file"`
 	Frameworks  []Framework  `xml:"framework"`
 	SourceFiles []SourceFile `xml:"source-file"`
+}
+
+func (p *Platform) NewSourceFrom(javaFiles []string) {
+	var sourceFiles []SourceFile
+	for i := 0; i < len(javaFiles); i++ {
+		path := javaFiles[i]
+		ext := filepath.Ext(path)
+		if ext == ".java"{
+			dir, _ := filepath.Split(javaFiles[i])
+			sourceFiles = append(sourceFiles, SourceFile{
+				Src:       path,
+				TargetDir: dir,
+			})
+		}
+	}
+	p.SourceFiles = sourceFiles
+}
+
+func (p *Plugin) NewJsModulesFrom(jsFiles []string) {
+	var jsModules []JSModule
+	for i := 0; i < len(jsFiles); i++ {
+		path := jsFiles[i]
+		ext := filepath.Ext(path)
+		if ext == ".js" {
+			_, name := filepath.Split(path)
+			jsModule := JSModule{
+				Name: strings.TrimSuffix(name, filepath.Ext(path)),
+				Src:  path,
+			}
+			if name[0] >= 'A' && name[0] <= 'Z' {
+				jsModule.Clobbers = &Clobbers{Target: name}
+			}
+			jsModules = append(jsModules, jsModule)
+		}
+	}
+	p.JsModule = jsModules
 }
 
 // Framework ...

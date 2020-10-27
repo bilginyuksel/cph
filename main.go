@@ -3,32 +3,23 @@ package main
 import (
 	//"github.com/bilginyuksel/cordova-plugin-helper/writer"
 
-	"os"
-	"path/filepath"
+	"github.com/bilginyuksel/cordova-plugin-helper/parser"
+	"github.com/bilginyuksel/cordova-plugin-helper/reader"
 )
 
 func main() {
-	//plg, _ := parser.ParseXML("parser/plugin.xml")
-	//parser.CreateXML(plg, "plg.xml")
+	plg, _ := parser.ParseXML("parser/plugin.xml")
+	javaFiles, _ := reader.FilePathWalkDir("src")
+	plg.Platform.NewSourceFrom(javaFiles)
+	jsModules, _ := reader.FilePathWalkDir("www")
+	plg.NewJsModulesFrom(jsModules)
+	parser.CreateXML(plg, "plg.xml")
 	//ctx := kong.Parse(&cli)
 	// Call the Run() method of the selected parsed command.
 	//err := ctx.Run(&Context{Debug: cli.Debug})
 	//ctx.FatalIfErrorf(err)
 }
 
-func filePathWalkDir(root string) ([]string, error) {
-	var files []string
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			files = append(files, path)
-		}
-		return err
-	})
-	return files, err
-}
 
 // Context ...
 type Context struct {

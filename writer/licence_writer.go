@@ -2,6 +2,7 @@ package writer
 
 import (
 	"bufio"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -37,67 +38,14 @@ func CheckIfLicenceFormatIsValid(file *os.File) bool {
 
 func WriteLicenceToFile(fileName string, licenceFile string) (bool, error) {
 	ok, err := CheckIfFileContainsLicenceAlready(fileName, licenceFile)
-
 	if ok {
 		return false, err
 	}
-
-	// open the file to be appended to for read
-	f, err := os.Open(fileName)
-
-	if err != nil {
-		return false, err
-	}
-
-	defer f.Close()
-
-	// make a temporary outfile
-	outfile, err := os.Create("temp.java")
-
-	if err != nil {
-		return false, err
-	}
-
-	defer outfile.Close()
-
-	// append at the start
-	LICENCE := ReadFile(licenceFile)
-	_, err = outfile.WriteString(LICENCE)
-	if err != nil {
-		return false, err
-	}
-
-	scanner := bufio.NewScanner(f)
-
-	// read the file to be appended to and output all of it
-	for scanner.Scan() {
-		_, err = outfile.WriteString(scanner.Text())
-		_, err = outfile.WriteString("\n")
-	}
-
-	if err := scanner.Err(); err != nil {
-		return false, err
-	}
-	// ensure all lines are written
-	outfile.Sync()
-	//close the file to rename it, otherwise error will be thrown
-	err = outfile.Close()
-	if err != nil {
-		return false, err
-	}
-	err = f.Close()
-	if err != nil {
-		return false, err
-	}
-	// overwrite the old file with the new one
-	err = os.Remove(fileName)
-	if err != nil {
-		return false, err
-	}
-	err = os.Rename(outfile.Name(), fileName)
-	if err != nil {
-		return false, err
-	}
+	bytes, _ := ioutil.ReadFile(fileName)
+	var content string
+	licence := ReadFile(licenceFile)
+	content = licence + string(bytes)
+	_ = ioutil.WriteFile(fileName, []byte(content), 0644)
 	return true, nil
 }
 
