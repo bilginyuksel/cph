@@ -1,25 +1,25 @@
 package main
 
 import (
+	"github.com/alecthomas/kong"
 	//"github.com/bilginyuksel/cordova-plugin-helper/writer"
-
-	"github.com/bilginyuksel/cordova-plugin-helper/parser"
-	"github.com/bilginyuksel/cordova-plugin-helper/reader"
 )
 
 func main() {
-	plg, _ := parser.ParseXML("parser/plugin.xml")
-	javaFiles, _ := reader.FilePathWalkDir("src")
-	plg.Platform.NewSourceFrom(javaFiles)
-	jsModules, _ := reader.FilePathWalkDir("www")
-	plg.NewJsModulesFrom(jsModules)
-	parser.CreateXML(plg, "plg.xml")
-	//ctx := kong.Parse(&cli)
-	// Call the Run() method of the selected parsed command.
-	//err := ctx.Run(&Context{Debug: cli.Debug})
-	//ctx.FatalIfErrorf(err)
+	prepareCliParser()
+	// plg, _ := parser.ParseXML("parser/plugin.xml")
+	// javaFiles, _ := reader.FilePathWalkDir("src")
+	// plg.Platform.NewSourceFrom(javaFiles)
+	// jsModules, _ := reader.FilePathWalkDir("www")
+	// plg.NewJsModulesFrom(jsModules)
+	// parser.CreateXML(plg, "plg.xml")
 }
 
+func prepareCliParser() {
+	ctx := kong.Parse(&cli)
+	err := ctx.Run(&Context{Debug: cli.Debug})
+	ctx.FatalIfErrorf(err)
+}
 
 // Context ...
 type Context struct {
