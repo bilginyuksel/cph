@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/bilginyuksel/cordova-plugin-helper/parser"
 	"github.com/bilginyuksel/cordova-plugin-helper/reader"
@@ -40,14 +41,20 @@ func SyncPluginXML(path string) error {
 }
 
 // AddLicenceTo ...
-func AddLicenceTo(path string, extension string) error {
+func AddLicenceTo(path string, extension string, licence string) error {
+	if len(licence) == 0 {
+		licence = "writer/licence"
+	}
 	files, err := reader.FilePathWalkDir(path)
 	if err != nil {
 		return err
 	}
 
-	for _, path := range files {
-		writer.WriteLicenceToFile(path, "writer/licence")
+	for _, p := range files {
+		ext := filepath.Ext(p)
+		if ext == extension || len(extension) == 0 {
+			writer.WriteLicenceToFile(p, licence)
+		}
 	}
 
 	return nil
@@ -60,8 +67,7 @@ func (pl *PluginXMLCmd) Run(ctx *Context) error {
 
 // Run ...
 func (l *AddLicenseCmd) Run(ctx *Context) error {
-	fmt.Println(l)
-	return AddLicenceTo(l.Paths[0], l.FileExtensions[0])
+	return AddLicenceTo(l.Path, l.Extension, l.License)
 }
 
 // Context ...
@@ -76,9 +82,9 @@ type PluginXMLCmd struct {
 
 // AddLicenseCmd ...
 type AddLicenseCmd struct {
-	Paths          []string `name:"path" help:"Paths to list." type:"path"`
-	FileExtensions []string `name:"extension" help:"Instead of giving every files path, just give file extensions here."`
-	License        string   `help:"License file path to use."`
+	Path      string `name:"path" help:"Paths to list." type:"path"`
+	Extension string `name:"extension" help:"File extension you wish to licence."`
+	License   string `help:"License file path to use."`
 }
 
 var cli struct {

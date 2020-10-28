@@ -199,4 +199,5 @@ exports.asyncExec = asyncExec;
 }`)
 	createFile("cordova-plugin-group-project/plugin.xml", "")
 
+	os.RemoveAll("cordova-plugin-group-project")
 }

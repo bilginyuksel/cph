@@ -71,6 +71,7 @@ type Platform struct {
 	SourceFiles []SourceFile `xml:"source-file"`
 }
 
+// NewSourceFrom ...
 func (p *Platform) NewSourceFrom(javaFiles []string) {
 	var sourceFiles []SourceFile
 	for i := 0; i < len(javaFiles); i++ {
@@ -87,6 +88,7 @@ func (p *Platform) NewSourceFrom(javaFiles []string) {
 	p.SourceFiles = sourceFiles
 }
 
+// NewJsModulesFrom ...
 func (p *Plugin) NewJsModulesFrom(jsFiles []string) {
 	var jsModules []JSModule
 	for i := 0; i < len(jsFiles); i++ {
