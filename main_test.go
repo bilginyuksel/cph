@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -12,13 +11,21 @@ import (
 )
 
 var (
-	javaFiles []string = []string{"src/main/java/com/group/project/Test1.java",
+	linuxJavaFiles []string = []string{"src/main/java/com/group/project/Test1.java",
 		"src/main/java/com/group/project/Test2.java", "src/main/java/com/group/project/test/Test3.java",
 		"src/main/java/com/group/project/test/test/Test4.java", "src/main/java/com/group/project/test/test/Test5.java",
 		"src/main/java/com/group/project/test/test/test/Test6.java"}
 
-	jsFiles []string = []string{"www/Test1.js", "www/test2.js", "www/test/test3.js",
+	winJavaFiles []string = []string{"src\\main\\java\\com\\group\\project\\Test1.java",
+		"src\\main\\java\\com\\group\\project\\Test2.java", "src\\main\\java\\com\\group\\project\\test\\Test3.java",
+		"src\\main\\java\\com\\group\\project\\test\\test\\Test4.java", "src\\main\\java\\com\\group\\project\\test\\test\\Test5.java",
+		"src\\main\\java\\com\\group\\project\\test\\test\\test\\Test6.java"}
+
+	linuxJsFiles []string = []string{"www/Test1.js", "www/test2.js", "www/test/test3.js",
 		"www/test/Test4.js", "www/test/test/Test5.js", "www/test/test/test6.js"}
+
+	winJsFiles []string = []string{"www\\Test1.js", "www\\test2.js", "www\\test\\test3.js",
+		"www\\test\\Test4.js", "www\\test\\test\\Test5.js", "www\\test\\test\\test6.js"}
 )
 
 func createMockFileStructure() {
@@ -36,11 +43,11 @@ func createMockFileStructure() {
 	os.Mkdir("www/test", 0755)
 	os.Mkdir("www/test/test", 0755)
 
-	for _, path := range javaFiles {
+	for _, path := range linuxJavaFiles {
 		ioutil.WriteFile(path, []byte(""), 0644)
 	}
 
-	for _, path := range jsFiles {
+	for _, path := range linuxJsFiles {
 		ioutil.WriteFile(path, []byte(""), 0644)
 	}
 
@@ -59,7 +66,8 @@ func createMockFileStructure() {
 		</engines>
 
 		<platform name="android">
-		</platform>`), 0644)
+		</platform>
+		</plugin>`), 0644)
 }
 
 func eraseMockFileStructure() {
@@ -73,49 +81,64 @@ func TestSyncPluginXMLNoPathPluginXMLExists_UpdatePluginXML(t *testing.T) {
 
 	plugin, _ := parser.ParseXML("plugin.xml")
 
-	if len(plugin.JsModule) != len(jsFiles) {
+	if len(plugin.JsModule) != len(linuxJsFiles) {
 		t.Error()
 	}
 
-	if len(plugin.Platform.SourceFiles) != len(javaFiles) {
+	if len(plugin.Platform.SourceFiles) != len(linuxJavaFiles) {
 		t.Error()
 	}
 
-	jsFileMap := make(map[string]string)
-	javaFileMap := make(map[string]string)
+	winJsFileMap := make(map[string]string)
+	winJavaFileMap := make(map[string]string)
+	linuxJsFileMap := make(map[string]string)
+	linuxJavaFileMap := make(map[string]string)
 
-	for _, path := range jsFiles {
+	for _, path := range winJsFiles {
 		_, name := filepath.Split(path)
 		name = strings.TrimSuffix(name, filepath.Ext(path))
-		jsFileMap[path] = name
+		winJsFileMap[path] = name
 	}
 
-	for _, path := range javaFiles {
+	for _, path := range linuxJsFiles {
+		_, name := filepath.Split(path)
+		name = strings.TrimSuffix(name, filepath.Ext(path))
+		linuxJsFileMap[path] = name
+	}
+
+	for _, path := range winJavaFiles {
 		dir, _ := filepath.Split(path)
-		javaFileMap[path] = dir
+		winJavaFileMap[path] = dir
 	}
 
-	fmt.Println(jsFileMap)
-	_, ok := javaFileMap[strings.TrimSpace(plugin.Platform.SourceFiles[0].Src)]
-	fmt.Println(ok)
+	for _, path := range linuxJavaFiles {
+		dir, _ := filepath.Split(path)
+		linuxJavaFileMap[path] = dir
+	}
 
 	for i := 0; i < len(plugin.JsModule); i++ {
 		currentJsModule := plugin.JsModule[i]
-		name, isPresent := jsFileMap[currentJsModule.Src]
-		if !isPresent || name != currentJsModule.Name {
-			t.Errorf(`Current JS Module and the js module is not the same.
-			Actual JS Module= %v
-			Expected JS Module= %s`, currentJsModule, name)
+		ansWin, isPresentOnWin := winJsFileMap[currentJsModule.Src]
+		ansLinux, isPresentOnLinux := linuxJsFileMap[currentJsModule.Src]
+		if isPresentOnWin && ansWin == currentJsModule.Name {
+			t.Logf("Passed windows type jsModule file paths... Data= %v", currentJsModule)
+		} else if isPresentOnLinux && ansLinux == currentJsModule.Name {
+			t.Logf("Passed linux type jsModule file paths... Data= %v", currentJsModule)
+		} else {
+			t.Error()
 		}
 	}
 
-	for i := 0; i < len(javaFiles); i++ {
+	for i := 0; i < len(linuxJavaFiles); i++ {
 		currentSourceFile := plugin.Platform.SourceFiles[i]
-		dir, isPresent := javaFileMap[currentSourceFile.Src]
-		if !isPresent || dir != currentSourceFile.TargetDir {
-			t.Errorf(`Current Java Source File is not the same with the expected.
-			Actual Source File= %v
-			Expected Source File= %s`, currentSourceFile, javaFileMap[currentSourceFile.Src])
+		ansWin, isPresentOnWin := winJavaFileMap[currentSourceFile.Src]
+		ansLinux, isPresentOnLinux := linuxJavaFileMap[currentSourceFile.Src]
+		if isPresentOnWin && ansWin == currentSourceFile.TargetDir {
+			t.Logf("Passed windows type sourceJava file paths... Data= %v", currentSourceFile)
+		} else if isPresentOnLinux && ansLinux == currentSourceFile.TargetDir {
+			t.Logf("Passed linux type sourceJava file paths... Data= %v", currentSourceFile)
+		} else {
+			t.Error()
 		}
 	}
 
