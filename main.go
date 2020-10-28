@@ -5,9 +5,9 @@ import (
 
 	"github.com/bilginyuksel/cordova-plugin-helper/parser"
 	"github.com/bilginyuksel/cordova-plugin-helper/reader"
+	"github.com/bilginyuksel/cordova-plugin-helper/writer"
 
 	"github.com/alecthomas/kong"
-	//"github.com/bilginyuksel/cordova-plugin-helper/writer"
 )
 
 func main() {
@@ -41,6 +41,14 @@ func SyncPluginXML(path string) error {
 
 // AddLicenceTo ...
 func AddLicenceTo(path string, extension string) error {
+	files, err := reader.FilePathWalkDir(path)
+	if err != nil {
+		return err
+	}
+
+	for _, path := range files {
+		writer.WriteLicenceToFile(path, "writer/licence")
+	}
 
 	return nil
 }

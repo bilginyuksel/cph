@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/bilginyuksel/cordova-plugin-helper/parser"
+	"github.com/bilginyuksel/cordova-plugin-helper/writer"
 )
 
 var (
@@ -142,5 +143,45 @@ func TestSyncPluginXMLNoPathPluginXMLExists_UpdatePluginXML(t *testing.T) {
 		}
 	}
 
+	eraseMockFileStructure()
+}
+
+func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) {
+	createMockFileStructure()
+	ioutil.WriteFile("www/test.ts", []byte(""), 0644)
+	winJsFiles = append(winJsFiles, "www/test.ts")
+
+	AddLicenceTo("www", "js")
+	for _, path := range winJsFiles {
+		ext := filepath.Ext(path)
+		hasLicence, err := writer.CheckIfFileContainsLicenceAlready(path, "writer/licence")
+		if err == nil && hasLicence && ext == ".js" {
+			t.Log("Passed.")
+		} else {
+			t.Error()
+		}
+	}
+
+	os.Remove("www/test.ts")
+	eraseMockFileStructure()
+}
+
+func TestAddLicenceToJavaFilesInCurrentPath_JavaFilesShouldBeLicensed(t *testing.T) {
+	createMockFileStructure()
+	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
+	winJavaFiles = append(winJavaFiles, "src/test.ts")
+
+	AddLicenceTo("src", "java")
+	for _, path := range winJavaFiles {
+		ext := filepath.Ext(path)
+		hasLicence, err := writer.CheckIfFileContainsLicenceAlready(path, "writer/licence")
+		if err == nil && hasLicence && ext == ".java" {
+			t.Log("Passed.")
+		} else {
+			t.Error()
+		}
+	}
+
+	os.Remove("test.ts")
 	eraseMockFileStructure()
 }

@@ -76,7 +76,7 @@ func (p *Platform) NewSourceFrom(javaFiles []string) {
 	for i := 0; i < len(javaFiles); i++ {
 		path := javaFiles[i]
 		ext := filepath.Ext(path)
-		if ext == ".java"{
+		if ext == ".java" {
 			dir, _ := filepath.Split(javaFiles[i])
 			sourceFiles = append(sourceFiles, SourceFile{
 				Src:       path,
