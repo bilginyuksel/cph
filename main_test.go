@@ -207,12 +207,20 @@ func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T
 	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
 	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
 
-	AddLicenceTo("src", "", "")
-	for _, path := range winJavaFiles {
-		hasLicence, err := writer.CheckIfFileContainsLicenceAlready(path, "writer/licence")
-		if err != nil || !hasLicence {
-			t.Error()
+	checkAllFilesLicence := func(files []string) {
+		for _, path := range files {
+			hasLicence, err := writer.CheckIfFileContainsLicenceAlready(path, "writer/licence")
+			if err != nil || !hasLicence {
+				t.Error()
+			}
 		}
+	}
+
+	AddLicenceTo("src", "", "")
+	if runtime.GOOS == "windows" {
+		checkAllFilesLicence(winJavaFiles)
+	} else {
+		checkAllFilesLicence(linuxJavaFiles)
 	}
 
 	eraseMockFileStructure()
