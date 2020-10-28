@@ -3,5 +3,5 @@
 *.exe
 cover
 cover.html
-cover.
+cover.out
 go.sum
