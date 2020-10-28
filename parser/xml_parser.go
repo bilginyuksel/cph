@@ -71,12 +71,13 @@ type Platform struct {
 	SourceFiles []SourceFile `xml:"source-file"`
 }
 
+// NewSourceFrom ...
 func (p *Platform) NewSourceFrom(javaFiles []string) {
 	var sourceFiles []SourceFile
 	for i := 0; i < len(javaFiles); i++ {
 		path := javaFiles[i]
 		ext := filepath.Ext(path)
-		if ext == ".java"{
+		if ext == ".java" {
 			dir, _ := filepath.Split(javaFiles[i])
 			sourceFiles = append(sourceFiles, SourceFile{
 				Src:       path,
@@ -87,6 +88,7 @@ func (p *Platform) NewSourceFrom(javaFiles []string) {
 	p.SourceFiles = sourceFiles
 }
 
+// NewJsModulesFrom ...
 func (p *Plugin) NewJsModulesFrom(jsFiles []string) {
 	var jsModules []JSModule
 	for i := 0; i < len(jsFiles); i++ {
