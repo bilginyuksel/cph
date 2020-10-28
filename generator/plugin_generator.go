@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// CreateBasePlugin ... Ready to develop example. Ready to run example.
+// CreateBasePlugin ...
 func CreateBasePlugin(path string, group string, project string) {
 	createFile := func(filename string, content string) {
 		d := []byte(content)
@@ -25,15 +25,12 @@ func CreateBasePlugin(path string, group string, project string) {
 	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s", group, project, group), 0755)
 	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova", group, project, group), 0755)
 	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova/%s", group, project, group, project), 0755)
-	// File...
-	// os.Create("cordova-plugin-%s(group)-%s(project)/src/main/java/com/huawei/%s(group)/cordova/%s(project)/Example.java", 0755)
 
 	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/www", group, project), 0755)
 	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/scripts", group, project), 0755)
 	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/tests", group, project), 0755)
 	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/types", group, project), 0755)
 
-	// cordova-plugin-%s(group)-%s(project)/resources/plugin.gradle
 	createFile(fmt.Sprintf("cordova-plugin-%s-%s/README.md", group, project), fmt.Sprintf("## cordova-plugin-%s-%s", group, project))
 	createFile(fmt.Sprintf("cordova-plugin-%s-%s/tsconfig.json", group, project), `{
 	"compileOnSave": true,
