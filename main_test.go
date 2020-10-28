@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -150,49 +151,50 @@ func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) 
 	createMockFileStructure()
 	ioutil.WriteFile("www\\test.ts", []byte(""), 0644)
 	winJsFiles = append(winJsFiles, "www\\test.ts")
+	ioutil.WriteFile("www/test.ts", []byte(""), 0644)
+	linuxJsFiles = append(linuxJsFiles, "www/test.ts")
 
 	AddLicenceTo("www", ".js", "")
-	for _, path := range winJsFiles {
+	if runtime.GOOS == "windows" {
+		controlLicenceOnArrayOfFiles(winJsFiles, t, ".js")
+	} else {
+		controlLicenceOnArrayOfFiles(linuxJsFiles, t, ".js")
+	}
+
+	eraseMockFileStructure()
+}
+
+func controlLicenceOnArrayOfFiles(files []string, t *testing.T, extension string) {
+	for _, path := range files {
 		ext := filepath.Ext(path)
 		hasLicence, err := writer.CheckIfFileContainsLicenceAlready(path, "writer/licence")
 		if err != nil {
 			t.Error(err)
 		}
-		if hasLicence && ext == ".js" {
+		if hasLicence && ext == extension {
 			t.Logf("Passed licence added to file= %s", path)
-		} else if hasLicence && ext != ".js" {
-			t.Errorf(`Failed there should be a licence if the file's extension is equal to '.js', 
-			and there shouldn't be a licence if file's extension is different than '.js', File=%s`, path)
-		} else if !hasLicence && ext == ".js" {
-			t.Errorf(`Failed there should be a licence if the file's extension is equal to '.js', 
-			and there shouldn't be a licence if file's extension is different than '.js', File=%s`, path)
+		} else if hasLicence && ext != extension {
+			t.Errorf(`Failed there should be a licence if the file's extension is equal to '%s', 
+			and there shouldn't be a licence if file's extension is different than '%s', File=%s`, extension, extension, path)
+		} else if !hasLicence && ext == extension {
+			t.Errorf(`Failed there should be a licence if the file's extension is equal to '%s', 
+			and there shouldn't be a licence if file's extension is different than '%s', File=%s`, extension, extension, path)
 		}
 	}
-
-	eraseMockFileStructure()
 }
 
 func TestAddLicenceToJavaFilesInCurrentPath_JavaFilesShouldBeLicensed(t *testing.T) {
 	createMockFileStructure()
 	ioutil.WriteFile("src\\test.ts", []byte(""), 0644)
 	winJavaFiles = append(winJavaFiles, "src\\test.ts")
+	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
+	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
 
 	AddLicenceTo("src", ".java", "writer/licence")
-	for _, path := range winJavaFiles {
-		ext := filepath.Ext(path)
-		hasLicence, err := writer.CheckIfFileContainsLicenceAlready(path, "writer/licence")
-		if err != nil {
-			t.Error(err)
-		}
-		if hasLicence && ext == ".java" {
-			t.Logf("Passed licence added to file= %s", path)
-		} else if hasLicence && ext != ".java" {
-			t.Errorf(`Failed there should be a licence if the file's extension is equal to '.java', 
-			and there shouldn't be a licence if file's extension is different than '.java', File=%s`, path)
-		} else if !hasLicence && ext == ".java" {
-			t.Errorf(`Failed there should be a licence if the file's extension is equal to '.java', 
-			and there shouldn't be a licence if file's extension is different than '.java', File=%s`, path)
-		}
+	if runtime.GOOS == "windows" {
+		controlLicenceOnArrayOfFiles(winJavaFiles, t, ".java")
+	} else {
+		controlLicenceOnArrayOfFiles(linuxJavaFiles, t, ".java")
 	}
 
 	eraseMockFileStructure()
@@ -202,6 +204,8 @@ func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T
 	createMockFileStructure()
 	ioutil.WriteFile("src\\test.ts", []byte(""), 0644)
 	winJavaFiles = append(winJavaFiles, "src\\test.ts")
+	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
+	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
 
 	AddLicenceTo("src", "", "")
 	for _, path := range winJavaFiles {
