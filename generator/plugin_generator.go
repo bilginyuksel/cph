@@ -7,7 +7,7 @@ import (
 )
 
 // CreateBasePlugin ...
-func CreateBasePlugin(path string, group string, project string) {
+func CreateBasePlugin(path string, group string, project_name string) {
 	createFile := func(filename string, content string) {
 		d := []byte(content)
 		err := ioutil.WriteFile(filename, d, 0644)
@@ -15,24 +15,23 @@ func CreateBasePlugin(path string, group string, project string) {
 			panic(err)
 		}
 	}
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s", group, project_name), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src", group, project_name), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main", group, project_name), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java", group, project_name), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com", group, project_name), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/", group, project_name), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s", group, project_name, group), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova", group, project_name, group), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova/%s", group, project_name, group, project_name), 0755)
 
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s", group, project), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src", group, project), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main", group, project), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java", group, project), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com", group, project), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/", group, project), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s", group, project, group), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova", group, project, group), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova/%s", group, project, group, project), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/www", group, project_name), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/scripts", group, project_name), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/tests", group, project_name), 0755)
+	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/types", group, project_name), 0755)
 
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/www", group, project), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/scripts", group, project), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/tests", group, project), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/types", group, project), 0755)
-
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/README.md", group, project), fmt.Sprintf("## cordova-plugin-%s-%s", group, project))
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/tsconfig.json", group, project), `{
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/README.md", group, project_name), fmt.Sprintf("## cordova-plugin-%s-%s", group, project_name))
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/tsconfig.json", group, project_name), `{
 	"compileOnSave": true,
 	"compilerOptions": {
 		"noImplicitAny": true,
@@ -49,7 +48,7 @@ func CreateBasePlugin(path string, group string, project string) {
 	"exclude": ["node_modules", "src", "www", "types"]
 }`)
 
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/scripts/util.ts", group, project),
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/scripts/util.ts", group, project_name),
 		`import { exec } from 'cordova';
 
 /*
@@ -69,8 +68,11 @@ export function asyncExec(clazz: string, func: string, args: any[] = []): Promis
 		exec(resolve, reject, clazz, func, args);
 	});
 }`)
-
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/scripts/%s.ts", group, project, project),
+	capitalizedProjectName := project_name
+	if project_name[0] >= 'A' || project_name[0] <= 'Z' {
+		capitalizedProjectName = string(capitalizedProjectName[0] - 32) + project_name[1:]
+	}
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/scripts/%s.ts", group, project_name, capitalizedProjectName),
 		fmt.Sprintf(`import { asyncExec } from './util';
 
 /*
@@ -82,9 +84,10 @@ sends information the java to process.
 */
 export function showToast(message: string): Promise<void> {
 	return asyncExec('%s', 'showToast', [message]);
-}`, project))
+}`, capitalizedProjectName))
 
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova/%s/%s.java", group, project, group, project, project),
+
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova/%s/%s.java", group, project_name, group, project_name, capitalizedProjectName),
 		fmt.Sprintf(`package com.%s.cordova.%s;
 
 import android.util.Log;
@@ -126,11 +129,11 @@ public class %s extends CordovaPlugin {
 		Toast.makeText(webView.getContext(), message, Toast.LENGTH_SHORT).show();
 		callbackContext.success();
 	}
-}`, group, project, project, project))
+}`, group, project_name, capitalizedProjectName, capitalizedProjectName))
 
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/types/%s.d.ts", group, project, project), "export declare function showToast(message: string): Promise<void>;")
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/types/util.d.ts", group, project), "export declare function asyncExec(clazz: string, func: string, args?: any[]): Promise<any>;")
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/www/%s.js", group, project, project), fmt.Sprintf(`"use strict";
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/types/%s.d.ts", group, project_name, capitalizedProjectName), "export declare function showToast(message: string): Promise<void>;")
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/types/util.d.ts", group, project_name), "export declare function asyncExec(clazz: string, func: string, args?: any[]): Promise<any>;")
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/www/%s.js", group, project_name, capitalizedProjectName), fmt.Sprintf(`"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.showToast = void 0;
 const util_1 = require("./util");
@@ -138,8 +141,8 @@ function showToast(message) {
 	return util_1.asyncExec('%s', 'showToast', [message]);
 }
 exports.showToast = showToast;
-//# sourceMappingURL=%s.js.map`, project, project))
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/www/util.js", group, project), `"use strict";
+//# sourceMappingURL=%s.js.map`, capitalizedProjectName, capitalizedProjectName))
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/www/util.js", group, project_name), `"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.asyncExec = void 0;
 const cordova_1 = require("cordova");
@@ -150,10 +153,10 @@ function asyncExec(clazz, func, args = []) {
 }
 exports.asyncExec = asyncExec;
 //# sourceMappingURL=util.js.map`)
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/www/%s.js.map", group, project, project),
-		fmt.Sprintf(`{"version":3,"file":"%s.js","sourceRoot":"","sources":["../scripts/%s.ts"],"names":[],"mappings":";;;AAAA,iCAAmC;AASnC,SAAgB,SAAS,CAAC,OAAe;IACxC,OAAO,gBAAS,CAAC,SAAS,EAAE,WAAW,EAAE,CAAC,OAAO,CAAC,CAAC,CAAC;AACrD,CAAC;AAFD,8BAEC","sourcesContent":["import { asyncExec } from './util';\n\n/*\nExample function to show toast in the screen. Function calls asyncExec function from util.ts file. And async function \nsends information the java to process.\n\n@param message :: The parameter sent here will be the message of the toast showed. \n\n*/\nexport function showToast(message: string): Promise<void> {\n\treturn asyncExec('%s', 'showToast', [message]);\n}"]}`, project, project, project))
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/www/util.js.map", group, project), fmt.Sprintf(`{"version":3,"file":"util.js","sourceRoot":"","sources":["../scripts/util.ts"],"names":[],"mappings":";;;AAAA,qCAA+B;AAc/B,SAAgB,SAAS,CAAC,KAAa,EAAE,IAAY,EAAE,OAAc,EAAE;IACtE,OAAO,IAAI,OAAO,CAAC,CAAC,OAAO,EAAE,MAAM,EAAE,EAAE;QACtC,cAAI,CAAC,OAAO,EAAE,MAAM,EAAE,KAAK,EAAE,IAAI,EAAE,IAAI,CAAC,CAAC;IAC1C,CAAC,CAAC,CAAC;AACJ,CAAC;AAJD,8BAIC","sourcesContent":["import { exec } from 'cordova';\n\n/*\nasyncExec(clazz: string, func: string, args: any[] = []): Promise<any> \nIs a helper function to use when sending information to java with your cordova application. \n\n@param clazz :: you should write the class name you choose when creating the plugin the default is (%s(project).java). Basically you need to write the\nname of the java class which extends the CordovaPlugin. \n\n@param func :: This parameter matches with the action parameter in java files execute function. The value sent here will be captured\nas action from java.\n\n@paramm args :: You can send array of elements here to capture from java's execute method again.\n*/\nexport function asyncExec(clazz: string, func: string, args: any[] = []): Promise<any> {\n\treturn new Promise((resolve, reject) => {\n\t\texec(resolve, reject, clazz, func, args);\n\t});\n}"]}`, project))
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/package.json", group, project), fmt.Sprintf(`{
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/www/%s.js.map", group, project_name, capitalizedProjectName),
+		fmt.Sprintf(`{"version":3,"file":"%s.js","sourceRoot":"","sources":["../scripts/%s.ts"],"names":[],"mappings":";;;AAAA,iCAAmC;AASnC,SAAgB,SAAS,CAAC,OAAe;IACxC,OAAO,gBAAS,CAAC,SAAS,EAAE,WAAW,EAAE,CAAC,OAAO,CAAC,CAAC,CAAC;AACrD,CAAC;AAFD,8BAEC","sourcesContent":["import { asyncExec } from './util';\n\n/*\nExample function to show toast in the screen. Function calls asyncExec function from util.ts file. And async function \nsends information the java to process.\n\n@param message :: The parameter sent here will be the message of the toast showed. \n\n*/\nexport function showToast(message: string): Promise<void> {\n\treturn asyncExec('%s', 'showToast', [message]);\n}"]}`, capitalizedProjectName, capitalizedProjectName, capitalizedProjectName))
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/www/util.js.map", group, project_name), fmt.Sprintf(`{"version":3,"file":"util.js","sourceRoot":"","sources":["../scripts/util.ts"],"names":[],"mappings":";;;AAAA,qCAA+B;AAc/B,SAAgB,SAAS,CAAC,KAAa,EAAE,IAAY,EAAE,OAAc,EAAE;IACtE,OAAO,IAAI,OAAO,CAAC,CAAC,OAAO,EAAE,MAAM,EAAE,EAAE;QACtC,cAAI,CAAC,OAAO,EAAE,MAAM,EAAE,KAAK,EAAE,IAAI,EAAE,IAAI,CAAC,CAAC;IAC1C,CAAC,CAAC,CAAC;AACJ,CAAC;AAJD,8BAIC","sourcesContent":["import { exec } from 'cordova';\n\n/*\nasyncExec(clazz: string, func: string, args: any[] = []): Promise<any> \nIs a helper function to use when sending information to java with your cordova application. \n\n@param clazz :: you should write the class name you choose when creating the plugin the default is (%s(project_name).java). Basically you need to write the\nname of the java class which extends the CordovaPlugin. \n\n@param func :: This parameter matches with the action parameter in java files execute function. The value sent here will be captured\nas action from java.\n\n@paramm args :: You can send array of elements here to capture from java's execute method again.\n*/\nexport function asyncExec(clazz: string, func: string, args: any[] = []): Promise<any> {\n\treturn new Promise((resolve, reject) => {\n\t\texec(resolve, reject, clazz, func, args);\n\t});\n}"]}`, project_name))
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/package.json", group, project_name), fmt.Sprintf(`{
 	"name": "cordova-plugin-%s-%s",
 	"title": "Cordova %s %s Plugin",
 	"version":"1.0.0",
@@ -193,8 +196,8 @@ exports.asyncExec = asyncExec;
 		"plugin.xml",
 		"README.md"
 	]
-}`, group, project, group, project, group, project))
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/plugin.xml", group, project), fmt.Sprintf(`<?xml version='1.0' encoding='utf-8'?>
+}`, group, project_name, group, project_name, group, project_name))
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/plugin.xml", group, project_name), fmt.Sprintf(`<?xml version='1.0' encoding='utf-8'?>
 	<plugin id="cordova-plugin-%s-%s"
 			version="1.0.0"
 			xmlns="http://apache.org/cordova/ns/plugins/1.0"
@@ -203,13 +206,24 @@ exports.asyncExec = asyncExec;
 		<description>Cordova Plugin %s %s</description>
 		<license>Apache 2.0</license>
 		<keywords>android, %s, %s</keywords>
+
+		<js-module name="%s" src="www/%s.js">
+        	<clobbers target="%s"/>
+    	</js-module>
+
+		<js-module name="util" src="www/util.js"/>
 	
 		<engines>
 			<engine name="cordova" version=">=3.0.0"/>
 		</engines>
 
 		<platform name="android">
+			 <source-file src="src/main/java/com/%s/cordova/%s/%s.java" 
+				target-dir="src/com/%s/cordova/%s"/>
 		</platform>
-		</plugin>`, group, project, group, project, group, project, group, project))
+		</plugin>`, group, project_name, group, project_name, group,
+			project_name, group, project_name,capitalizedProjectName,
+			capitalizedProjectName,capitalizedProjectName,group,project_name,
+			capitalizedProjectName,group,project_name))
 
 }
