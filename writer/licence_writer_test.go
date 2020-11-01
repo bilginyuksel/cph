@@ -12,7 +12,7 @@ func TestCheckIfFileContainsLicenceAlready_LicenceExists(t *testing.T) {
 	file, _ := os.OpenFile("test.java", os.O_RDWR, 0644)
 	_, err := file.WriteString(readFile("licence"))
 	_ = file.Close()
-	ok, err := isLicenceExist("test.java", "licence")
+	ok, err := IsLicenceExist("test.java", "licence")
 	if err != nil {
 		t.Error()
 	}
@@ -26,7 +26,7 @@ func TestCheckIfFileContainsLicenceAlready_LicenceExists(t *testing.T) {
 func TestCheckIfFileContainsLicenceAlready_LicenceNotFound(t *testing.T) {
 	createFile("test1.java")
 	file, _ := os.OpenFile("test1.java", os.O_RDWR, 0644)
-	ok, err := isLicenceExist("test1.java", "licence")
+	ok, err := IsLicenceExist("test1.java", "licence")
 	if err != nil {
 		t.Error()
 	}
@@ -38,7 +38,7 @@ func TestCheckIfFileContainsLicenceAlready_LicenceNotFound(t *testing.T) {
 }
 
 func TestCheckIfFileContainsLicenceAlready_FileNotFound(t *testing.T) {
-	_, err := isLicenceExist("notFound.java", "licence")
+	_, err := IsLicenceExist("notFound.java", "licence")
 	if err == nil {
 		t.Error()
 	}
@@ -47,16 +47,16 @@ func TestCheckIfFileContainsLicenceAlready_FileNotFound(t *testing.T) {
 func TestCheckIfFileContainsLicenceAlready_LicenceExistWithWrongFormat(t *testing.T) {
 	createFile("test.java")
 	file, _ := os.OpenFile("test.java", os.O_RDWR, 0644)
-	_, _ = file.WriteString(readFile("licence"))
-	_, _ = file.WriteString("test string")
+	licence := readFile("licence")
+	lines := strings.Split(licence,"\n")
+	lines[0] = "wrong format"
+	licence = strings.Join(lines,"\n")
+	_, _ = file.WriteString(licence)
 	file.Close()
-	os.Remove(file.Name())
-	file, err := os.OpenFile("licence", os.O_RDONLY, 0644)
-	if err != nil {
+	if IsLicenceFormatValid("test.java","licence"){
 		t.Error()
 	}
-	_ = file.Close()
-	isLicenceFormatValid(file)
+	os.Remove(file.Name())
 }
 
 func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
@@ -65,7 +65,7 @@ func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
 	for i := 1; i < 100; i++ {
 		_, _ = file.WriteString("This is a test file.\n")
 	}
-	_, _ = WriteLicenceToFile(file.Name(), "licence")
+	_, _ = WriteLicenceToFile(file.Name(), "licence","/*","*/")
 	s := readFile(file.Name())
 	licence := readFile("licence")
 	file.Close()

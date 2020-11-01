@@ -2,12 +2,13 @@ package writer
 
 import (
 	"bufio"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 )
 
-func isLicenceExist(fileName string, licenceFile string) (bool, error) {
+func IsLicenceExist(fileName string, licenceFile string) (bool, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		return false, err
@@ -21,23 +22,25 @@ func isLicenceExist(fileName string, licenceFile string) (bool, error) {
 	return strings.Contains(fileContent, LICENCE), err
 }
 
-func isLicenceFormatValid(file *os.File) bool {
-	content := readFile(file.Name())
-	lines := strings.Split(content, "\n")
-	firstLine := lines[1]
-	fileContent := readFile(file.Name())
-	if strings.Contains(fileContent, firstLine) {
-		index := strings.Index(fileContent, firstLine)
-		tempLicence := ""
+func IsLicenceFormatValid(fileName string, licenceName string) bool {
+	licence := readFile(licenceName)
+	licenceArray := strings.Split(licence,"\n")
+	firstLineOfLicence := licenceArray[0]
+	fileContent := readFile(fileName)
+	if strings.Contains(fileContent, firstLineOfLicence) {
+		index := strings.Index(fileContent, firstLineOfLicence)
+		tempLicence := string(fileContent[index])
 		for i := index; fileContent[i-1] != '*' || fileContent[i] != '/'; i++ {
 			tempLicence += string(fileContent[i])
 		}
+		fmt.Println(tempLicence)
+		return licence == tempLicence
 	}
-	return true
+	return false
 }
 
 func WriteLicenceToFile(fileName string, licenceFile string, startTag string, endTag string) (bool, error) {
-	ok, err := isLicenceExist(fileName, licenceFile)
+	ok, err := IsLicenceExist(fileName, licenceFile)
 	if ok {
 		return false, err
 	}
