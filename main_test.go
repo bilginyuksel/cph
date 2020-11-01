@@ -154,7 +154,7 @@ func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) 
 	ioutil.WriteFile("www/test.ts", []byte(""), 0644)
 	linuxJsFiles = append(linuxJsFiles, "www/test.ts")
 
-	AddLicenceTo("www", ".js", "")
+	AddLicenceTo("www", ".js", "","","")
 	if runtime.GOOS == "windows" {
 		controlLicenceOnArrayOfFiles(winJsFiles, t, ".js")
 	} else {
@@ -167,7 +167,7 @@ func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) 
 func controlLicenceOnArrayOfFiles(files []string, t *testing.T, extension string) {
 	for _, path := range files {
 		ext := filepath.Ext(path)
-		hasLicence, err := writer.CheckIfFileContainsLicenceAlready(path, "writer/licence")
+		hasLicence, err := writer.IsLicenceExist(path, "writer/licence")
 		if err != nil {
 			t.Error(err)
 		}
@@ -190,7 +190,7 @@ func TestAddLicenceToJavaFilesInCurrentPath_JavaFilesShouldBeLicensed(t *testing
 	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
 	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
 
-	AddLicenceTo("src", ".java", "writer/licence")
+	AddLicenceTo("src", ".java", "writer/licence","","")
 	if runtime.GOOS == "windows" {
 		controlLicenceOnArrayOfFiles(winJavaFiles, t, ".java")
 	} else {
@@ -209,14 +209,14 @@ func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T
 
 	checkAllFilesLicence := func(files []string) {
 		for _, path := range files {
-			hasLicence, err := writer.CheckIfFileContainsLicenceAlready(path, "writer/licence")
+			hasLicence, err := writer.IsLicenceExist(path, "writer/licence")
 			if err != nil || !hasLicence {
 				t.Error()
 			}
 		}
 	}
 
-	AddLicenceTo("src", "", "")
+	AddLicenceTo("src", "", "","","")
 	if runtime.GOOS == "windows" {
 		checkAllFilesLicence(winJavaFiles)
 	} else {

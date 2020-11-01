@@ -2,55 +2,74 @@ package writer
 
 import (
 	"bufio"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 )
 
-func CheckIfFileContainsLicenceAlready(fileName string, licenceFile string) (bool, error) {
+func IsLicenceExist(fileName string, licenceFile string) (bool, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		return false, err
 	}
-	fileContent := ReadFile(file.Name())
+	fileContent := readFile(file.Name())
 	err = file.Close()
 	if err != nil {
 		return false, err
 	}
-	LICENCE := ReadFile(licenceFile)
+	LICENCE := readFile(licenceFile)
 	return strings.Contains(fileContent, LICENCE), err
 }
 
-func CheckIfLicenceFormatIsValid(file *os.File) bool {
-	content := ReadFile(file.Name())
-	lines := strings.Split(content, "\n")
-	firstLine := lines[1]
-	fileContent := ReadFile(file.Name())
-	if strings.Contains(fileContent, firstLine) {
-		index := strings.Index(fileContent, firstLine)
-		tempLicence := ""
+func IsLicenceFormatValid(fileName string, licenceName string) bool {
+	licence := readFile(licenceName)
+	licenceArray := strings.Split(licence,"\n")
+	firstLineOfLicence := licenceArray[0]
+	fileContent := readFile(fileName)
+	if strings.Contains(fileContent, firstLineOfLicence) {
+		index := strings.Index(fileContent, firstLineOfLicence)
+		tempLicence := string(fileContent[index])
 		for i := index; fileContent[i-1] != '*' || fileContent[i] != '/'; i++ {
 			tempLicence += string(fileContent[i])
 		}
+		fmt.Println(tempLicence)
+		return licence == tempLicence
 	}
-	return true
+	return false
 }
 
-func WriteLicenceToFile(fileName string, licenceFile string) (bool, error) {
-	ok, err := CheckIfFileContainsLicenceAlready(fileName, licenceFile)
+func WriteLicenceToFile(fileName string, licenceFile string, startTag string, endTag string) (bool, error) {
+	ok, err := IsLicenceExist(fileName, licenceFile)
 	if ok {
 		return false, err
 	}
+	if startTag == "" || endTag == "" {
+		startTag = "/*"
+		endTag = "*/"
+	}
 	bytes, _ := ioutil.ReadFile(fileName)
 	var content string
-	licence := ReadFile(licenceFile)
+	licence := readFile(licenceFile)
+	if !isLicenceAlreadyContainsTags(licence, startTag) {
+		licence = addTagToLicence(startTag, endTag, licence)
+	}
 	content = licence + string(bytes)
 	_ = ioutil.WriteFile(fileName, []byte(content), 0644)
 	return true, nil
 }
+func isLicenceAlreadyContainsTags(licence string, startTag string) bool {
+	lines := strings.Split(licence, "\n")
+	return strings.Contains(lines[0], startTag)
+}
 
-// ReadFile ...
-func ReadFile(fileName string) string {
+func addTagToLicence(startTag string, endTag string, licence string) string {
+	licence = startTag + "\n" + licence + "\n" + endTag
+	return licence
+}
+
+// readFile ...
+func readFile(fileName string) string {
 	file, err := os.Open(fileName)
 	checkErr(err)
 	scanner := bufio.NewScanner(file)
