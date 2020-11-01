@@ -13,19 +13,19 @@ func TestCreatePluginWithGivenName_ExpectPluginFilesCreated(t *testing.T) {
 	CreateBasePlugin(".", "group", "project")
 
 	linuxFileList := []string{"cordova-plugin-group-project/README.md", "cordova-plugin-group-project/tsconfig.json",
-		"cordova-plugin-group-project/scripts/util.ts", "cordova-plugin-group-project/scripts/project.ts",
-		"cordova-plugin-group-project/src/main/java/com/group/cordova/project/project.java",
-		"cordova-plugin-group-project/types/util.d.ts", "cordova-plugin-group-project/www/project.js",
-		"cordova-plugin-group-project/types/project.d.ts", "cordova-plugin-group-project/www/util.js",
-		"cordova-plugin-group-project/www/project.js.map", "cordova-plugin-group-project/www/util.js.map",
+		"cordova-plugin-group-project/scripts/util.ts", "cordova-plugin-group-project/scripts/Project.ts",
+		"cordova-plugin-group-project/src/main/java/com/group/cordova/project/Project.java",
+		"cordova-plugin-group-project/types/util.d.ts", "cordova-plugin-group-project/www/Project.js",
+		"cordova-plugin-group-project/types/Project.d.ts", "cordova-plugin-group-project/www/util.js",
+		"cordova-plugin-group-project/www/Project.js.map", "cordova-plugin-group-project/www/util.js.map",
 		"cordova-plugin-group-project/package.json", "cordova-plugin-group-project/plugin.xml"}
 
 	winFileList := []string{"cordova-plugin-group-project\\README.md", "cordova-plugin-group-project\\tsconfig.json",
-		"cordova-plugin-group-project\\scripts\\util.ts", "cordova-plugin-group-project\\scripts\\project.ts",
-		"cordova-plugin-group-project\\src\\main\\java\\com\\group\\cordova\\project\\project.java",
-		"cordova-plugin-group-project\\types\\util.d.ts", "cordova-plugin-group-project\\www\\project.js",
-		"cordova-plugin-group-project\\types\\project.d.ts", "cordova-plugin-group-project\\www\\util.js",
-		"cordova-plugin-group-project\\www\\project.js.map", "cordova-plugin-group-project\\www\\util.js.map",
+		"cordova-plugin-group-project\\scripts\\util.ts", "cordova-plugin-group-project\\scripts\\Project.ts",
+		"cordova-plugin-group-project\\src\\main\\java\\com\\group\\cordova\\project\\Project.java",
+		"cordova-plugin-group-project\\types\\util.d.ts", "cordova-plugin-group-project\\www\\Project.js",
+		"cordova-plugin-group-project\\types\\Project.d.ts", "cordova-plugin-group-project\\www\\util.js",
+		"cordova-plugin-group-project\\www\\Project.js.map", "cordova-plugin-group-project\\www\\util.js.map",
 		"cordova-plugin-group-project\\package.json", "cordova-plugin-group-project\\plugin.xml"}
 
 	// fmt.Println(linuxFileList)
