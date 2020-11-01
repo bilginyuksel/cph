@@ -42,7 +42,7 @@ func SyncPluginXML(path string) error {
 }
 
 // AddLicenceTo ...
-func AddLicenceTo(path string, extension string, licence string) error {
+func AddLicenceTo(path string, extension string, licence string,startTag string, endTag string) error {
 	if len(licence) == 0 {
 		licence = "writer/licence"
 	}
@@ -54,7 +54,7 @@ func AddLicenceTo(path string, extension string, licence string) error {
 	for _, p := range files {
 		ext := filepath.Ext(p)
 		if ext == extension || len(extension) == 0 {
-			writer.WriteLicenceToFile(p, licence)
+			writer.WriteLicenceToFile(p, licence,startTag,endTag)
 		}
 	}
 
@@ -77,7 +77,7 @@ func (pl *PluginXMLCmd) Run(ctx *Context) error {
 
 // Run ...
 func (l *AddLicenseCmd) Run(ctx *Context) error {
-	return AddLicenceTo(l.Path, l.Extension, l.License)
+	return AddLicenceTo(l.Path, l.Extension, l.License,l.StartTag,l.EndTag)
 }
 
 // Run ...
@@ -100,6 +100,8 @@ type AddLicenseCmd struct {
 	Path      string `name:"path" help:"Paths to list." type:"path"`
 	Extension string `name:"extension" help:"File extension you wish to licence."`
 	License   string `help:"License file path to use."`
+	StartTag  string `help:"starting comment sign to use. Default is: /*"`
+	EndTag 	  string `help:"ending comment sign to use. Default is: */"`
 }
 
 // PluginCmd ...
