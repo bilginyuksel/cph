@@ -98,8 +98,8 @@ type PluginXMLCmd struct {
 // AddLicenseCmd ...
 type AddLicenseCmd struct {
 	Path      string `name:"path" help:"Paths to list." type:"path"`
-	Extension string `name:"extension" help:"File extension you wish to licence."`
-	License   string `help:"License file path to use."`
+	Extension string `required name:"extension" help:"File extension you wish to licence."`
+	License   string `required help:"License file path to use."`
 	StartTag  string `help:"starting comment sign to use. Default is: /*"`
 	EndTag 	  string `help:"ending comment sign to use. Default is: */"`
 }
@@ -107,8 +107,8 @@ type AddLicenseCmd struct {
 // PluginCmd ...
 type PluginCmd struct {
 	Path    string `name:"path" help:"Where to create the new plugin." type:"path"`
-	Group   string `name:"group" help:"Group name for the plugin."`
-	Project string `name:"project" help:"Project name for the plugin."`
+	Group   string `required name:"domain" help:"Group name for the plugin."`
+	Project string `required name:"project_name" help:"Project name for the plugin."`
 }
 
 var cli struct {
