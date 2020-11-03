@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
-
 	"github.com/bilginyuksel/cordova-plugin-helper/generator"
 	"github.com/bilginyuksel/cordova-plugin-helper/parser"
 	"github.com/bilginyuksel/cordova-plugin-helper/reader"
 	"github.com/bilginyuksel/cordova-plugin-helper/writer"
+	"path/filepath"
 
 	"github.com/alecthomas/kong"
 )
@@ -42,31 +41,41 @@ func SyncPluginXML(path string) error {
 }
 
 // AddLicenceTo ...
-func AddLicenceTo(path string, extension string, licence string,startTag string, endTag string) error {
+func AddLicenceTo(path string, extension string, licence string) error {
 	if len(licence) == 0 {
 		licence = "writer/licence"
+	}
+	if path == "" {
+		path = "."
 	}
 	files, err := reader.FilePathWalkDir(path)
 	if err != nil {
 		return err
 	}
-
+	extensions := make(map[string][]string)
+	extensions[".html"] = []string{"<!--", "-->"}
+	extensions[".java"] = []string{"/*", "*/"}
+	extensions[".js"] = []string{"/*", "*/"}
+	extensions[".ts"] = []string{"/*", "*/"}
+	extensions[".py"] = []string{"\"\"\"", "\"\"\""}
 	for _, p := range files {
 		ext := filepath.Ext(p)
-		if ext == extension || len(extension) == 0 {
-			writer.WriteLicenceToFile(p, licence,startTag,endTag)
+		if extension != "" && extension[0] != '.' {
+			extension = "." + extension
+		}
+		if extension == ext || extension == "" {
+			tag, isPresent := extensions[ext]
+			if isPresent {
+				writer.WriteLicenceToFile(p, licence, tag[0], tag[1])
+			}
 		}
 	}
-
 	return nil
 }
 
 // PluginGenerator ...
-func PluginGenerator(path string, group string, project string) error {
-	if len(path) == 0 {
-		path = "."
-	}
-	generator.CreateBasePlugin(path, group, project)
+func PluginGenerator(group string, project string, homePage string) error {
+	generator.CreateBasePlugin(group, project, homePage)
 	return nil
 }
 
@@ -77,12 +86,12 @@ func (pl *PluginXMLCmd) Run(ctx *Context) error {
 
 // Run ...
 func (l *AddLicenseCmd) Run(ctx *Context) error {
-	return AddLicenceTo(l.Path, l.Extension, l.License,l.StartTag,l.EndTag)
+	return AddLicenceTo(l.Path, l.Extension, l.License)
 }
 
 // Run ...
 func (p *PluginCmd) Run(ctx *Context) error {
-	return PluginGenerator(p.Path, p.Group, p.Project)
+	return PluginGenerator(p.Group, p.ProjectName, p.HomePage)
 }
 
 // Context ...
@@ -98,17 +107,15 @@ type PluginXMLCmd struct {
 // AddLicenseCmd ...
 type AddLicenseCmd struct {
 	Path      string `name:"path" help:"Paths to list." type:"path"`
-	Extension string `required name:"extension" help:"File extension you wish to licence."`
+	Extension string `name:"extension" help:"File extension you wish to licence."`
 	License   string `required help:"License file path to use."`
-	StartTag  string `help:"starting comment sign to use. Default is: /*"`
-	EndTag 	  string `help:"ending comment sign to use. Default is: */"`
 }
 
 // PluginCmd ...
 type PluginCmd struct {
-	Path    string `name:"path" help:"Where to create the new plugin." type:"path"`
-	Group   string `required name:"domain" help:"Group name for the plugin."`
-	Project string `required name:"project_name" help:"Project name for the plugin."`
+	ProjectName string `required name:"project-name" help:"Project name for the plugin."`
+	Group       string `required name:"domain" help:"Group name for the plugin."`
+	HomePage    string `required name:"home-page" help:"Home page for the plugin."`
 }
 
 var cli struct {
