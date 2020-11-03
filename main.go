@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/bilginyuksel/cordova-plugin-helper/generator"
 	"github.com/bilginyuksel/cordova-plugin-helper/parser"
 	"github.com/bilginyuksel/cordova-plugin-helper/reader"
 	"github.com/bilginyuksel/cordova-plugin-helper/writer"
-	"path/filepath"
 
 	"github.com/alecthomas/kong"
 )
@@ -58,11 +59,13 @@ func AddLicenceTo(path string, extension string, licence string) error {
 	extensions[".js"] = []string{"/*", "*/"}
 	extensions[".ts"] = []string{"/*", "*/"}
 	extensions[".py"] = []string{"\"\"\"", "\"\"\""}
+
+	if extension != "" && extension[0] != '.' {
+		extension = "." + extension
+	}
+
 	for _, p := range files {
 		ext := filepath.Ext(p)
-		if extension != "" && extension[0] != '.' {
-			extension = "." + extension
-		}
 		if extension == ext || extension == "" {
 			tag, isPresent := extensions[ext]
 			if isPresent {
