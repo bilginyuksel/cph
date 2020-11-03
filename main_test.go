@@ -154,7 +154,7 @@ func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) 
 	ioutil.WriteFile("www/test.ts", []byte(""), 0644)
 	linuxJsFiles = append(linuxJsFiles, "www/test.ts")
 
-	AddLicenceTo("www", ".js", "","","")
+	AddLicenceTo("www", ".js", "")
 	if runtime.GOOS == "windows" {
 		controlLicenceOnArrayOfFiles(winJsFiles, t, ".js")
 	} else {
@@ -190,7 +190,7 @@ func TestAddLicenceToJavaFilesInCurrentPath_JavaFilesShouldBeLicensed(t *testing
 	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
 	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
 
-	AddLicenceTo("src", ".java", "writer/licence","","")
+	AddLicenceTo("src", ".java", "writer/licence")
 	if runtime.GOOS == "windows" {
 		controlLicenceOnArrayOfFiles(winJavaFiles, t, ".java")
 	} else {
@@ -216,7 +216,7 @@ func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T
 		}
 	}
 
-	AddLicenceTo("src", "", "","","")
+	AddLicenceTo("src", "", "")
 	if runtime.GOOS == "windows" {
 		checkAllFilesLicence(winJavaFiles)
 	} else {

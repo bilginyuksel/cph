@@ -64,7 +64,7 @@ func isLicenceAlreadyContainsTags(licence string, startTag string) bool {
 }
 
 func addTagToLicence(startTag string, endTag string, licence string) string {
-	licence = startTag + "\n" + licence + "\n" + endTag
+	licence = startTag + "\n" + licence + endTag + "\n"
 	return licence
 }
 
