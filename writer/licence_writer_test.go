@@ -48,15 +48,24 @@ func TestCheckIfFileContainsLicenceAlready_LicenceExistWithWrongFormat(t *testin
 	createFile("test.java")
 	file, _ := os.OpenFile("test.java", os.O_RDWR, 0644)
 	licence := readFile("licence")
-	lines := strings.Split(licence,"\n")
-	lines[0] = "wrong format"
-	licence = strings.Join(lines,"\n")
+	lines := strings.Split(licence, "\n")
+	lines[0] = "wrong formatter text"
+	lines = append(lines, "wrong formatter text\n")
+	licence = strings.Join(lines, "\n")
+	if !isLicenceAlreadyContainsTags(licence, "/*") {
+		licence = addTagToLicence("/*","*/",licence)
+	}
+	ioutil.WriteFile("testLicence", []byte(licence), 0644)
 	_, _ = file.WriteString(licence)
+	for i := 0; i < 30; i++ {
+		file.WriteString("Test line\n")
+	}
 	file.Close()
-	if IsLicenceFormatValid("test.java","licence"){
+	if IsLicenceFormatValid("test.java", "testLicence") {
 		t.Error()
 	}
 	os.Remove(file.Name())
+	os.Remove("testLicence")
 }
 
 func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
@@ -65,7 +74,7 @@ func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
 	for i := 1; i < 100; i++ {
 		_, _ = file.WriteString("This is a test file.\n")
 	}
-	_, _ = WriteLicenceToFile(file.Name(), "licence","/*","*/")
+	_, _ = WriteLicenceToFile(file.Name(), "licence", "/*", "*/")
 	s := readFile(file.Name())
 	licence := readFile("licence")
 	file.Close()
@@ -78,4 +87,3 @@ func TestWriteToFileLicence_LicenceIsWrittenProperly(t *testing.T) {
 func createFile(fileName string) {
 	ioutil.WriteFile(fileName, []byte(""), 0644)
 }
-
