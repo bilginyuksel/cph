@@ -4,14 +4,17 @@ import (
 	"fmt"
 )
 
-func main(){
-	fmt.Println("Generator package main method.")
+func main() {
+	fmt.Println("generator package initialized")
 }
 
+var tokens []string
+var symbols []string
 
-type TSFile struct {
-	Functions map[string]Function
+func Parse(content string) *TSFile{
+	return nil
 }
+
 
 type AccessSpecifier string
 const (
@@ -21,11 +24,56 @@ const (
 	Default AccessSpecifier = "default"
 )
 
+type TSFile struct {
+	Name string
+	Functions map[string]Function
+	Classes map[string]Class
+	Variables map[string]Variable
+	Interface map[string]Interface
+	Enum map[string]Enum
+}
+
+type Class struct {
+	Abstract bool
+	Export bool
+	Default bool
+	// Inner class...
+	Name string
+	Inherited *Class
+	Implemented []Interface
+	Annotations []Annotation
+	Attributes []Attribute
+	Methods []Method
+	Constructors []Constructor
+}
+
+type Interface struct {
+	Export bool
+	Name string
+	Inherited []Interface
+	Variables map[string]string
+	Methods []Method
+}
+
+type Enum struct {
+	Name string
+	Values map[string]string
+}
+
+type Constructor struct {
+	AccessSpecifier AccessSpecifier
+	Parameters []Parameter
+	Parent *Class
+}
+
 type Method struct {
 	Static bool
+	Abstract bool
+	Async bool
+	Name string
 	Annotations []Annotation
 	Parameters []Parameter
-	ReturnType DataType
+	Return string
 	AccessSpecifier AccessSpecifier
 	Parent *Class
 	DocString *DocString
@@ -33,16 +81,45 @@ type Method struct {
 
 type Function struct {
 	Export bool
+	Async bool
+	Name string
 	Annotations []Annotation
 	Parameters []Parameter
-	ReturnType DataType
+	Return string
 	Parent *File
 	DocString *DocString
 }
 
-type DocString struct {}
-type DataType struct {}
-type Function struct {}
-type Class struct {}
-type Annotation struct {}
-type Parameter struct {}
+type Variable struct {
+	Export bool
+	Name string
+	Type string
+}
+
+type Attribute struct {
+	AccessSpecifier AccessSpecifier
+	Name string
+	Type string
+}
+
+type Annotation struct {
+	Name string
+	Param string
+}
+
+type Parameter struct {
+	Name string
+	Type string
+	DefaultValue string
+}
+
+type ReturnDoc struct{
+	Return string
+	Description string
+}
+
+type DocString struct {
+	Description string
+	Params map[string]string
+	ReturnDoc ReturnDoc
+}

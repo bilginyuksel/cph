@@ -1,0 +1,63 @@
+- function parser:
+* export function foo();
+* export async function foo();
+* export async function foo(): void;
+* function foo();
+
+<function-template>
+// <docstring>
+// <annotation[]>
+// <export> <async> function <name>(<param[]>): <return> ;
+
+<method-template>
+// <docstring>
+// <annotation[]>
+// <access-specifier> <abstract|static> <async> <name>(<param[]>): <return>;
+
+
+## FILE-LEVEL-FINDER
+
+<default?>
+		|
+	<export?>
+		| 
+		|____ <abstract?>&class
+		|		    	|___ <class-name>
+        |           	|___ <extends?>&class
+  		|		    	|___ <implements?>&[]interfaces
+		|
+		|____ interface
+		|			|___ <interface-name>
+		|			|___ <extends?>&[]interfaces
+		|
+		|____ enum
+		|		 |___ <enum-name>
+		|
+		|
+		|____ <const, let, var>
+		|				  |___ <variable-name>
+		|				  |___ <type|value>|<type&value>
+		|
+		|			
+		|____ <async?>&function
+						  |___ <function-name>
+						  |___ <parameters?>[]parameters
+						  |___ <return?>
+
+
+
+## CLASS-LEVEL-FINDER
+
+accss = access-specifier
+<accss?> - (empty default)
+	|
+	|____ <variable>
+	|			|___
+	|			|___
+	|
+	|____ <async?>&function
+				|___
+				|___
+				|___
+
+
