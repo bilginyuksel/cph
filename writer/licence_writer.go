@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-func IsLicenceExist(fileName string, licenceFile string) (bool, error) {
-	file, err := os.Open(fileName)
+func IsLicenceExist(filePath string, licenceFilePath string) (bool, error) {
+	file, err := os.Open(filePath)
 	if err != nil {
 		return false, err
 	}
@@ -18,44 +18,50 @@ func IsLicenceExist(fileName string, licenceFile string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	LICENCE := readFile(licenceFile)
+	LICENCE := readFile(licenceFilePath)
 	return strings.Contains(fileContent, LICENCE), err
 }
 
-func IsLicenceFormatValid(fileName string, licenceName string) bool {
-	licence := readFile(licenceName)
-	licenceArray := strings.Split(licence,"\n")
-	firstLineOfLicence := licenceArray[0]
-	fileContent := readFile(fileName)
-	if strings.Contains(fileContent, firstLineOfLicence) {
-		index := strings.Index(fileContent, firstLineOfLicence)
-		tempLicence := string(fileContent[index])
-		for i := index; fileContent[i-1] != '*' || fileContent[i] != '/'; i++ {
-			tempLicence += string(fileContent[i])
+func IsLicenceFormatValid(filePath string, licenceFilePath string) bool {
+	licence := readFile(licenceFilePath)
+	licenceArray := strings.Split(licence, "\n")
+	fileContent := readFile(filePath)
+	for i := 0; i < len(licenceArray); i++ {
+		line := licenceArray[i]
+		if strings.Contains(fileContent, line) {
+			startIndex := strings.Index(fileContent, "/*")
+			endIndex := strings.Index(fileContent, "*/")
+			if startIndex >= 0 && endIndex > 0{
+				tempLicence := ""
+				for i := startIndex; i < endIndex + 2; i++ {
+					tempLicence += string(fileContent[i])
+				}
+				fmt.Println(tempLicence)
+				return licence == tempLicence
+			}
 		}
-		fmt.Println(tempLicence)
-		return licence == tempLicence
 	}
-	return false
+	return true
 }
 
-func WriteLicenceToFile(fileName string, licenceFile string, startTag string, endTag string) (bool, error) {
-	ok, err := IsLicenceExist(fileName, licenceFile)
-	if ok {
+func WriteLicenceToFile(filePath string, licenceFilePath string, startTag string, endTag string) (bool, error) {
+	licenceExist, err := IsLicenceExist(filePath, licenceFilePath)
+	licenceFormatValid := IsLicenceFormatValid(filePath, licenceFilePath)
+	if licenceExist || !licenceFormatValid {
 		return false, err
 	}
 	if startTag == "" || endTag == "" {
 		startTag = "/*"
 		endTag = "*/"
 	}
-	bytes, _ := ioutil.ReadFile(fileName)
+	bytes, _ := ioutil.ReadFile(filePath)
 	var content string
-	licence := readFile(licenceFile)
+	licence := readFile(licenceFilePath)
 	if !isLicenceAlreadyContainsTags(licence, startTag) {
 		licence = addTagToLicence(startTag, endTag, licence)
 	}
 	content = licence + string(bytes)
-	_ = ioutil.WriteFile(fileName, []byte(content), 0644)
+	_ = ioutil.WriteFile(filePath, []byte(content), 0644)
 	return true, nil
 }
 func isLicenceAlreadyContainsTags(licence string, startTag string) bool {
@@ -68,8 +74,8 @@ func addTagToLicence(startTag string, endTag string, licence string) string {
 	return licence
 }
 
-func readFile(fileName string) string {
-	file, err := os.Open(fileName)
+func readFile(filePath string) string {
+	file, err := os.Open(filePath)
 	checkErr(err)
 	scanner := bufio.NewScanner(file)
 	content := ""
