@@ -68,6 +68,7 @@ func addTagToLicence(startTag string, endTag string, licence string) string {
 	return licence
 }
 
+// readFile ...
 func readFile(fileName string) string {
 	file, err := os.Open(fileName)
 	checkErr(err)
