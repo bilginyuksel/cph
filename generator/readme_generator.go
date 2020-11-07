@@ -1,20 +1,5 @@
 package generator
 
-import (
-	"fmt"
-)
-
-func main() {
-	fmt.Println("generator package initialized")
-}
-
-var tokens []string
-var symbols []string
-
-func Parse(content string) *TSFile{
-	return nil
-}
-
 
 type AccessSpecifier string
 const (
@@ -26,11 +11,14 @@ const (
 
 type TSFile struct {
 	Name string
+	Imports map[string][]string
+	Exports map[string][]string
 	Functions map[string]Function
 	Classes map[string]Class
 	Variables map[string]Variable
 	Interface map[string]Interface
 	Enum map[string]Enum
+	Comments []string
 }
 
 type Class struct {
@@ -86,7 +74,7 @@ type Function struct {
 	Annotations []Annotation
 	Parameters []Parameter
 	Return string
-	Parent *File
+	Parent *TSFile
 	DocString *DocString
 }
 
