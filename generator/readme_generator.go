@@ -4,17 +4,40 @@ import (
 	"fmt"
 )
 
-func main() {
-	fmt.Println("generator package initialized")
+var tokens = map[string]bool{
+	"export": true,
+	"const": true,
+	"let": true,
+	"var": true,
+	"default": true,
+	"class": true,
+	"function": true,
+	"async": true,
+	"extends": true,
+	"implements": true,
+	"abstract": true,
+	"import":true,
+	"constructor": true,
+	"return": true,
+	"//": true,
+	"/*": true,
 }
 
-var tokens []string
-var symbols []string
+var symbols = map[string]bool {
+	"(": true,
+	")": true,
+	"{": true,
+	"}": true,
+	"\"": true,
+	"'": true,
+	"`": true,
+	":": true,
+	";": true
+}
 
 func Parse(content string) *TSFile{
 	return nil
 }
-
 
 type AccessSpecifier string
 const (
@@ -26,11 +49,14 @@ const (
 
 type TSFile struct {
 	Name string
+	Imports map[string][]string
+	Exports map[string][]string
 	Functions map[string]Function
 	Classes map[string]Class
 	Variables map[string]Variable
 	Interface map[string]Interface
 	Enum map[string]Enum
+	Comments []string
 }
 
 type Class struct {

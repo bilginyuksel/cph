@@ -1,3 +1,5 @@
+Don't forget, in TSFile there should be imports, exports and etc.
+
 -- Parse helper --
 
 Find every word in the language. In human languages a words ending is
@@ -6,4 +8,185 @@ represented by semi colon, but in different languages this can be change.
 ** Let's talk about TypeScript, in TypeScript code line can be end by ('.' or
 '\r\n--new line character').  
 
-** 
+Read the file line by line and try to find a cleaner result.
+
+Example file:
+------------------------------------------------------
+class FooClass{
+	constructor() {
+		...
+	}
+	public foo() {
+		...
+	}
+}
+
+export function foo() { ... };
+
+const a = 1; const b = 2;
+const c = 2
+const d = 3
+let e = 4; let f=5; let k=6
+
+------------------------------------------------------
+Example Output:
+------------------------------------------------------
+FooClass
+	|__ constructor();
+	|__ public foo();
+export function foo()
+const a = 1
+const b = 2
+const c = 2
+const d = 3
+let e = 4
+let f = 5
+let k = 6
+
+          Main  
+       /  |  | \ 
+      @  //  /*  <data-type|class|function|export|default|import>
+
+
+		@		//		/*		const|let|var	
+	    |       |        |            |
+ 	   name    newline   */          name
+	   / \        *      *          /  | \
+	  (	  -*                       ;   =  :
+      |                            *   |    \
+      )*                              value  type
+                                       / \     \  \
+                                      ;  \n     =  ;
+									  *   *     |  *
+ 											   ...
+
+
+									class
+									  |
+									  |
+									 name
+							   /       |     \
+							  /        |      \
+							 /         |       \
+							/          |        \
+						   /   		   |         \
+						  / 		   |          \
+					  extends    implements       ...
+						 |             |
+						name         name
+					   /   |          /  \
+                      /   ...       ,    ...
+                     /              |
+			   implements         recursive
+					|
+ 				   name
+ 				  /   \
+ 				 ,    ...
+                |
+             recursive
+
+
+								export
+							  /    |   \
+ 						     /     |    \
+							{    name   token
+
+
+class Exp {
+	constructor(){
+		console.log("Exp");
+	}
+	async foo(): Promise<void>{
+		return asyncExec('s1', 's2', []);
+	}
+	protected boo(): string {
+		return "Hello, World";
+	}
+}
+
+<expression>
+	<token>class</token>
+	<token>Exp</token>
+	<symbol>{</symbol>
+	<token>constructor</token>
+	<symbol>(</symbol>
+	<symbol>)</symbol>
+	<symbol>{</symbol>
+	<token>console.log</token>
+	<symbol>(</symbol>
+	<symbol>"Exp"</symbol>
+	<symbol>)</symbol>
+	<symbol>;</symbol>	
+</expression>
+
+type token struct {
+	name string
+	value string
+}
+
+var tokens []token
+
+func parseLine(line string){
+	match := ""
+	for i:=0; i<len(line); i++ {
+		if _, ok := symbols[line[i]]; ok {
+			if len(match) != 0 {
+				tokens = append(tokens, Token{name:Name})
+			}
+			tokens = append(tokens, Token{name:Symbol})
+			match = ""
+			continue
+		}
+
+		if line[i] == " " {
+			if _, ok := keywords[match]; ok {
+				tokens = append(tokens, Token{name:Keyword})
+			}
+			match = ""
+			continue
+		}
+		
+		match += line[i]
+	}
+}
+
+func parse(content []string){
+	for _, line := range content {
+		parseLine(line)
+	}
+}
+
+
+class TrieNode:
+	def __init__(self, val):
+		self.value = val
+		self.children = {}
+		self.end = False
+
+root = TrieNode()
+root.children["const"] = varTrie
+root.children["let"] = varTrie
+root.children["var"] = varTrie
+
+varTrie = TrieNode()
+node = TrieNode("string")
+varTrie.children["string"] = node
+
+eqnode = TrieNode("=")
+semcolnode = TrieNode(";")
+colnode = TrieNode(":")
+node.children[";"] = semcolnode
+node.children[":"] = colnode
+node.children["="] = eqnode
+
+semcolnode.end = True
+eqnode.children["<value>"] = TrieNode()
+typenode = TrieNode("type")
+semcolnode.children["<type>"] = typenode
+typenode.children["="] = eqnode
+typenode.children[";"] = semcolnode
+
+functionTrie = TrieNode()
+root.children["function"] = functionTrie
+functionTrie.children["name"] = TrieNode()
+
