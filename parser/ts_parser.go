@@ -54,6 +54,21 @@ func ParseVariables(content string) []string {
 			continue
 		}
 
+		// Advance improvement.
+		// Create a special character hashMap for ",',`,/,@ and
+		// map the functions to this characters
+		// if hashMap returns ok result then call the function for the returned value.
+		if currentElem == "/" {
+			idx = tokenizeCommentThenReturnEndIdx(content, idx)
+			continue
+		}
+
+		if currentElem == "@" {
+			idx = tokenizeAnnotationThenReturnEndIdx(content, idx)
+			continue
+		}
+
+
 		currentWord = strings.Trim(currentWord, " ")
 		if currentElem == " " && len(currentWord) > 0 {
 			tokens = append(tokens, currentWord)
@@ -70,6 +85,15 @@ func ParseVariables(content string) []string {
 	}
 
 	return tokens
+}
+
+func tokenizeAnnotationThenReturnEndIdx(content string, startIdx int) int {
+
+}
+
+
+func tokenizeCommentThenReturnEndIdx(content string, startIdx int) int {
+
 }
 
 
