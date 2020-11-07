@@ -39,7 +39,7 @@ var symbols = map[string]bool{
 
 var tokens []string
 
-func ParseVariables(content string) []string {
+func Tokenize(content string) []string {
 	// I couldn't pass slice by reference so I created a global slice and initalized it in
 	// this method. Whenever this method called it will be initialized again.
 	tokens = []string{}
@@ -63,16 +63,15 @@ func ParseVariables(content string) []string {
 			continue
 		}
 
-		if currentElem == "@" {
-			idx = tokenizeAnnotationThenReturnEndIdx(content, idx)
-			continue
-		}
-
-
 		currentWord = strings.Trim(currentWord, " ")
-		if currentElem == " " && len(currentWord) > 0 {
+		currentWord = strings.Trim(currentWord, "\n")
+		currentWord = strings.Trim(currentWord, "\t")
+		if (currentElem == " " || currentElem == "\n") && len(currentWord) > 0 {
 			tokens = append(tokens, currentWord)
 			currentWord = ""
+			continue
+		}
+		if currentElem == "\n" {
 			continue
 		}
 		currentWord += currentElem
@@ -80,6 +79,8 @@ func ParseVariables(content string) []string {
 
 	// If currentWord is not empty add to tokens
 	currentWord = strings.Trim(currentWord, " ")
+	currentWord = strings.Trim(currentWord, "\n")
+	currentWord = strings.Trim(currentWord, "\t")
 	if len(currentWord) > 0 {
 		tokens = append(tokens, currentWord)
 	}
@@ -87,13 +88,34 @@ func ParseVariables(content string) []string {
 	return tokens
 }
 
-func tokenizeAnnotationThenReturnEndIdx(content string, startIdx int) int {
-
-}
-
 
 func tokenizeCommentThenReturnEndIdx(content string, startIdx int) int {
+	endIdx := startIdx + 1
+	comment := ""
 
+	if string(content[endIdx]) == "/" {
+		endIdx++
+		// oneline comment
+		// it should be \n or \r\n find the difference
+		for ;endIdx<len(content) && string(content[endIdx]) != "\n"; endIdx++ {
+			comment += string(content[endIdx])
+		}
+
+	} else if string(content[endIdx]) == "*" {
+		endIdx++
+		// multiline comment
+		for ;endIdx<len(content)-1; endIdx++ {
+			if string(content[endIdx]) == "*" && string(content[endIdx+1]) == "/" {
+				endIdx += 2
+				break
+			}
+			comment += string(content[endIdx])
+		}
+	}
+
+	tokens = append(tokens, comment)
+
+	return endIdx
 }
 
 
