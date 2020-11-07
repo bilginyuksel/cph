@@ -1,0 +1,9 @@
+-- Parse helper --
+
+Find every word in the language. In human languages a words ending is
+represented by a dot sign. In computer languages this sign is usually
+represented by semi colon, but in different languages this can be change.
+** Let's talk about TypeScript, in TypeScript code line can be end by ('.' or
+'\r\n--new line character').  
+
+** 

@@ -1,20 +1,12 @@
-- function parser:
-* export function foo();
-* export async function foo();
-* export async function foo(): void;
-* function foo();
-
-<function-template>
-// <docstring>
-// <annotation[]>
-// <export> <async> function <name>(<param[]>): <return> ;
-
-<method-template>
-// <docstring>
-// <annotation[]>
-// <access-specifier> <abstract|static> <async> <name>(<param[]>): <return>;
-
-
+       	                         ____ <docstring>
+                                |
+<template> ---------- <function> --- <annotation[]>
+					|			|____  <export> <async> function <name>(<param[]>): <return> ;
+					|
+					|___ <method> --- <docstring>
+								|____ <annotation[]>
+								|____ <access-specifier> <abstract|static> <async> <name>(<param[]>): <return>;
+ 
 ## FILE-LEVEL-FINDER
 
 <default?>
