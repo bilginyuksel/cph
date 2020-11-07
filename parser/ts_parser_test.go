@@ -2,11 +2,11 @@ package parser
 
 import "testing"
 
-func TestParseLine_tokenizeVar1(t *testing.T) {
+func TestParseVariables_tokenizeVar1(t *testing.T) {
 	content := `const foo  ="Life \"is all about quotes\"";let l;     var baz:string; const koz:   number   =     5;var soz; var loz = 'hi'`
 
 	expected := []string{"const", "foo", "=", "Life \"is all about quotes\"", ";", "let", "l", ";", "var", "baz", ":", "string", ";", "const", "koz", ":", "number", "=", "5", ";", "var", "soz", ";", "var", "loz", "=", "hi"}
-	given := ParseLine(content)
+	given := ParseVariables(content)
 
 	if len(given) != len(expected) {
 		t.Errorf("Length of the expected array is not satisfied. expected: %d, given: %d", len(expected), len(given))
@@ -19,12 +19,12 @@ func TestParseLine_tokenizeVar1(t *testing.T) {
 	}
 }
 
-func TestParseLine_tokenizeVar2(t *testing.T) {
+func TestParseVariables_tokenizeVar2(t *testing.T) {
 	content := `const f='\'\'hello\'\'';let l="\"\"world\"\"";`
 
 	expected := []string{"const","f","=","''hello''", ";", "let", "l", "=", "\"\"world\"\"", ";"}
 
-	given := ParseLine(content)
+	given := ParseVariables(content)
 
 	if len(given) != len(expected) {
 		t.Errorf("Length of the expected array is not satisfied. expected: %d, given: %d", len(expected), len(given))
@@ -37,7 +37,7 @@ func TestParseLine_tokenizeVar2(t *testing.T) {
 	}
 }
 /*
-func TestParseLine_tokenizeVar3(t *testing.T) {
+func TestParseVariables_tokenizeVar3(t *testing.T) {
 	content := `const f: string="hello world"
 				const l="wow"
 let yey; let how: string
@@ -47,7 +47,7 @@ var l = "lo\"l\"ol";let l;`
 	expected := []string{"const", "f", ":", "string", "=", "hello world", "const", "l", "=", "wow", "let",
 		"yey", ";", "let", "how", ":", "string", "var", "v", "var", "l", "=","lo\"l\"ol", ";", "let", "l", ";"}
 
-	given := ParseLine(content)
+	given := ParseVariables(content)
 
 	if len(given) != len(expected) {
 		t.Errorf("Length of the expected array is not satisfied. expected: %d, given: %d", len(expected), len(given))
