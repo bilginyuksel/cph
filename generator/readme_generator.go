@@ -1,43 +1,5 @@
 package generator
 
-import (
-	"fmt"
-)
-
-var tokens = map[string]bool{
-	"export": true,
-	"const": true,
-	"let": true,
-	"var": true,
-	"default": true,
-	"class": true,
-	"function": true,
-	"async": true,
-	"extends": true,
-	"implements": true,
-	"abstract": true,
-	"import":true,
-	"constructor": true,
-	"return": true,
-	"//": true,
-	"/*": true,
-}
-
-var symbols = map[string]bool {
-	"(": true,
-	")": true,
-	"{": true,
-	"}": true,
-	"\"": true,
-	"'": true,
-	"`": true,
-	":": true,
-	";": true
-}
-
-func Parse(content string) *TSFile{
-	return nil
-}
 
 type AccessSpecifier string
 const (
@@ -112,7 +74,7 @@ type Function struct {
 	Annotations []Annotation
 	Parameters []Parameter
 	Return string
-	Parent *File
+	Parent *TSFile
 	DocString *DocString
 }
 
