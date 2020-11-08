@@ -1,0 +1,40 @@
+<const|let|var>
+	<variable-name>
+		<newline_end_sign>
+		<semicolon_end_sign>
+		
+		<colon>
+			<data-type>
+				<assignment_fcall>
+			</data-type>
+		</colon>
+
+		<assignment>
+			// if value is a function () => {}... it is an edge case for this problem.
+			<value> 
+				<newline_end_sign>
+				<semicolon_end_sign>
+			</value>	
+		</assignment>
+
+	</variable-name>
+</const|let|var>
+
+<function>
+	<name>
+	<paranthesis>
+		  ...
+		<param>
+		<comma>
+		  ...
+		  ...
+	</paranthesis>
+	<colon>
+		<type>
+	</colon>
+	<curly-bracket>
+		...
+		// you can follow the ending curly bracket
+		...
+	</curly-bracket>
+</function>

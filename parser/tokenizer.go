@@ -40,6 +40,7 @@ var symbols = map[string]bool{
 	"=":  true,
 	">":  true,
 	"<":  true,
+	"-":  true,
 }
 
 var tokens []string
@@ -59,18 +60,12 @@ func Tokenize(content string) []string {
 			continue
 		}
 
-		// Advance improvement.
-		// Create a special character hashMap for ",',`,/,@ and
-		// map the functions to this characters
-		// if hashMap returns ok result then call the function for the returned value.
 		if currentElem == "/" {
 			idx = tokenizeCommentThenReturnEndIdx(content, idx)
 			continue
 		}
 
-		currentWord = strings.Trim(currentWord, " ")
-		currentWord = strings.Trim(currentWord, "\n")
-		currentWord = strings.Trim(currentWord, "\t")
+		currentWord = trimByNewLineTabSpace(currentWord)
 		if (currentElem == " " || currentElem == "\n") && len(currentWord) > 0 {
 			tokens = append(tokens, currentWord)
 			currentWord = ""
@@ -83,14 +78,19 @@ func Tokenize(content string) []string {
 	}
 
 	// If currentWord is not empty add to tokens
-	currentWord = strings.Trim(currentWord, " ")
-	currentWord = strings.Trim(currentWord, "\n")
-	currentWord = strings.Trim(currentWord, "\t")
+	currentWord = trimByNewLineTabSpace(currentWord)
 	if len(currentWord) > 0 {
 		tokens = append(tokens, currentWord)
 	}
 
 	return tokens
+}
+
+func trimByNewLineTabSpace(word string) string {
+	word = strings.Trim(word, " ")
+	word = strings.Trim(word, "\n")
+	word = strings.Trim(word, "\t")
+	return word
 }
 
 func tokenizeCommentThenReturnEndIdx(content string, startIdx int) int {
