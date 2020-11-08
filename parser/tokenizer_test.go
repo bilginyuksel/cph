@@ -350,3 +350,74 @@ func TestTokenize_Interface2(t *testing.T) {
 		}
 	}
 }
+
+func TestTokenize_Mix1(t *testing.T) {
+
+	content := `import mm from './file';
+	import {mm1, mm2, mm3} from './file2'
+	export {mm1, mm2} from './file2';
+	abstract class Foo {
+		@Test("hello", "myHello")
+		/*
+		Docstring line-1
+		Docstring line-2
+		*/
+		abstract method1(param: string, param2: number): Promise<void>;
+		method2(param): Promise<string> {
+			doSomething();
+			return new Promise((resolve, reject) => {
+				console.log("hello world");
+			});
+		}
+	}
+	const globalParam: string = "print me";
+	export function doSomething() {
+		console.log("I did something");
+		console.log(globalParam);
+	}
+
+	interface Data {
+		foo: number;
+		baz: string
+	}
+
+	function intertest(data: Data) : Data{
+		let newData: data = {} as Data;
+		if(data.foo) newData.foo = data.foo;
+		if(data.baz) newData.baz = data.baz;
+		return newData;
+	}
+
+	@ConstantAnnotation
+	enum Constant {
+		CONSTANT1="hello",
+		CONSTANT2="world"
+	}
+	`
+
+	expected := []string{"import", "mm", "from", "./file",";", "import", "{", "mm1", ",", "mm2", ",", "mm3", "}", "from", "./file2",
+	"export", "{", "mm1", ",", "mm2","}", "from", "./file2", ";", "abstract", "class", "Foo", "{", "@", "Test", "(","hello", ",", "myHello", ")", `
+		Docstring line-1
+		Docstring line-2
+		`, "abstract", "method1", "(","param", ":", "string", ",", "param2", ":", "number", ")", ":", "Promise", "<", "void", ">",";",
+		"method2", "(", "param", ")", ":", "Promise", "<","string", ">", "{", "doSomething", "(", ")", ";", "return", "new", "Promise", "(",
+		"(","resolve", ",", "reject", ")", "=", ">", "{","console.log", "(", "hello world",")", ";","}",")",";", "}", "}",
+		"const", "globalParam", ":", "string", "=", "print me", ";", "export", "function", "doSomething", "(", ")", "{", "console.log",
+		"(", "I did something",")", ";", "console.log", "(", "globalParam", ")", ";", "}", "interface", "Data", "{", "foo", ":",
+		"number", ";", "baz", ":", "string", "}", "function", "intertest", "(", "data", ":", "Data", ")",":","Data", "{", "let", "newData", ":", "data", "=",
+		"{", "}", "as", "Data", ";", "if", "(","data.foo",")","newData.foo", "=", "data.foo", ";", "if", "(", "data.baz", ")",
+		"newData.baz", "=", "data.baz",";","return", "newData", ";", "}", "@", "ConstantAnnotation", "enum", "Constant", "{",
+		"CONSTANT1", "=", "hello", ",", "CONSTANT2", "=", "world", "}" }
+
+	given := Tokenize(content)
+
+	if len(given) != len(expected) {
+		t.Errorf("Length of the expected array is not satisfied. expected: %d, given: %d", len(expected), len(given))
+	}
+
+	for i := 0; i < len(expected); i++ {
+		if expected[i] != given[i] {
+			t.Errorf(`tokens should be %s at index=%d but given is %s`, expected[i], i, given[i])
+		}
+	}
+}
