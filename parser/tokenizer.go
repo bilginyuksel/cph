@@ -24,12 +24,15 @@ var keywords = map[string]bool{
 }
 
 var symbols = map[string]bool{
+	"@":  true,
 	"(":  true,
 	")":  true,
 	"{":  true,
 	"}":  true,
 	"\"": true,
+	"+":  true,
 	"'":  true,
+	",":  true,
 	"`":  true,
 	":":  true,
 	";":  true,
@@ -71,7 +74,7 @@ func Tokenize(content string) []string {
 			currentWord = ""
 			continue
 		}
-		if currentElem == "\n" {
+		if currentElem == "\n" || currentElem == " " || currentElem == "\t" {
 			continue
 		}
 		currentWord += currentElem
