@@ -13,6 +13,7 @@ var keywords = map[string]bool{
 	"class":       true,
 	"function":    true,
 	"async":       true,
+	"await":       true,
 	"extends":     true,
 	"implements":  true,
 	"abstract":    true,
@@ -37,8 +38,9 @@ var symbols = map[string]bool{
 	":":  true,
 	";":  true,
 	"=":  true,
+	">":  true,
+	"<":  true,
 }
-
 
 var tokens []string
 
@@ -91,7 +93,6 @@ func Tokenize(content string) []string {
 	return tokens
 }
 
-
 func tokenizeCommentThenReturnEndIdx(content string, startIdx int) int {
 	endIdx := startIdx + 1
 	comment := ""
@@ -100,14 +101,14 @@ func tokenizeCommentThenReturnEndIdx(content string, startIdx int) int {
 		endIdx++
 		// oneline comment
 		// it should be \n or \r\n find the difference
-		for ;endIdx<len(content) && string(content[endIdx]) != "\n"; endIdx++ {
+		for ; endIdx < len(content) && string(content[endIdx]) != "\n"; endIdx++ {
 			comment += string(content[endIdx])
 		}
 
 	} else if string(content[endIdx]) == "*" {
 		endIdx++
 		// multiline comment
-		for ;endIdx<len(content)-1; endIdx++ {
+		for ; endIdx < len(content)-1; endIdx++ {
 			if string(content[endIdx]) == "*" && string(content[endIdx+1]) == "/" {
 				endIdx += 2
 				break
@@ -121,10 +122,9 @@ func tokenizeCommentThenReturnEndIdx(content string, startIdx int) int {
 	return endIdx
 }
 
-
 func findEndIndexOfString(content string, startIdx int) int {
 	endIdx := startIdx + 1
-	for ;content[endIdx] != content[startIdx]; {
+	for content[endIdx] != content[startIdx] {
 		if string(content[endIdx]) == "\\" {
 			endIdx++
 		}
@@ -150,5 +150,3 @@ func tokenizeSymbolThenReturnEndIdx(content string, currentWord string, startIdx
 
 	return startIdx
 }
-
-
