@@ -8,8 +8,25 @@ import (
 	"strings"
 )
 
-func IsExists(content string, licence string) bool {
-	return strings.Contains(content, licence)
+// LICENCE ... -- apache licence
+// Copyright 2020. Huawei Technologies Co., Ltd. All rights reserved.
+var LICENCE = `	Copyright %d %s
+
+	Licensed under the Apache License, Version 2.0 (the "License")
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		https://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.`
+
+// IsExists ...
+func IsExists(content string) bool {
+	return strings.Contains(content, LICENCE)
 }
 
 // var knownTypes = string[]{}
@@ -24,13 +41,13 @@ var extensions = map[string][]string{
 }
 
 // Write ...
-func Write(filePath string, licence string) {
+func Write(filePath string) {
 
 	content := readFile(filePath)
-	if IsExists(content, licence) {
+	if IsExists(content) {
 		return
 	}
-	similarity := findCommentedInvalidLicenceToDelete(content, licence, 0.2)
+	similarity := findCommentedInvalidLicenceToDelete(content, 0.2)
 	if similarity.similar {
 		content = deleteInvalidLicence(content, similarity.startIdx, similarity.endIdx)
 	}
@@ -39,7 +56,7 @@ func Write(filePath string, licence string) {
 		fmt.Printf("Unknown file extension= %s! Can't licence it.", extension)
 		return
 	}
-	content = addTagToLicence(licence, extension) + content
+	content = addTagToLicence(extension) + content
 	ioutil.WriteFile(filePath, []byte(content), 0644)
 }
 
@@ -54,7 +71,7 @@ func deleteInvalidLicence(content string, startIdx int, endIdx int) string {
 	return strings.Replace(content, content[startIdx:endIdx+1], "", 1)
 }
 
-func findCommentedInvalidLicenceToDelete(content string, licence string, bound float64) licenceSimilarity {
+func findCommentedInvalidLicenceToDelete(content string, bound float64) licenceSimilarity {
 	var prob float64 = 1
 	var startIdx int = 0
 	var endIdx int = 0
@@ -62,7 +79,7 @@ func findCommentedInvalidLicenceToDelete(content string, licence string, bound f
 		if content[i] == '*' && content[i-1] == '/' {
 			end := findEndIdxOfTheBlockComment(content, i)
 			potentialLicence := content[i+1 : end+1]
-			tempProb := comparePotentialLicenceToActualLicence(potentialLicence, licence)
+			tempProb := comparePotentialLicenceToActualLicence(potentialLicence)
 			if tempProb < prob {
 				prob = tempProb
 				startIdx = i - 1
@@ -78,9 +95,9 @@ func findCommentedInvalidLicenceToDelete(content string, licence string, bound f
 	return licenceSimilarity{similar: false, prob: prob}
 }
 
-func comparePotentialLicenceToActualLicence(potentialLicence string, licence string) float64 {
+func comparePotentialLicenceToActualLicence(potentialLicence string) float64 {
 	potentialLicence = strings.ReplaceAll(potentialLicence, "\n", " ")
-	licence = strings.ReplaceAll(licence, "\n", " ")
+	licence := strings.ReplaceAll(LICENCE, "\n", " ")
 
 	potentialLicenceMap := stringArrayToMap(strings.Split(potentialLicence, " "))
 	originalLicenceMap := stringArrayToMap(strings.Split(licence, " "))
@@ -122,9 +139,9 @@ func findEndIdxOfTheBlockComment(content string, startIdx int) int {
 	return startIdx
 }
 
-func addTagToLicence(licence string, extension string) string {
+func addTagToLicence(extension string) string {
 	tag := extensions[extension]
-	licence = tag[0] + "\n" + licence + "\n" + tag[1]
+	licence := tag[0] + "\n" + LICENCE + "\n" + tag[1]
 	return licence
 }
 

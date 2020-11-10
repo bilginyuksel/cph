@@ -49,7 +49,7 @@ func AddLicenceTo(path string) error {
 	files, _ := reader.FilePathWalkDir(path)
 
 	for _, p := range files {
-		lic.Write(p, reader.ReadFile("licence/licence"))
+		lic.Write(p)
 	}
 	return nil
 }

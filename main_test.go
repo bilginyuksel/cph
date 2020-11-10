@@ -169,7 +169,7 @@ func TestSyncPluginXMLNoPathPluginXMLExists_UpdatePluginXML(t *testing.T) {
 func controlLicenceOnArrayOfFiles(files []string, t *testing.T, extension string) {
 	for _, path := range files {
 		ext := filepath.Ext(path)
-		hasLicence := lic.IsExists(path, "licence/licence")
+		hasLicence := lic.IsExists(path)
 
 		if hasLicence && ext == extension {
 			t.Logf("Passed licence added to file= %s", path)
@@ -209,9 +209,8 @@ func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T
 
 	checkAllFilesLicence := func(files []string) {
 		for _, path := range files {
-			licence := reader.ReadFile("licence/licence")
 			content := reader.ReadFile(path)
-			hasLicence := lic.IsExists(content, licence)
+			hasLicence := lic.IsExists(content)
 			if !hasLicence {
 				t.Error()
 			}

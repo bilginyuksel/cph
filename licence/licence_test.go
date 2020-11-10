@@ -5,20 +5,19 @@ import (
 	"testing"
 )
 
-const licence = `    Copyright 2020. Huawei Technologies Co., Ltd. All rights reserved.
+const licence = `	Copyright %d %s
 
-Licensed under the Apache License, Version 2.0 (the "License")
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+	Licensed under the Apache License, Version 2.0 (the "License")
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
 
-	https://www.apache.org/licenses/LICENSE-2.0
+		https://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-`
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.`
 
 const falseLicence = `Copyright 2020. Huawei Technologies Co., Ltd. All rights reserved.
 
@@ -33,13 +32,13 @@ See the License for the specific language governing permissions and
 limitations under the License.`
 
 func TestCompareLicenceSimilarity_ZeroDifference(t *testing.T) {
-	if 0 != comparePotentialLicenceToActualLicence(licence, licence) {
+	if 0 != comparePotentialLicenceToActualLicence(licence) {
 		t.Error()
 	}
 }
 
 func TestCompareLicenceSimilarity_NotZeroDifference(t *testing.T) {
-	difference := comparePotentialLicenceToActualLicence(falseLicence, licence)
+	difference := comparePotentialLicenceToActualLicence(falseLicence)
 	fmt.Printf("Difference= %f", difference)
 	if 0 == difference {
 		t.Error(difference)
@@ -47,7 +46,7 @@ func TestCompareLicenceSimilarity_NotZeroDifference(t *testing.T) {
 }
 
 func TestCompareLicenceSimilarity_BigDifference(t *testing.T) {
-	difference := comparePotentialLicenceToActualLicence("", licence)
+	difference := comparePotentialLicenceToActualLicence("")
 	fmt.Printf("Difference= %f", difference)
 	if 0.7 > difference {
 		t.Error(difference)
@@ -98,33 +97,26 @@ func TestFindEndIdxOfTheBlockComment_Sample2(t *testing.T) {
 }
 
 func TestAddTagToLicence_Sample1(t *testing.T) {
-	content := "sample licence"
-	expected := `/*
-sample licence
-*/`
-	given := addTagToLicence(content, ".java")
+	expected := fmt.Sprintf("/*\n%s\n*/", LICENCE)
+	given := addTagToLicence(".java")
 	if given != expected {
 		t.Errorf("given= %s, expected= %s", given, expected)
 	}
 }
 
 func TestAddTagToLicence_Sample2(t *testing.T) {
-	content := "sample licence"
-	expected := `<!--
-sample licence
--->`
-	given := addTagToLicence(content, ".html")
+	expected := fmt.Sprintf("<!--\n%s\n-->", LICENCE)
+
+	given := addTagToLicence(".html")
 	if given != expected {
 		t.Errorf("given= %s, expected= %s", given, expected)
 	}
 }
 
 func TestAddTagToLicence_Sample3(t *testing.T) {
-	content := "sample licence"
-	expected := `"""
-sample licence
-"""`
-	given := addTagToLicence(content, ".py")
+	expected := fmt.Sprintf("\"\"\"\n%s\n\"\"\"", LICENCE)
+
+	given := addTagToLicence(".py")
 	if given != expected {
 		t.Errorf("given= %s, expected= %s", given, expected)
 	}
@@ -138,7 +130,7 @@ func TestDeleteInvalidLicence_DeleteInvalid(t *testing.T) {
 }
 
 func TestFindCommentedInvalidLicenceToDelete_Similar(t *testing.T) {
-	licSim := findCommentedInvalidLicenceToDelete("/*"+licence+"*/", "/*"+licence+"*/", 0.3)
+	licSim := findCommentedInvalidLicenceToDelete("/*"+licence+"*/", 0.3)
 	fmt.Printf("Licsim prob= %f", licSim.prob)
 	if !licSim.similar {
 		t.Error()
@@ -147,7 +139,7 @@ func TestFindCommentedInvalidLicenceToDelete_Similar(t *testing.T) {
 
 func TestFindCommentedInvalidLicenceToDelete_NotSimilar(t *testing.T) {
 	content := "hello world/*hello world*/hello world"
-	licSim := findCommentedInvalidLicenceToDelete(content, licence, 0.1)
+	licSim := findCommentedInvalidLicenceToDelete(content, 0.1)
 	fmt.Printf("Licsim prob= %f", licSim.prob)
 	if licSim.similar {
 		t.Error()
