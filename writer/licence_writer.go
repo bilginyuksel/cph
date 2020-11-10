@@ -31,9 +31,9 @@ func IsLicenceFormatValid(filePath string, licenceFilePath string) bool {
 		if strings.Contains(fileContent, line) {
 			startIndex := strings.Index(fileContent, "/*")
 			endIndex := strings.Index(fileContent, "*/")
-			if startIndex >= 0 && endIndex > 0{
+			if startIndex >= 0 && endIndex > 0 {
 				tempLicence := ""
-				for i := startIndex; i < endIndex + 2; i++ {
+				for i := startIndex; i < endIndex+2; i++ {
 					tempLicence += string(fileContent[i])
 				}
 				fmt.Println(tempLicence)

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/bilginyuksel/cordova-plugin-helper/generator"
-	"github.com/bilginyuksel/cordova-plugin-helper/parser"
-	"github.com/bilginyuksel/cordova-plugin-helper/reader"
-	"github.com/bilginyuksel/cordova-plugin-helper/writer"
+	"github.com/bilginyuksel/cph/generator"
+	"github.com/bilginyuksel/cph/parser"
+	"github.com/bilginyuksel/cph/reader"
+	"github.com/bilginyuksel/cph/writer"
 
 	"github.com/alecthomas/kong"
 )

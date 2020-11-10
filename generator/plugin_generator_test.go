@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/bilginyuksel/cordova-plugin-helper/reader"
+	"github.com/bilginyuksel/cph/reader"
 )
 
 func TestCreatePluginWithGivenName_ExpectPluginFilesCreated(t *testing.T) {
@@ -15,17 +15,11 @@ func TestCreatePluginWithGivenName_ExpectPluginFilesCreated(t *testing.T) {
 	linuxFileList := []string{"cordova-plugin-group-project/README.md", "cordova-plugin-group-project/tsconfig.json",
 		"cordova-plugin-group-project/scripts/util.ts", "cordova-plugin-group-project/scripts/Project.ts",
 		"cordova-plugin-group-project/src/main/java/com/group/cordova/project/Project.java",
-		"cordova-plugin-group-project/types/util.d.ts", "cordova-plugin-group-project/www/Project.js",
-		"cordova-plugin-group-project/types/Project.d.ts", "cordova-plugin-group-project/www/util.js",
-		"cordova-plugin-group-project/www/Project.js.map", "cordova-plugin-group-project/www/util.js.map",
 		"cordova-plugin-group-project/package.json", "cordova-plugin-group-project/plugin.xml"}
 
 	winFileList := []string{"cordova-plugin-group-project\\README.md", "cordova-plugin-group-project\\tsconfig.json",
 		"cordova-plugin-group-project\\scripts\\util.ts", "cordova-plugin-group-project\\scripts\\Project.ts",
 		"cordova-plugin-group-project\\src\\main\\java\\com\\group\\cordova\\project\\Project.java",
-		"cordova-plugin-group-project\\types\\util.d.ts", "cordova-plugin-group-project\\www\\Project.js",
-		"cordova-plugin-group-project\\types\\Project.d.ts", "cordova-plugin-group-project\\www\\util.js",
-		"cordova-plugin-group-project\\www\\Project.js.map", "cordova-plugin-group-project\\www\\util.js.map",
 		"cordova-plugin-group-project\\package.json", "cordova-plugin-group-project\\plugin.xml"}
 
 	// fmt.Println(linuxFileList)
