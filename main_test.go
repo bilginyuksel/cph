@@ -8,8 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/bilginyuksel/cph/reader"
+
+	lic "github.com/bilginyuksel/cph/licence"
 	"github.com/bilginyuksel/cph/parser"
-	"github.com/bilginyuksel/cph/writer"
 )
 
 var (
@@ -147,30 +149,28 @@ func TestSyncPluginXMLNoPathPluginXMLExists_UpdatePluginXML(t *testing.T) {
 	eraseMockFileStructure()
 }
 
-func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) {
-	createMockFileStructure()
-	ioutil.WriteFile("www\\test.ts", []byte(""), 0644)
-	winJsFiles = append(winJsFiles, "www\\test.ts")
-	ioutil.WriteFile("www/test.ts", []byte(""), 0644)
-	linuxJsFiles = append(linuxJsFiles, "www/test.ts")
+// func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) {
+// 	createMockFileStructure()
+// 	ioutil.WriteFile("www\\test.ts", []byte(""), 0644)
+// 	winJsFiles = append(winJsFiles, "www\\test.ts")
+// 	ioutil.WriteFile("www/test.ts", []byte(""), 0644)
+// 	linuxJsFiles = append(linuxJsFiles, "www/test.ts")
 
-	AddLicenceTo("www", ".js", "")
-	if runtime.GOOS == "windows" {
-		controlLicenceOnArrayOfFiles(winJsFiles, t, ".js")
-	} else {
-		controlLicenceOnArrayOfFiles(linuxJsFiles, t, ".js")
-	}
+// 	AddLicenceTo("www")
+// 	if runtime.GOOS == "windows" {
+// 		controlLicenceOnArrayOfFiles(winJsFiles, t, ".js")
+// 	} else {
+// 		controlLicenceOnArrayOfFiles(linuxJsFiles, t, ".js")
+// 	}
 
-	eraseMockFileStructure()
-}
+// 	eraseMockFileStructure()
+// }
 
 func controlLicenceOnArrayOfFiles(files []string, t *testing.T, extension string) {
 	for _, path := range files {
 		ext := filepath.Ext(path)
-		hasLicence, err := writer.IsLicenceExist(path, "writer/licence")
-		if err != nil {
-			t.Error(err)
-		}
+		hasLicence := lic.IsExists(path, "licence/licence")
+
 		if hasLicence && ext == extension {
 			t.Logf("Passed licence added to file= %s", path)
 		} else if hasLicence && ext != extension {
@@ -183,22 +183,22 @@ func controlLicenceOnArrayOfFiles(files []string, t *testing.T, extension string
 	}
 }
 
-func TestAddLicenceToJavaFilesInCurrentPath_JavaFilesShouldBeLicensed(t *testing.T) {
-	createMockFileStructure()
-	ioutil.WriteFile("src\\test.ts", []byte(""), 0644)
-	winJavaFiles = append(winJavaFiles, "src\\test.ts")
-	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
-	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
+// func TestAddLicenceToJavaFilesInCurrentPath_JavaFilesShouldBeLicensed(t *testing.T) {
+// 	createMockFileStructure()
+// 	ioutil.WriteFile("src\\test.ts", []byte(""), 0644)
+// 	winJavaFiles = append(winJavaFiles, "src\\test.ts")
+// 	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
+// 	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
 
-	AddLicenceTo("src", ".java", "writer/licence")
-	if runtime.GOOS == "windows" {
-		controlLicenceOnArrayOfFiles(winJavaFiles, t, ".java")
-	} else {
-		controlLicenceOnArrayOfFiles(linuxJavaFiles, t, ".java")
-	}
+// 	AddLicenceTo("src")
+// 	if runtime.GOOS == "windows" {
+// 		controlLicenceOnArrayOfFiles(winJavaFiles, t, ".java")
+// 	} else {
+// 		controlLicenceOnArrayOfFiles(linuxJavaFiles, t, ".java")
+// 	}
 
-	eraseMockFileStructure()
-}
+// 	eraseMockFileStructure()
+// }
 
 func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T) {
 	createMockFileStructure()
@@ -209,14 +209,16 @@ func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T
 
 	checkAllFilesLicence := func(files []string) {
 		for _, path := range files {
-			hasLicence, err := writer.IsLicenceExist(path, "writer/licence")
-			if err != nil || !hasLicence {
+			licence := reader.ReadFile("licence/licence")
+			content := reader.ReadFile(path)
+			hasLicence := lic.IsExists(content, licence)
+			if !hasLicence {
 				t.Error()
 			}
 		}
 	}
 
-	AddLicenceTo("src", "", "")
+	AddLicenceTo("src")
 	if runtime.GOOS == "windows" {
 		checkAllFilesLicence(winJavaFiles)
 	} else {

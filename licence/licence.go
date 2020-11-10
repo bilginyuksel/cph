@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func isExists(content string, licence string) bool {
+func IsExists(content string, licence string) bool {
 	return strings.Contains(content, licence)
 }
 
@@ -27,7 +27,7 @@ var extensions = map[string][]string{
 func Write(filePath string, licence string) {
 
 	content := readFile(filePath)
-	if isExists(content, licence) {
+	if IsExists(content, licence) {
 		return
 	}
 	similarity := findCommentedInvalidLicenceToDelete(content, licence, 0.2)
