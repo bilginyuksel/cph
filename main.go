@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/bilginyuksel/cph/generator"
+	lic "github.com/bilginyuksel/cph/licence"
 	"github.com/bilginyuksel/cph/parser"
 	"github.com/bilginyuksel/cph/reader"
-	"github.com/bilginyuksel/cph/writer"
 
 	"github.com/alecthomas/kong"
 )
@@ -42,36 +41,15 @@ func SyncPluginXML(path string) error {
 }
 
 // AddLicenceTo ...
-func AddLicenceTo(path string, extension string, licence string) error {
-	if len(licence) == 0 {
-		licence = "writer/licence"
-	}
+func AddLicenceTo(path string) error {
+
 	if path == "" {
 		path = "."
 	}
-	files, err := reader.FilePathWalkDir(path)
-	if err != nil {
-		return err
-	}
-	extensions := make(map[string][]string)
-	extensions[".html"] = []string{"<!--", "-->"}
-	extensions[".java"] = []string{"/*", "*/"}
-	extensions[".js"] = []string{"/*", "*/"}
-	extensions[".ts"] = []string{"/*", "*/"}
-	extensions[".py"] = []string{"\"\"\"", "\"\"\""}
-
-	if extension != "" && extension[0] != '.' {
-		extension = "." + extension
-	}
+	files, _ := reader.FilePathWalkDir(path)
 
 	for _, p := range files {
-		ext := filepath.Ext(p)
-		if extension == ext || extension == "" {
-			tag, isPresent := extensions[ext]
-			if isPresent {
-				writer.WriteLicenceToFile(p, licence, tag[0], tag[1])
-			}
-		}
+		lic.Write(p, reader.ReadFile("licence/licence"))
 	}
 	return nil
 }
@@ -89,7 +67,7 @@ func (pl *PluginXMLCmd) Run(ctx *Context) error {
 
 // Run ...
 func (l *AddLicenseCmd) Run(ctx *Context) error {
-	return AddLicenceTo(l.Path, l.Extension, l.License)
+	return AddLicenceTo(l.Path)
 }
 
 // Run ...
@@ -109,9 +87,7 @@ type PluginXMLCmd struct {
 
 // AddLicenseCmd ...
 type AddLicenseCmd struct {
-	Path      string `name:"path" help:"Paths to list." type:"path"`
-	Extension string `name:"extension" help:"File extension you wish to licence."`
-	License   string `required help:"License file path to use."`
+	Path string `name:"path" help:"Paths to list." type:"path"`
 }
 
 // PluginCmd ...
