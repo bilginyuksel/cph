@@ -10,7 +10,7 @@ import (
 
 // LICENCE ... -- apache licence
 // Copyright 2020. Huawei Technologies Co., Ltd. All rights reserved.
-var LICENCE = `	Copyright %d %s
+var LICENCE = `    Copyright %d %s
 
 	Licensed under the Apache License, Version 2.0 (the "License")
 	you may not use this file except in compliance with the License.
@@ -31,13 +31,13 @@ func IsExists(content string) bool {
 
 // var knownTypes = string[]{}
 var extensions = map[string][]string{
-	".html": []string{"<!--", "-->"},
-	".py":   []string{"\"\"\"", "\"\"\""},
-	".java": []string{"/*", "*/"},
-	".css":  []string{"/*", "*/"},
-	".scss": []string{"/*", "*/"},
-	".js":   []string{"/*", "*/"},
-	".ts":   []string{"/*", "*/"},
+	".html": {"<!--", "-->"},
+	".py":   {"\"\"\"", "\"\"\""},
+	".java": {"/*", "*/"},
+	".css":  {"/*", "*/"},
+	".scss": {"/*", "*/"},
+	".js":   {"/*", "*/"},
+	".ts":   {"/*", "*/"},
 }
 
 // Write ...
