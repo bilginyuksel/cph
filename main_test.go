@@ -79,6 +79,7 @@ func eraseMockFileStructure() {
 	os.RemoveAll("www")
 	os.Remove("plugin.xml")
 }
+
 func TestSyncPluginXMLNoPathPluginXMLExists_UpdatePluginXML(t *testing.T) {
 	createMockFileStructure()
 	SyncPluginXML("")
@@ -149,22 +150,23 @@ func TestSyncPluginXMLNoPathPluginXMLExists_UpdatePluginXML(t *testing.T) {
 	eraseMockFileStructure()
 }
 
-// func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) {
-// 	createMockFileStructure()
-// 	ioutil.WriteFile("www\\test.ts", []byte(""), 0644)
-// 	winJsFiles = append(winJsFiles, "www\\test.ts")
-// 	ioutil.WriteFile("www/test.ts", []byte(""), 0644)
-// 	linuxJsFiles = append(linuxJsFiles, "www/test.ts")
 
-// 	AddLicenceTo("www")
-// 	if runtime.GOOS == "windows" {
-// 		controlLicenceOnArrayOfFiles(winJsFiles, t, ".js")
-// 	} else {
-// 		controlLicenceOnArrayOfFiles(linuxJsFiles, t, ".js")
-// 	}
+/*func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) {
+	createMockFileStructure()
+	ioutil.WriteFile("www\\test.ts", []byte(""), 0644)
+	winJsFiles = append(winJsFiles, "www\\test.ts")
+	ioutil.WriteFile("www/test.ts", []byte(""), 0644)
+	linuxJsFiles = append(linuxJsFiles, "www/test.ts")
 
-// 	eraseMockFileStructure()
-// }
+	AddLicenceTo("www")
+	if runtime.GOOS == "windows" {
+		controlLicenceOnArrayOfFiles(winJsFiles, t, ".js")
+	} else {
+		controlLicenceOnArrayOfFiles(linuxJsFiles, t, ".js")
+	}
+
+	eraseMockFileStructure()
+}*/
 
 func controlLicenceOnArrayOfFiles(files []string, t *testing.T, extension string) {
 	for _, path := range files {
@@ -183,28 +185,28 @@ func controlLicenceOnArrayOfFiles(files []string, t *testing.T, extension string
 	}
 }
 
-// func TestAddLicenceToJavaFilesInCurrentPath_JavaFilesShouldBeLicensed(t *testing.T) {
-// 	createMockFileStructure()
-// 	ioutil.WriteFile("src\\test.ts", []byte(""), 0644)
-// 	winJavaFiles = append(winJavaFiles, "src\\test.ts")
-// 	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
-// 	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
-
-// 	AddLicenceTo("src")
-// 	if runtime.GOOS == "windows" {
-// 		controlLicenceOnArrayOfFiles(winJavaFiles, t, ".java")
-// 	} else {
-// 		controlLicenceOnArrayOfFiles(linuxJavaFiles, t, ".java")
-// 	}
-
-// 	eraseMockFileStructure()
-// }
-
-func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T) {
+/*func TestAddLicenceToJavaFilesInCurrentPath_JavaFilesShouldBeLicensed(t *testing.T) {
 	createMockFileStructure()
 	ioutil.WriteFile("src\\test.ts", []byte(""), 0644)
 	winJavaFiles = append(winJavaFiles, "src\\test.ts")
 	ioutil.WriteFile("src/test.ts", []byte(""), 0644)
+	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
+
+	AddLicenceTo("src")
+	if runtime.GOOS == "windows" {
+		controlLicenceOnArrayOfFiles(winJavaFiles, t, ".java")
+	} else {
+		controlLicenceOnArrayOfFiles(linuxJavaFiles, t, ".java")
+	}
+
+	eraseMockFileStructure()
+}*/
+
+func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T) {
+	createMockFileStructure()
+	ioutil.WriteFile("src\\test.ts", []byte("s"), 0644)
+	winJavaFiles = append(winJavaFiles, "src\\test.ts")
+	ioutil.WriteFile("src/test.ts", []byte("s"), 0644)
 	linuxJavaFiles = append(linuxJavaFiles, "src/test.ts")
 
 	checkAllFilesLicence := func(files []string) {

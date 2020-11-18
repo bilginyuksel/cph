@@ -12,6 +12,12 @@ import (
 )
 
 func main() {
+	/*content := `
+	export function baz(param1: number, param2: string) string{
+		return param1.toString() + param2;	
+	}`
+	parser.Tokenize(content)
+	parser.Parse()*/
 	prepareCliParser()
 }
 

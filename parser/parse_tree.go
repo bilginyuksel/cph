@@ -73,6 +73,11 @@ func next() string {
 	return token
 }
 
+
+type Tree struct {
+	TreeNode
+}
+
 type TreeNode struct {
 	Children  []TreeNode
 	Value     string

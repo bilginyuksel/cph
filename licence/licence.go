@@ -10,7 +10,7 @@ import (
 
 // LICENCE ... -- apache licence
 // Copyright 2020. Huawei Technologies Co., Ltd. All rights reserved.
-var LICENCE = `    Copyright %d %s
+var LICENCE = `    Copyright 2020. Huawei Technologies Co., Ltd. All rights reserved.
 
 	Licensed under the Apache License, Version 2.0 (the "License")
 	you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ func Write(filePath string) {
 	if IsExists(content) {
 		return
 	}
-	similarity := findCommentedInvalidLicenceToDelete(content, 0.2)
+	similarity := findCommentedInvalidLicenceToDelete(content, 0.8)
 	if similarity.similar {
 		content = deleteInvalidLicence(content, similarity.startIdx, similarity.endIdx)
 	}
@@ -72,15 +72,15 @@ func deleteInvalidLicence(content string, startIdx int, endIdx int) string {
 }
 
 func findCommentedInvalidLicenceToDelete(content string, bound float64) licenceSimilarity {
-	var prob float64 = 1
-	var startIdx int = 0
-	var endIdx int = 0
+	var prob float64 = 0
+	var startIdx = 0
+	var endIdx = 0
 	for i := 0; i < len(content); i++ {
 		if content[i] == '*' && content[i-1] == '/' {
 			end := findEndIdxOfTheBlockComment(content, i)
 			potentialLicence := content[i+1 : end+1]
 			tempProb := comparePotentialLicenceToActualLicence(potentialLicence)
-			if tempProb < prob {
+			if tempProb > prob {
 				prob = tempProb
 				startIdx = i - 1
 				endIdx = end
@@ -89,7 +89,7 @@ func findCommentedInvalidLicenceToDelete(content string, bound float64) licenceS
 		}
 	}
 
-	if bound >= prob {
+	if bound <= prob {
 		return licenceSimilarity{similar: true, startIdx: startIdx, endIdx: endIdx, prob: prob}
 	}
 	return licenceSimilarity{similar: false, prob: prob}
@@ -102,17 +102,16 @@ func comparePotentialLicenceToActualLicence(potentialLicence string) float64 {
 	potentialLicenceMap := stringArrayToMap(strings.Split(potentialLicence, " "))
 	originalLicenceMap := stringArrayToMap(strings.Split(licence, " "))
 
-	totalDiff := 0
-	for key, value := range originalLicenceMap {
-		totalDiff += value - potentialLicenceMap[key]
-	}
 	actualTotal := 0
 	for _, value := range originalLicenceMap {
 		actualTotal += value
 	}
-	fmt.Println(totalDiff, actualTotal)
+	match := 0
+	for key, value := range potentialLicenceMap {
+		match += int(math.Min(float64(value), float64(originalLicenceMap[key])))
+	}
 
-	return math.Abs(float64(totalDiff)) / float64(actualTotal)
+	return float64(match) / float64(actualTotal)
 }
 
 func max(num1 int, num2 int) int {
@@ -141,7 +140,7 @@ func findEndIdxOfTheBlockComment(content string, startIdx int) int {
 
 func addTagToLicence(extension string) string {
 	tag := extensions[extension]
-	licence := tag[0] + "\n" + LICENCE + "\n" + tag[1]
+	licence := tag[0] + "\n" + LICENCE + "\n" + tag[1] + "\n\n"
 	return licence
 }
 
