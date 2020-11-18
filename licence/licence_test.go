@@ -132,3 +132,78 @@ func TestFindCommentedInvalidLicenceToDelete_NotSimilar(t *testing.T) {
 	}
 }
 
+func TestFindHowManyCommentExists_ZeroCommentJavaExt(t *testing.T) {
+	content := "function test(){}"
+	given := findHowManyCommentExists(content,".java")
+	expected := 0
+	if given != expected {
+		t.Errorf("Given:%d but expected:%d", given, expected)
+	}
+}
+
+func TestFindHowManyCommentExists_OneCommentJavaExt(t *testing.T) {
+	content := "/* This is a comment*/ function test(){}"
+	given := findHowManyCommentExists(content,".java")
+	expected := 1
+	if given != expected {
+		t.Errorf("Given:%d but expected:%d", given, expected)
+	}
+}
+
+func TestFindHowManyCommentExists_OneComment1JavaExt(t *testing.T) {
+	content := "/* This is a comment*/ function test(){return '*/'}"
+	given := findHowManyCommentExists(content,".java")
+	expected := 1
+	if given != expected {
+		t.Errorf("Given:%d but expected:%d", given, expected)
+	}
+}
+func TestFindHowManyCommentExists_OneComment2JavaExt(t *testing.T) {
+	content := "/* This is a comment*/ function test(){return '/* /* */'}"
+	given := findHowManyCommentExists(content,".java")
+	expected := 1
+	if given != expected {
+		t.Errorf("Given:%d but expected:%d", given, expected)
+	}
+}
+func TestFindHowManyCommentExists_OneComment3JavaExt(t *testing.T) {
+	content := "/* This is 'a' comment*/ function test(){return \"/* /* */\"}"
+	given := findHowManyCommentExists(content,".java")
+	expected := 1
+	if given != expected {
+		t.Errorf("Given:%d but expected:%d", given, expected)
+	}
+}
+func TestFindHowManyCommentExists_OneComment4JavaExt(t *testing.T) {
+	content := "/* This is 'a' comment*/ function test(){return \"/*' /* */\"}"
+	given := findHowManyCommentExists(content,".java")
+	expected := 1
+	if given != expected {
+		t.Errorf("Given:%d but expected:%d", given, expected)
+	}
+}
+func TestFindHowManyCommentExists_TwoCommentsJavaExt(t *testing.T) {
+	content := "/* This is 'a' comment*//* This is 'a' comment*/ function test(){return \"/*/**/\"}"
+	given := findHowManyCommentExists(content,".java")
+	expected := 2
+	if given != expected {
+		t.Errorf("Given:%d but expected:%d", given, expected)
+	}
+}
+func TestFindHowManyCommentExists_TwoComments2HtmlExt(t *testing.T) {
+	content := "<!-- This is 'a' comment--><!-- This is 'a' comment--> function test(){return \"/*/**/\"}"
+	given := findHowManyCommentExists(content,".html")
+	expected := 2
+	if given != expected {
+		t.Errorf("Given:%d but expected:%d", given, expected)
+	}
+}
+func TestFindHowManyCommentExists_TwoComments3HtmlExt(t *testing.T) {
+	content := "<!-- This is 'a' comment--><!-- This is 'a' */ comment--> function test(){return \"/*/**/-->\"}"
+	given := findHowManyCommentExists(content,".html")
+	expected := 2
+	if given != expected {
+		t.Errorf("Given:%d but expected:%d", given, expected)
+	}
+}
+

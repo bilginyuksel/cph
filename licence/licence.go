@@ -40,6 +40,31 @@ var extensions = map[string][]string{
 	".ts":   {"/*", "*/"},
 }
 
+func findHowManyCommentExists(content string, extension string) int {
+	endTag := extensions[extension][1]
+	count := 0
+	singleQuoteFlag := false
+	doubleQuoteFlag := false
+	isNotQuoteStarted := false
+	for i := 2; i < len(content); i++ {
+		if content[i] == '\'' {
+			singleQuoteFlag = !singleQuoteFlag
+		}
+		if content[i] == '"' {
+			doubleQuoteFlag = !doubleQuoteFlag
+		}
+		isNotQuoteStarted = !doubleQuoteFlag && !singleQuoteFlag
+		if isNotQuoteStarted && isCommentEndingFound(content, i, endTag) {
+			count++
+		}
+	}
+	return count
+}
+
+func isCommentEndingFound(content string, startIdx int, endTag string) bool {
+	return content[startIdx-len(endTag)+1:startIdx+1] == endTag
+}
+
 // Write ...
 func Write(filePath string) {
 
