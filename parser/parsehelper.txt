@@ -64,13 +64,13 @@ let k = 6
 									class
 									  |
 									  |
-									 name
-							   /       |     \
-							  /        |      \
-							 /         |       \
-							/          |        \
-						   /   		   |         \
-						  / 		   |          \
+									name
+							   /      |     \
+							  /       |      \
+							 /        |       \
+							/         |        \
+						   /   		  |         \
+						  / 		  |          \
 					  extends    implements       ...
 						 |             |
 						name         name

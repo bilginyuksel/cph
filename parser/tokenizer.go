@@ -45,6 +45,7 @@ var symbols = map[string]bool{
 
 var tokens []string
 
+// Tokenize ...
 func Tokenize(content string) []string {
 	// I couldn't pass slice by reference so I created a global slice and initalized it in
 	// this method. Whenever this method called it will be initialized again.

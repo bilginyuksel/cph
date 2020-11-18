@@ -86,12 +86,14 @@ package parser
 
 // }
 
+// TreeNode ...
 type TreeNode struct {
 	Children []TreeNode
 	Value    string
 	Type     string
 }
 
+// TrieNode ...
 type TrieNode struct {
 	End      bool
 	Value    string
