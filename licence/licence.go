@@ -12,7 +12,7 @@ import (
 // Copyright 2020. Huawei Technologies Co., Ltd. All rights reserved.
 var LICENCE = `    Copyright 2020. Huawei Technologies Co., Ltd. All rights reserved.
 
-	Licensed under the Apache License, Version 2.0 (the "License")
+    Licensed under the Apache License, Version 2.0 (the "License")
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
 
@@ -69,14 +69,17 @@ func isCommentEndingFound(content string, startIdx int, endTag string) bool {
 func Write(filePath string) {
 
 	content := readFile(filePath)
+	extension := filepath.Ext(filePath)
+	numberOfComments := findHowManyCommentExists(content, extension)
+	for i := 0; i < numberOfComments; i++ {
+		similarity := findCommentedInvalidLicenceToDelete(content, 0.7)
+		if similarity.similar {
+			content = deleteInvalidLicence(content, similarity.startIdx, similarity.endIdx)
+		}
+	}
 	if IsExists(content) {
 		return
 	}
-	similarity := findCommentedInvalidLicenceToDelete(content, 0.8)
-	if similarity.similar {
-		content = deleteInvalidLicence(content, similarity.startIdx, similarity.endIdx)
-	}
-	extension := filepath.Ext(filePath)
 	if _, ok := extensions[extension]; !ok {
 		fmt.Printf("Unknown file extension= %s! Can't licence it.", extension)
 		return
@@ -93,31 +96,31 @@ type licenceSimilarity struct {
 }
 
 func deleteInvalidLicence(content string, startIdx int, endIdx int) string {
-	return strings.Replace(content, content[startIdx:endIdx+1], "", 1)
+	clearedContent := strings.Replace(content, content[startIdx:endIdx+1], "", 1)
+	if len(clearedContent) > 0 && clearedContent[0] == 10{
+		clearedContent = clearedContent[1:]
+	}
+	return clearedContent
 }
 
 func findCommentedInvalidLicenceToDelete(content string, bound float64) licenceSimilarity {
-	var prob float64 = 0
+	var prop float64
 	var startIdx = 0
 	var endIdx = 0
 	for i := 0; i < len(content); i++ {
 		if content[i] == '*' && content[i-1] == '/' {
 			end := findEndIdxOfTheBlockComment(content, i)
-			potentialLicence := content[i+1 : end+1]
-			tempProb := comparePotentialLicenceToActualLicence(potentialLicence)
-			if tempProb > prob {
-				prob = tempProb
+			potentialLicence := content[i+1 : end-1]
+			prop := comparePotentialLicenceToActualLicence(potentialLicence)
+			if prop > bound {
 				startIdx = i - 1
 				endIdx = end
+				return licenceSimilarity{similar: true, startIdx: startIdx, endIdx: endIdx, prob: prop}
 			}
 			i = end + 1
 		}
 	}
-
-	if bound <= prob {
-		return licenceSimilarity{similar: true, startIdx: startIdx, endIdx: endIdx, prob: prob}
-	}
-	return licenceSimilarity{similar: false, prob: prob}
+	return licenceSimilarity{similar: false, prob: prop}
 }
 
 func comparePotentialLicenceToActualLicence(potentialLicence string) float64 {
@@ -165,7 +168,7 @@ func findEndIdxOfTheBlockComment(content string, startIdx int) int {
 
 func addTagToLicence(extension string) string {
 	tag := extensions[extension]
-	licence := tag[0] + "\n" + LICENCE + "\n" + tag[1] + "\n\n"
+	licence := tag[0] + "\n" + LICENCE + "\n" + tag[1] + "\n"
 	return licence
 }
 

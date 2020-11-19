@@ -15,20 +15,20 @@ import (
 )
 
 var (
-	linuxJavaFiles []string = []string{"src/main/java/com/group/project/Test1.java",
+	linuxJavaFiles = []string{"src/main/java/com/group/project/Test1.java",
 		"src/main/java/com/group/project/Test2.java", "src/main/java/com/group/project/test/Test3.java",
 		"src/main/java/com/group/project/test/test/Test4.java", "src/main/java/com/group/project/test/test/Test5.java",
 		"src/main/java/com/group/project/test/test/test/Test6.java"}
 
-	winJavaFiles []string = []string{"src\\main\\java\\com\\group\\project\\Test1.java",
+	winJavaFiles = []string{"src\\main\\java\\com\\group\\project\\Test1.java",
 		"src\\main\\java\\com\\group\\project\\Test2.java", "src\\main\\java\\com\\group\\project\\test\\Test3.java",
 		"src\\main\\java\\com\\group\\project\\test\\test\\Test4.java", "src\\main\\java\\com\\group\\project\\test\\test\\Test5.java",
 		"src\\main\\java\\com\\group\\project\\test\\test\\test\\Test6.java"}
 
-	linuxJsFiles []string = []string{"www/Test1.js", "www/test2.js", "www/test/test3.js",
+	linuxJsFiles = []string{"www/Test1.js", "www/test2.js", "www/test/test3.js",
 		"www/test/Test4.js", "www/test/test/Test5.js", "www/test/test/test6.js"}
 
-	winJsFiles []string = []string{"www\\Test1.js", "www\\test2.js", "www\\test\\test3.js",
+	winJsFiles = []string{"www\\Test1.js", "www\\test2.js", "www\\test\\test3.js",
 		"www\\test\\Test4.js", "www\\test\\test\\Test5.js", "www\\test\\test\\test6.js"}
 )
 
@@ -149,7 +149,6 @@ func TestSyncPluginXMLNoPathPluginXMLExists_UpdatePluginXML(t *testing.T) {
 
 	eraseMockFileStructure()
 }
-
 
 /*func TestAddLicenceToJSFilesInCurrentPath_JSFilesShouldBeLicensed(t *testing.T) {
 	createMockFileStructure()
