@@ -2,6 +2,8 @@ package licence
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -134,7 +136,7 @@ func TestFindCommentedInvalidLicenceToDelete_NotSimilar(t *testing.T) {
 
 func TestFindHowManyCommentExists_ZeroCommentJavaExt(t *testing.T) {
 	content := "function test(){}"
-	given := findHowManyCommentExists(content,".java")
+	given := findHowManyCommentExists(content, ".java")
 	expected := 0
 	if given != expected {
 		t.Errorf("Given:%d but expected:%d", given, expected)
@@ -143,7 +145,7 @@ func TestFindHowManyCommentExists_ZeroCommentJavaExt(t *testing.T) {
 
 func TestFindHowManyCommentExists_OneCommentJavaExt(t *testing.T) {
 	content := "/* This is a comment*/ function test(){}"
-	given := findHowManyCommentExists(content,".java")
+	given := findHowManyCommentExists(content, ".java")
 	expected := 1
 	if given != expected {
 		t.Errorf("Given:%d but expected:%d", given, expected)
@@ -152,7 +154,7 @@ func TestFindHowManyCommentExists_OneCommentJavaExt(t *testing.T) {
 
 func TestFindHowManyCommentExists_OneComment1JavaExt(t *testing.T) {
 	content := "/* This is a comment*/ function test(){return '*/'}"
-	given := findHowManyCommentExists(content,".java")
+	given := findHowManyCommentExists(content, ".java")
 	expected := 1
 	if given != expected {
 		t.Errorf("Given:%d but expected:%d", given, expected)
@@ -160,7 +162,7 @@ func TestFindHowManyCommentExists_OneComment1JavaExt(t *testing.T) {
 }
 func TestFindHowManyCommentExists_OneComment2JavaExt(t *testing.T) {
 	content := "/* This is a comment*/ function test(){return '/* /* */'}"
-	given := findHowManyCommentExists(content,".java")
+	given := findHowManyCommentExists(content, ".java")
 	expected := 1
 	if given != expected {
 		t.Errorf("Given:%d but expected:%d", given, expected)
@@ -168,7 +170,7 @@ func TestFindHowManyCommentExists_OneComment2JavaExt(t *testing.T) {
 }
 func TestFindHowManyCommentExists_OneComment3JavaExt(t *testing.T) {
 	content := "/* This is 'a' comment*/ function test(){return \"/* /* */\"}"
-	given := findHowManyCommentExists(content,".java")
+	given := findHowManyCommentExists(content, ".java")
 	expected := 1
 	if given != expected {
 		t.Errorf("Given:%d but expected:%d", given, expected)
@@ -176,7 +178,7 @@ func TestFindHowManyCommentExists_OneComment3JavaExt(t *testing.T) {
 }
 func TestFindHowManyCommentExists_OneComment4JavaExt(t *testing.T) {
 	content := "/* This is 'a' comment*/ function test(){return \"/*' /* */\"}"
-	given := findHowManyCommentExists(content,".java")
+	given := findHowManyCommentExists(content, ".java")
 	expected := 1
 	if given != expected {
 		t.Errorf("Given:%d but expected:%d", given, expected)
@@ -184,7 +186,7 @@ func TestFindHowManyCommentExists_OneComment4JavaExt(t *testing.T) {
 }
 func TestFindHowManyCommentExists_TwoCommentsJavaExt(t *testing.T) {
 	content := "/* This is 'a' comment*//* This is 'a' comment*/ function test(){return \"/*/**/\"}"
-	given := findHowManyCommentExists(content,".java")
+	given := findHowManyCommentExists(content, ".java")
 	expected := 2
 	if given != expected {
 		t.Errorf("Given:%d but expected:%d", given, expected)
@@ -192,7 +194,7 @@ func TestFindHowManyCommentExists_TwoCommentsJavaExt(t *testing.T) {
 }
 func TestFindHowManyCommentExists_TwoComments2HtmlExt(t *testing.T) {
 	content := "<!-- This is 'a' comment--><!-- This is 'a' comment--> function test(){return \"/*/**/\"}"
-	given := findHowManyCommentExists(content,".html")
+	given := findHowManyCommentExists(content, ".html")
 	expected := 2
 	if given != expected {
 		t.Errorf("Given:%d but expected:%d", given, expected)
@@ -200,10 +202,68 @@ func TestFindHowManyCommentExists_TwoComments2HtmlExt(t *testing.T) {
 }
 func TestFindHowManyCommentExists_TwoComments3HtmlExt(t *testing.T) {
 	content := "<!-- This is 'a' comment--><!-- This is 'a' */ comment--> function test(){return \"/*/**/-->\"}"
-	given := findHowManyCommentExists(content,".html")
+	given := findHowManyCommentExists(content, ".html")
 	expected := 2
 	if given != expected {
 		t.Errorf("Given:%d but expected:%d", given, expected)
 	}
 }
 
+func TestWrite_DeleteWrongFormatLicense(t *testing.T) {
+	content := "/*\n" + LICENCE + "\n*/\n/*\n" + falseLicence + "\n*/"
+	ioutil.WriteFile("test.ts", []byte(content), 0644)
+	Write("test.ts")
+	b, _ := ioutil.ReadFile("test.ts")
+	given := string(b)
+	expected := "/*\n" + LICENCE + "\n*/\n"
+	if expected != given {
+		t.Errorf("Given:%s but expected:%s", given, expected)
+	}
+	os.Remove("test.ts")
+}
+
+func TestWrite_DeleteTwoWrongFormatLicenses(t *testing.T) {
+	content := "/*\n" + LICENCE + "\n*/\n/*\n" + falseLicence + "\n*/\n/*\n" + falseLicence + "\n*/"
+	ioutil.WriteFile("test.ts", []byte(content), 0644)
+	Write("test.ts")
+	b, _ := ioutil.ReadFile("test.ts")
+	given := string(b)
+	expected := "/*\n" + LICENCE + "\n*/\n"
+	if expected != given {
+		t.Errorf("Given:%s but expected:%s", given, expected)
+	}
+	os.Remove("test.ts")
+}
+
+func TestWrite_DeleteOneOfTwoValidLicenses(t *testing.T) {
+	content := "/*\n" + LICENCE + "\n*/\n/*\n" + LICENCE + "\n*/"
+	ioutil.WriteFile("test.ts", []byte(content), 0644)
+	Write("test.ts")
+	b, _ := ioutil.ReadFile("test.ts")
+	given := string(b)
+	expected := "/*\n" + LICENCE + "\n*/\n"
+	if expected != given {
+		t.Errorf("Given:%s but expected:%s", given, expected)
+	}
+	os.Remove("test.ts")
+}
+
+func TestWrite_DeleteOnlyWrongFormatLicense(t *testing.T) {
+	anotherLicence := `    2020 GeniusBros Corp. Ltd. All right is ours.
+	Licence Licence Licence Licence Licence Licence Licence Licence
+	Licence Licence Licence Licence Licence Licence Licence Licence
+	Licence Licence Licence Licence Licence Licence Licence Licence
+	Licence Licence Licence Licence Licence Licence Licence Licence
+	Licence Licence Licence Licence Licence Licence Licence Licence
+	Licence Licence Licence Licence Licence Licence Licence Licence`
+	content := "/*\n" + falseLicence + "\n*/\n/*\n" + anotherLicence + "\n*/\n/*\n" + LICENCE + "\n*/"
+	ioutil.WriteFile("test.ts", []byte(content), 0644)
+	Write("test.ts")
+	b, _ := ioutil.ReadFile("test.ts")
+	given := string(b)
+	expected := "/*\n" + LICENCE + "\n*/\n/*\n" + anotherLicence + "\n*/\n"
+	if expected != given {
+		t.Errorf("Given:\n%s but expected:\n%s", given, expected)
+	}
+	os.Remove("test.ts")
+}
