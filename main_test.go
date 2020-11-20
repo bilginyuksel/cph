@@ -218,7 +218,7 @@ func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T
 		}
 	}
 
-	AddLicenceTo("src")
+	AddLicenceTo("src", []string{})
 	if runtime.GOOS == "windows" {
 		checkAllFilesLicence(winJavaFiles)
 	} else {
