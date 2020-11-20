@@ -70,9 +70,13 @@ func Write(filePath string) {
 
 	content := readFile(filePath)
 	extension := filepath.Ext(filePath)
+	if _, ok := extensions[extension]; !ok {
+		fmt.Printf("Unknown file extension= %s! Can't licence it.", extension)
+		return
+	}
 	numberOfComments := findHowManyCommentExists(content, extension)
 	for i := 0; i < numberOfComments; i++ {
-		similarity := findCommentedInvalidLicenceToDelete(content, 0.7)
+		similarity := findCommentedInvalidLicenceToDelete(content, 0.6)
 		if similarity.similar {
 			content = deleteInvalidLicence(content, similarity.startIdx, similarity.endIdx)
 		}
@@ -80,10 +84,7 @@ func Write(filePath string) {
 	if IsExists(content) {
 		return
 	}
-	if _, ok := extensions[extension]; !ok {
-		fmt.Printf("Unknown file extension= %s! Can't licence it.", extension)
-		return
-	}
+
 	content = addTagToLicence(extension) + content
 	ioutil.WriteFile(filePath, []byte(content), 0644)
 }
@@ -97,7 +98,7 @@ type licenceSimilarity struct {
 
 func deleteInvalidLicence(content string, startIdx int, endIdx int) string {
 	clearedContent := strings.Replace(content, content[startIdx:endIdx+1], "", 1)
-	if len(clearedContent) > 0 && clearedContent[0] == 10{
+	if len(clearedContent) > 0 && clearedContent[0] == 10 {
 		clearedContent = clearedContent[1:]
 	}
 	return clearedContent
