@@ -1,5 +1,7 @@
 package parser
 
+import "fmt"
+
 var idx int
 
 var words = map[string]string{
@@ -7,6 +9,87 @@ var words = map[string]string{
 	"const":    "variable",
 	"let":      "variable",
 	"var":      "variable",
+}
+
+type param struct {
+	name  string
+	dtype string
+}
+
+type function struct {
+	export bool
+	name   string
+	rtype  string
+	params []param
+}
+
+func ParseLoop() {
+	for has() {
+		token := next()
+		if _, ok := words[token]; ok {
+			// read function or read variable
+			fun := readFunction()
+			fmt.Println(fun)
+		}
+	}
+}
+
+func readFunctionReturnType() string {
+	returnType := ""
+	for token := next(); token != "{"; {
+		returnType += token
+	}
+	return returnType
+}
+
+func collectParameterDataOfFunction(fun *function, nameOfTheFirstParam string) {
+	prm := param{}
+	prm.name = nameOfTheFirstParam
+	token := next()
+	if token == "," {
+		prm.dtype = "any"
+		fun.params = append(fun.params, prm)
+		collectParameterDataOfFunction(fun, next())
+	} else if token == ":" {
+		// get data type
+		open := 0
+		dtype := ""
+		for true {
+			token = next()
+			if open <= 0 && token == ")" {
+				break // end of the parameter collection
+			} else if open <= 0 && token == "," {
+				collectParameterDataOfFunction(fun, next()) // new parameter
+				break
+			} else if open > 0 && token == ")" {
+				open--
+			} else if token == "(" {
+				open++
+			}
+			dtype += token
+
+		}
+		prm.dtype = dtype
+		fun.params = append(fun.params, prm)
+	}
+}
+
+func readFunction() function {
+	fun := function{}
+	fun.name = next()
+	next() // start paranthesis
+	token := next()
+	if token != ")" {
+		collectParameterDataOfFunction(&fun, token)
+	}
+	token = next()
+	if token == "{" {
+		fun.rtype = "any"
+	} else {
+		fun.rtype = readFunctionReturnType()
+	}
+
+	return fun
 }
 
 var punc map[string]interface{}
@@ -95,8 +178,9 @@ func startOfParameter(token string, node *TreeNode) *TreeNode {
 		// 		stk = append(stk, potentialToken)
 		// 	}
 		// }
+
+		// callback: (data1,data2) => void
 		open := 0
-		dataType += "("
 		for true {
 			potential := next()
 			if potential == ")" && open > 0 {
@@ -112,7 +196,6 @@ func startOfParameter(token string, node *TreeNode) *TreeNode {
 				dataType += potential
 			}
 		}
-		return nil
 	}
 	param.DataType = dataType
 	node.Parameters = append(node.Parameters, param)
