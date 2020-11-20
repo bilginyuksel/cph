@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	lic "github.com/bilginyuksel/cph/licence"
 
 	"github.com/bilginyuksel/cph/generator"
-	lic "github.com/bilginyuksel/cph/licence"
 	"github.com/bilginyuksel/cph/parser"
 	"github.com/bilginyuksel/cph/reader"
 
@@ -12,12 +12,6 @@ import (
 )
 
 func main() {
-	/*content := `
-	export function baz(param1: number, param2: string) string{
-		return param1.toString() + param2;	
-	}`
-	parser.Tokenize(content)
-	parser.Parse()*/
 	prepareCliParser()
 }
 
@@ -37,9 +31,9 @@ func SyncPluginXML(path string) error {
 	if err != nil {
 		return err
 	}
-	sourceFiles, _ := reader.FilePathWalkDir("src")
+	sourceFiles, _ := reader.FilePathWalkDir("src", []string{})
 	plugin.Platform.NewSourceFrom(sourceFiles)
-	jsModules, _ := reader.FilePathWalkDir("www")
+	jsModules, _ := reader.FilePathWalkDir("www",[]string{})
 	plugin.NewJsModulesFrom(jsModules)
 
 	err = parser.CreateXML(plugin, "plugin.xml")
@@ -47,12 +41,13 @@ func SyncPluginXML(path string) error {
 }
 
 // AddLicenceTo ...
-func AddLicenceTo(path string) error {
+func AddLicenceTo(path string,ignored []string) error {
+	fmt.Println(ignored)
 
 	if path == "" {
 		path = "."
 	}
-	files, _ := reader.FilePathWalkDir(path)
+	files, _ := reader.FilePathWalkDir(path, ignored)
 
 	for _, p := range files {
 		lic.Write(p)
@@ -73,7 +68,7 @@ func (pl *PluginXMLCmd) Run(ctx *Context) error {
 
 // Run ...
 func (l *AddLicenseCmd) Run(ctx *Context) error {
-	return AddLicenceTo(l.Path)
+	return AddLicenceTo(l.Path,l.Ignore)
 }
 
 // Run ...
@@ -93,7 +88,8 @@ type PluginXMLCmd struct {
 
 // AddLicenseCmd ...
 type AddLicenseCmd struct {
-	Path string `name:"path" help:"Paths to list." type:"path"`
+	Path string `name:"path" help:"Paths to list." type:"path" short:"p"`
+	Ignore []string `name:"ignore" help:"list of ignored folders" short:"i"`
 }
 
 // PluginCmd ...

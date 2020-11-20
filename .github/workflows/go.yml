@@ -39,6 +39,7 @@ jobs:
       run: |
         go test -v ./... -coverprofile 'cover.out'
         go tool cover -html='cover.out' -o 'cover.html'
+        go build .
     
     - name: ExamineFiles
       run: ls
@@ -46,7 +47,8 @@ jobs:
     - name: UploadTestCoverage
       uses: actions/upload-artifact@v2
       with:
-        name: test-coverage
+        name: output
         path: |
           cover.html
           cover.out
+          cph.exe

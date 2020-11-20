@@ -33,7 +33,7 @@ func afterTestFilePathFinderDestroyFileStructure(t *testing.T) {
 func TestFilePathFinder_ReturnFilesIncludedSubDirectories(t *testing.T) {
 	beforeTestFilePathFinderCreateFileStructure(t)
 
-	files, err := FilePathWalkDir("test")
+	files, err := FilePathWalkDir("test", []string{})
 	if err != nil {
 		t.Errorf("Shouldn't error")
 	}
@@ -69,7 +69,7 @@ func TestFilePathFinder_ReturnFilesIncludedSubDirectories(t *testing.T) {
 
 func TestFilePathFinder_ReturnFilesOnlySubdirectory(t *testing.T) {
 	beforeTestFilePathFinderCreateFileStructure(t)
-	files, err := FilePathWalkDir("test/test1")
+	files, err := FilePathWalkDir("test/test1", []string{})
 	if err != nil {
 		t.Error("Shouldn't error")
 	}
@@ -102,7 +102,7 @@ func TestFilePathFinder_ReturnFilesOnlySubdirectory(t *testing.T) {
 }
 
 func TestFilePathFinder_NotFound(t *testing.T) {
-	_, err := FilePathWalkDir("empty")
+	_, err := FilePathWalkDir("empty", []string{})
 	if err == nil {
 		t.Errorf("Expected error.")
 	}

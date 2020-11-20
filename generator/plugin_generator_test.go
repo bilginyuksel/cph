@@ -25,7 +25,7 @@ func TestCreatePluginWithGivenName_ExpectPluginFilesCreated(t *testing.T) {
 	// fmt.Println(linuxFileList)
 	// fmt.Println(winFileList)
 
-	files, _ := reader.FilePathWalkDir("cordova-plugin-group-project")
+	files, _ := reader.FilePathWalkDir("cordova-plugin-group-project", []string{})
 
 	checkFiles := func(given []string, want []string, t *testing.T) {
 		fmap := make(map[string]string)
