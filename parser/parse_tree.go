@@ -266,11 +266,14 @@ func readFunction(name string) function {
 func getFunctionBodyToString() string {
 	open := 1
 	body := ""
-	for token := next(); token != "}" && open > 0; token = next() {
+	for token := next(); open > 0; token = next() {
 		if token == "{" {
 			open++
 		} else if token == "}" {
 			open--
+		}
+		if open <= 0 {
+			break
 		}
 		body += token
 	}
