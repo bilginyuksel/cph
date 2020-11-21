@@ -6,6 +6,7 @@ import (
 
 var keywords = map[string]bool{
 	"export":      true,
+
 	"const":       true,
 	"let":         true,
 	"var":         true,
@@ -41,6 +42,9 @@ var symbols = map[string]bool{
 	">":  true,
 	"<":  true,
 	"-":  true,
+	"!":  true,
+	"[":  true,
+	"]":  true,
 }
 
 var tokens []string
