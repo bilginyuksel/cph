@@ -65,6 +65,7 @@ type class struct {
 	functions          []function
 }
 
+// ParseLoop ...
 func ParseLoop() {
 	for has() {
 		token := next()
@@ -76,10 +77,6 @@ func ParseLoop() {
 			}
 		}
 	}
-}
-
-func test(function *function) {
-	function.export = true
 }
 
 var accessModifiers = map[string]string{
