@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// prepareCliParser()
-	fmt.Println(parser.Tokenize("function test(data, data1: string): void {}"))
+	fmt.Println(parser.Tokenize("function test(data, data1: string): void {}\nfunction demo(data: ()=>void): Promise<string>{}"))
 	parser.ParseLoop()
 }
 
