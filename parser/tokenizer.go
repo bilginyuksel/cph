@@ -5,7 +5,7 @@ import (
 )
 
 var keywords = map[string]bool{
-	"export":      true,
+	"export": true,
 
 	"const":       true,
 	"let":         true,
@@ -101,7 +101,7 @@ func trimByNewLineTabSpace(word string) string {
 func tokenizeCommentThenReturnEndIdx(content string, startIdx int) int {
 	endIdx := startIdx + 1
 	comment := ""
-
+	prefix := "/"
 	if string(content[endIdx]) == "/" {
 		endIdx++
 		// oneline comment
@@ -109,6 +109,7 @@ func tokenizeCommentThenReturnEndIdx(content string, startIdx int) int {
 		for ; endIdx < len(content) && string(content[endIdx]) != "\n"; endIdx++ {
 			comment += string(content[endIdx])
 		}
+		prefix += "/"
 
 	} else if string(content[endIdx]) == "*" {
 		endIdx++
@@ -120,10 +121,10 @@ func tokenizeCommentThenReturnEndIdx(content string, startIdx int) int {
 			}
 			comment += string(content[endIdx])
 		}
+		prefix += "*"
 	}
-
+	tokens = append(tokens, prefix)
 	tokens = append(tokens, comment)
-
 	return endIdx
 }
 

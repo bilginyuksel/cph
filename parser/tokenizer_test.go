@@ -77,8 +77,8 @@ var l = "lo\"l\"ol";let l;`
 		This is my multiline comment
 		This is my multiline comment
 		`
-	expected := []string{"const", "f", ":", "string", "=", "hello world", multilineComment, "const", "l", "=", "wow", " This is my first comment", "let",
-		"yey", ";", "let", "how", ":", "string", "var", "v", " This is my second comment", "var", "l", "=", "lo\"l\"ol", ";", "let", "l", ";"}
+	expected := []string{"const", "f", ":", "string", "=", "hello world", "/*", multilineComment, "const", "l", "=", "wow", "//", " This is my first comment", "let",
+		"yey", ";", "let", "how", ":", "string", "var", "v", "//", " This is my second comment", "var", "l", "=", "lo\"l\"ol", ";", "let", "l", ";"}
 
 	given := Tokenize(content)
 
@@ -131,7 +131,7 @@ var v
 var l = "lo\"l\"ol";let l;`
 
 	expected := []string{"const", "f", ":", "string", "=", "hello world", "const", "l", "=", "wow", "@", "NotNull", "let",
-		"yey", ";", "let", "how", ":", "string", "comment1", "@", "Nullable", "(", ")", "comment2", "var", "v", "Hello world_This is my multilecomment", "var", "l", "=", "lo\"l\"ol", ";", "let", "l", ";"}
+		"yey", ";", "let", "how", ":", "string", "//", "comment1", "@", "Nullable", "(", ")", "//", "comment2", "var", "v", "/*", "Hello world_This is my multilecomment", "var", "l", "=", "lo\"l\"ol", ";", "let", "l", ";"}
 
 	given := Tokenize(content)
 
@@ -395,19 +395,19 @@ func TestTokenize_Mix1(t *testing.T) {
 	}
 	`
 
-	expected := []string{"import", "mm", "from", "./file",";", "import", "{", "mm1", ",", "mm2", ",", "mm3", "}", "from", "./file2",
-	"export", "{", "mm1", ",", "mm2","}", "from", "./file2", ";", "abstract", "class", "Foo", "{", "@", "Test", "(","hello", ",", "myHello", ")", `
+	expected := []string{"import", "mm", "from", "./file", ";", "import", "{", "mm1", ",", "mm2", ",", "mm3", "}", "from", "./file2",
+		"export", "{", "mm1", ",", "mm2", "}", "from", "./file2", ";", "abstract", "class", "Foo", "{", "@", "Test", "(", "hello", ",", "myHello", ")", "/*", `
 		Docstring line-1
 		Docstring line-2
-		`, "abstract", "method1", "(","param", ":", "string", ",", "param2", ":", "number", ")", ":", "Promise", "<", "void", ">",";",
-		"method2", "(", "param", ")", ":", "Promise", "<","string", ">", "{", "doSomething", "(", ")", ";", "return", "new", "Promise", "(",
-		"(","resolve", ",", "reject", ")", "=", ">", "{","console.log", "(", "hello world",")", ";","}",")",";", "}", "}",
+		`, "abstract", "method1", "(", "param", ":", "string", ",", "param2", ":", "number", ")", ":", "Promise", "<", "void", ">", ";",
+		"method2", "(", "param", ")", ":", "Promise", "<", "string", ">", "{", "doSomething", "(", ")", ";", "return", "new", "Promise", "(",
+		"(", "resolve", ",", "reject", ")", "=", ">", "{", "console.log", "(", "hello world", ")", ";", "}", ")", ";", "}", "}",
 		"const", "globalParam", ":", "string", "=", "print me", ";", "export", "function", "doSomething", "(", ")", "{", "console.log",
-		"(", "I did something",")", ";", "console.log", "(", "globalParam", ")", ";", "}", "interface", "Data", "{", "foo", ":",
-		"number", ";", "baz", ":", "string", "}", "function", "intertest", "(", "data", ":", "Data", ")",":","Data", "{", "let", "newData", ":", "data", "=",
-		"{", "}", "as", "Data", ";", "if", "(","data.foo",")","newData.foo", "=", "data.foo", ";", "if", "(", "data.baz", ")",
-		"newData.baz", "=", "data.baz",";","return", "newData", ";", "}", "@", "ConstantAnnotation", "enum", "Constant", "{",
-		"CONSTANT1", "=", "hello", ",", "CONSTANT2", "=", "world", "}" }
+		"(", "I did something", ")", ";", "console.log", "(", "globalParam", ")", ";", "}", "interface", "Data", "{", "foo", ":",
+		"number", ";", "baz", ":", "string", "}", "function", "intertest", "(", "data", ":", "Data", ")", ":", "Data", "{", "let", "newData", ":", "data", "=",
+		"{", "}", "as", "Data", ";", "if", "(", "data.foo", ")", "newData.foo", "=", "data.foo", ";", "if", "(", "data.baz", ")",
+		"newData.baz", "=", "data.baz", ";", "return", "newData", ";", "}", "@", "ConstantAnnotation", "enum", "Constant", "{",
+		"CONSTANT1", "=", "hello", ",", "CONSTANT2", "=", "world", "}"}
 
 	given := Tokenize(content)
 
