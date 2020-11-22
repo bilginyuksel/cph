@@ -4,6 +4,7 @@ import "testing"
 
 func TestParseLoop_ParseSample1(t *testing.T) {
 	content := `
+
 	export enum Color {
 		RED = -65536,
 		DARK_GRAY = -12303292,
@@ -15,12 +16,18 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 		getVisibleRegion(): Promise<VisibleRegion>;
 		toScreenLocation(latLng: LatLng): Promise<Point>;
 	}
+	//@class This is a base class represent map object.
 	class HuaweiMapImpl implements HuaweiMap,HuaweiMap2,HuaweiMap3 {
 
 		public readonly components: Map<string, any> = new Map<string, any>();
 		private readonly id: number;
 		private readonly uiSettings: UiSettings;
 
+		/*
+		*This is an interface.
+		*@param callback callback function to pass bilmem ne
+		*@return any
+		*/
 		scroll(): void {
 			const mapRect = document.getElementById(this.divId).getBoundingClientRect();
 			this.forceUpdateXAndY(mapRect.x, mapRect.y);
@@ -55,48 +62,100 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 	}
 	const foo: string
 	const baz: number = 5
-	function fooCreator(safa: number): Promise<string> {
+
+	function fooCreator(safa: number = 5): Promise<string> {
 		return "promise<string>";
-	}`
+	}
+	
+	
+	/*
+	*This is an interface.
+	*@param callback callback function to pass bilmem ne
+	*@return any
+	*/
+	function considerCase(callback: ()=>void = () => {console.log("hello world")}) {
+	
+	}
+
+	function considerCase2(callback: (data1: string, data2: any) => void = (data1, data2) => {
+		console.log("Hello world");
+		const test = () => {
+			console.log(data1);
+			console.log(data2);
+		}}) {
+	
+	}
+
+	`
 	Tokenize(content)
 	given := ParseLoop()
 	expected := &TSFile{
 		classes: []class{
-			class{
+			{
 				name:               "HuaweiMapImpl",
 				implements:         true,
 				implementedClasses: []string{"HuaweiMap", "HuaweiMap2", "HuaweiMap3"},
-				variables: []variable{{accessModifier: "public", readonly: true, name: "components", dType: "Map<string,any>", dValue: "newMap<string,any>()"},
+				variables: []variable{
+					{accessModifier: "public", readonly: true, name: "components", dType: "Map<string,any>", dValue: "newMap<string,any>()"},
 					{accessModifier: "private", readonly: true, name: "id", dType: "number"},
-					{accessModifier: "private", readonly: true, name: "uiSettings", dType: "UiSettings"}},
-				functions: []function{{name: "scroll", rtype: "void", sbody: "constmapRect=document.getElementById(this.divId).getBoundingClientRect();this.forceUpdateXAndY(mapRect.x,mapRect.y);"},
+					{accessModifier: "private", readonly: true, name: "uiSettings", dType: "UiSettings"},
+				},
+				functions: []function{
+					{name: "scroll", rtype: "void", sbody: "constmapRect=document.getElementById(this.divId).getBoundingClientRect();this.forceUpdateXAndY(mapRect.x,mapRect.y);"},
 					{async: true, name: "hideMap", rtype: "Promise<void>", sbody: "returnasyncExec(HMSMap,hideMap,[this.divId]);"},
 					{async: true, name: "on", params: []param{{name: "callback", dtype: "(val:any)=>void"}, {name: "event", dtype: "MapEvent"}}, rtype: "Promise<void>", sbody: "constfixedFunctionNameForJavaScript:string=${event}_${this.id};constfixedFunctionNameForJava:string=set${event[0].toUpperCase()}${event.substr(1)}Listener;returnasyncExec(HMSMap,mapOptions,[this.divId,setListener,fixedFunctionNameForJava,{content:callback.toString()}]).then(value=>{//(<any>window)[fixedFunctionNameForJavaScript] = callback;window.subscribeHMSEvent(fixedFunctionNameForJavaScript,callback);}).catch(err=>console.log(err));"},
-					{async: true, name: "addCircle", params: []param{{name: "circleOptions", dtype: "CircleOptions"}}, rtype: "Promise<Circle>", sbody: "if(!circleOptions[center])returnPromise.reject(ErrorCodes.toString(ErrorCodes.CENTER_PROPERTY_MUST_DEFINED));constcomponentId=awaitasyncExec(HMSMap,addComponent,[this.divId,CIRCLE,circleOptions]);constcircle:Circle=newCircleImpl(this.divId,this.id,componentId);this.components.set(circle.getId(),circle);returncircle;"}},
+					{async: true, name: "addCircle", params: []param{{name: "circleOptions", dtype: "CircleOptions"}}, rtype: "Promise<Circle>", sbody: "if(!circleOptions[center])returnPromise.reject(ErrorCodes.toString(ErrorCodes.CENTER_PROPERTY_MUST_DEFINED));constcomponentId=awaitasyncExec(HMSMap,addComponent,[this.divId,CIRCLE,circleOptions]);constcircle:Circle=newCircleImpl(this.divId,this.id,componentId);this.components.set(circle.getId(),circle);returncircle;"},
+				},
 			}},
 		functions: []function{
-			function{
+			{
 				name: "demo", rtype: "any", sbody: "console.log(hello world);returnasyncExec(HMSMap,ssda,{dothis:nottodothis});",
 				params: []param{{name: "data1", dtype: "()=>void"}, {name: "data", dtype: "string"}},
 			},
-			function{
+			{
 				name: "fooCreator", rtype: "Promise<string>", sbody: "returnpromise<string>;",
-				params: []param{{name: "safa", dtype: "number"}},
-			}},
+				params: []param{{name: "safa", dtype: "number",value: "5"}},
+			},
+			{
+				name:   "considerCase",
+				rtype:  "any",
+				params: []param{{name: "callback", dtype: "()=>void", value: "()=>{console.log(hello world)}"}},
+			},
+			{
+				name:  "considerCase2",
+				rtype: "any",
+				params: []param{
+					{
+						name:  "callback",
+						dtype: "(data1:string,data2:any)=>void",
+						value: "(data1,data2)=>{console.log(Hello world);consttest=()=>{console.log(data1);console.log(data2);}}",
+					},
+				},
+			},
+		},
 		variables: []variable{
-			{name: "foo", dType: "string"},
-			{name: "baz", dType: "number", dValue: "5"},
+			{
+				name:  "foo",
+				dType: "string",
+			},
+			{
+				name: "baz", dType: "number", dValue: "5",
+			},
 		},
 		interfaces:
-		[]tinterface{
-			{name: "Projection", functions: []function{
+		[]tinterface{{
+			name: "Projection",
+			functions: []function{
 				{name: "fromScreenLocation", params: []param{{name: "point", dtype: "Point"}}, rtype: "Promise<LatLng>"},
 				{name: "getVisibleRegion", rtype: "Promise<VisibleRegion>"},
 				{name: "toScreenLocation", params: []param{{name: "latLng", dtype: "LatLng"}}, rtype: "Promise<Point>"}},
-			},
+		},
 		},
 		enums: []enum{
-			{export: true, name: "Color", items: []enumItem{{name: "RED", value: "-65536"}, {name: "DARK_GRAY", value: "-12303292"}, {name: "TRANSPARENT", value: "0"}}},
+			{
+				export: true, name: "Color",
+				items: []enumItem{{name: "RED", value: "-65536"}, {name: "DARK_GRAY", value: "-12303292"}, {name: "TRANSPARENT", value: "0"}},
+			},
 		},
 	}
 
@@ -226,9 +285,11 @@ func compareFunctionParameters(t *testing.T, given *param, expected *param) {
 	if given.dtype != expected.dtype {
 		t.Errorf("parameter dtype --> given:%s but expected:%s", given.dtype, expected.dtype)
 	}
-
 	if given.name != expected.name {
 		t.Errorf("parameter name -->  given:%s but expected:%s", given.name, expected.name)
+	}
+	if given.value != expected.value {
+		t.Errorf("parameter value -->  given:%s but expected:%s", given.value, expected.value)
 	}
 }
 
