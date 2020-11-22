@@ -4,6 +4,17 @@ import "testing"
 
 func TestParseLoop_ParseSample1(t *testing.T) {
 	content := `
+	export enum Color {
+		RED = -65536,
+		DARK_GRAY = -12303292,
+		TRANSPARENT = 0
+	}
+
+	export interface Projection {
+		fromScreenLocation(point: Point): Promise<LatLng>;
+		getVisibleRegion(): Promise<VisibleRegion>;
+		toScreenLocation(latLng: LatLng): Promise<Point>;
+	}
 	class HuaweiMapImpl implements HuaweiMap,HuaweiMap2,HuaweiMap3 {
 
 		public readonly components: Map<string, any> = new Map<string, any>();
@@ -60,7 +71,7 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 					{accessModifier: "private", readonly: true, name: "uiSettings", dType: "UiSettings"}},
 				functions: []function{{name: "scroll", rtype: "void", sbody: "constmapRect=document.getElementById(this.divId).getBoundingClientRect();this.forceUpdateXAndY(mapRect.x,mapRect.y);"},
 					{async: true, name: "hideMap", rtype: "Promise<void>", sbody: "returnasyncExec(HMSMap,hideMap,[this.divId]);"},
-					{async: true, name: "on", params: []param{{name: "callback", dtype: "(val:any)=>void"}, {name: "event", dtype: "MapEvent"}}, rtype: "Promise<void>", sbody: "constfixedFunctionNameForJavaScript:string=${event}_${this.id};constfixedFunctionNameForJava:string=set${event[0].toUpperCase()}${event.substr(1)}Listener;returnasyncExec(HMSMap,mapOptions,[this.divId,setListener,fixedFunctionNameForJava,{content:callback.toString()}]).then(value=>{(<any>window)[fixedFunctionNameForJavaScript] = callback;window.subscribeHMSEvent(fixedFunctionNameForJavaScript,callback);}).catch(err=>console.log(err));"},
+					{async: true, name: "on", params: []param{{name: "callback", dtype: "(val:any)=>void"}, {name: "event", dtype: "MapEvent"}}, rtype: "Promise<void>", sbody: "constfixedFunctionNameForJavaScript:string=${event}_${this.id};constfixedFunctionNameForJava:string=set${event[0].toUpperCase()}${event.substr(1)}Listener;returnasyncExec(HMSMap,mapOptions,[this.divId,setListener,fixedFunctionNameForJava,{content:callback.toString()}]).then(value=>{//(<any>window)[fixedFunctionNameForJavaScript] = callback;window.subscribeHMSEvent(fixedFunctionNameForJavaScript,callback);}).catch(err=>console.log(err));"},
 					{async: true, name: "addCircle", params: []param{{name: "circleOptions", dtype: "CircleOptions"}}, rtype: "Promise<Circle>", sbody: "if(!circleOptions[center])returnPromise.reject(ErrorCodes.toString(ErrorCodes.CENTER_PROPERTY_MUST_DEFINED));constcomponentId=awaitasyncExec(HMSMap,addComponent,[this.divId,CIRCLE,circleOptions]);constcircle:Circle=newCircleImpl(this.divId,this.id,componentId);this.components.set(circle.getId(),circle);returncircle;"}},
 			}},
 		functions: []function{
@@ -76,6 +87,17 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 			{name: "foo", dType: "string"},
 			{name: "baz", dType: "number", dValue: "5"},
 		},
+		interfaces:
+		[]tinterface{
+			{name: "Projection", functions: []function{
+				{name: "fromScreenLocation", params: []param{{name: "point", dtype: "Point"}}, rtype: "Promise<LatLng>"},
+				{name: "getVisibleRegion", rtype: "Promise<VisibleRegion>"},
+				{name: "toScreenLocation", params: []param{{name: "latLng", dtype: "LatLng"}}, rtype: "Promise<Point>"}},
+			},
+		},
+		enums: []enum{
+			{export: true, name: "Color", items: []enumItem{{name: "RED", value: "-65536"}, {name: "DARK_GRAY", value: "-12303292"}, {name: "TRANSPARENT", value: "0"}}},
+		},
 	}
 
 	if len(given.classes) != len(expected.classes) {
@@ -87,6 +109,18 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 	if len(given.variables) != len(expected.variables) {
 		t.Errorf("given:%d but expected:%d", len(given.variables), len(expected.variables))
 	}
+	if len(given.interfaces) != len(expected.interfaces) {
+		t.Errorf("given:%d but expected:%d", len(given.interfaces), len(expected.interfaces))
+	}
+	if len(given.enums) != len(expected.enums) {
+		t.Errorf("given:%d but expected:%d", len(given.enums), len(expected.enums))
+	}
+	for i := 0; i < len(given.interfaces); i++ {
+		compareInterface(t, &given.interfaces[i], &expected.interfaces[i])
+	}
+	for i := 0; i < len(given.enums); i++ {
+		compareEnums(t, &given.enums[i], &expected.enums[i])
+	}
 	for i := 0; i < len(expected.classes); i++ {
 		compareClass(t, &given.classes[i], &expected.classes[i])
 	}
@@ -96,6 +130,41 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 	for i := 0; i < len(expected.variables); i++ {
 		compareVariables(t, &given.variables[i], &expected.variables[i])
 	}
+}
+
+func compareEnums(t *testing.T, given *enum, expected *enum) {
+	if given.export != expected.export {
+		t.Errorf("given:%t but expected:%t", given.export, expected.export)
+	}
+	if given.name != expected.name {
+		t.Errorf("given:%s but expected:%s", given.name, expected.name)
+	}
+	for i := 0; i < len(given.items); i++ {
+		compareEnumItem(t, &given.items[i], &expected.items[i])
+	}
+}
+
+func compareEnumItem(t *testing.T, given *enumItem, expected *enumItem) {
+	if given.name != expected.name {
+		t.Errorf("given:%s but expected:%s", given.name, expected.name)
+	}
+	if given.value != expected.value {
+		t.Errorf("given:%s but expected:%s", given.value, expected.value)
+	}
+}
+
+func compareInterface(t *testing.T, given *tinterface, expected *tinterface) {
+	if given.name != expected.name {
+		t.Errorf("given:%s but expected:%s", given.name, expected.name)
+	}
+	for i := 0; i < len(given.functions); i++ {
+		compareFunctions(t, &given.functions[i], &expected.functions[i])
+	}
+
+	for i := 0; i < len(given.variables); i++ {
+		compareVariables(t, &given.variables[i], &expected.variables[i])
+	}
+
 }
 
 func compareVariables(t *testing.T, given *variable, expected *variable) {
