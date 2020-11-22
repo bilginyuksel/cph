@@ -1,7 +1,5 @@
 package parser
 
-import "fmt"
-
 var words = map[string]string{
 	"function": "function",
 	"const":    "variable",
@@ -67,13 +65,22 @@ type class struct {
 
 // ParseLoop ...
 func ParseLoop() {
+	classes := []class{}
+	functions := []function{}
+	variables := []variable{}
 	for has() {
 		token := next()
+		/*
+			common global scope parameters are ;
+			docs, annotations, export, declare, async, abstract
+		*/
 		if value, ok := words[token]; ok {
-			// read function or read variable or class
 			if value == "class" {
-				class := readClass()
-				fmt.Println(class)
+				classes = append(classes, readClass())
+			} else if value == "function" {
+				functions = append(functions, readFunction(next()))
+			} else if value == "variable" {
+				variables = append(variables, readVariable(next()))
 			}
 		}
 	}
