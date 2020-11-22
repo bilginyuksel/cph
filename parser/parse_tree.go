@@ -1,5 +1,7 @@
 package parser
 
+import "fmt"
+
 var words = map[string]string{
 	"function":  "function",
 	"const":     "variable",
@@ -97,6 +99,7 @@ type function struct {
 type param struct {
 	name  string
 	dtype string
+	value string
 }
 type fbody struct {
 	statements []string
@@ -113,10 +116,11 @@ func ParseLoop() *TSFile {
 	enums := []enum{}
 	for has() {
 		token := next()
-		/*
-			common global scope parameters are ;
-			docs, annotations, export, declare, async, abstract
-		*/
+		if token == "//" || token == "/*" {
+			docS := next()
+			fmt.Println(docS)
+			continue
+		}
 		identifiers, token := getIdentifiersAndReturnToken(token)
 		if value, ok := words[token]; ok {
 			if value == "class" {
@@ -210,6 +214,11 @@ func readClass(identifiers []string) class {
 		token = readImplementedInterfaces(&class)
 	}
 	for token := next(); token != "}"; token = next() {
+		if token == "//" || token == "/*" {
+			docS := next()
+			fmt.Println(docS)
+			continue
+		}
 		identifiers, token := getIdentifiersAndReturnToken(token)
 		name := token
 		token = next()
@@ -300,6 +309,7 @@ var identifiersMap = map[string]bool{
 	"private":   true,
 	"protected": true,
 	"abstract":  true,
+	"default":   true,
 }
 
 func getIdentifiersAndReturnToken(token string) ([]string, string) {
@@ -399,8 +409,15 @@ func collectParameterDataOfFunction(fun *function, nameOfTheFirstParam string) {
 		// get data type
 		open := 0
 		dtype := ""
+		previousToken := ""
 		for true {
+			previousToken = token
 			token = next()
+			if previousToken == "=" && token != ">" && open <= 0 {
+				prev()
+				dtype = dtype[:len(dtype)-1]
+				break
+			}
 			if open <= 0 && token == ")" {
 				break // end of the parameter collection
 			} else if open <= 0 && token == "," {
@@ -412,11 +429,31 @@ func collectParameterDataOfFunction(fun *function, nameOfTheFirstParam string) {
 				open++
 			}
 			dtype += token
-
 		}
 		prm.dtype = dtype
+		if !(token == "," || token == ")") {
+			prm.value = readDefaultValueOfParameter()
+		}
 		fun.params = append(fun.params, prm)
 	}
+}
+
+func readDefaultValueOfParameter() string {
+	value := ""
+	open := 1
+	for true {
+		token := next()
+		if token == "(" {
+			open++
+		} else if token == ")" {
+			open--
+		}
+		if open <= 0 {
+			break
+		}
+		value += token
+	}
+	return value
 }
 
 func readFunction(name string, identifiers []string) function {
