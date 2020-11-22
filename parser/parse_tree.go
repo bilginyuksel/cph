@@ -80,7 +80,7 @@ func ParseLoop() {
 			} else if value == "function" {
 				functions = append(functions, readFunction(next()))
 			} else if value == "variable" {
-				variables = append(variables, readVariable(next()))
+				variables = append(variables, readVariable(next(), token))
 			}
 		}
 	}
@@ -118,7 +118,7 @@ func readClass() class {
 			fun.attachAccessModifierAndIdentifiers(accessModifier, identifiers)
 			class.functions = append(class.functions, fun)
 		} else { // class element is a variable
-			variable := readVariable(name)
+			variable := readVariable(token, name)
 			variable.attachAccessModifierAndIdentifiers(accessModifier, identifiers)
 			class.variables = append(class.variables, variable)
 		}
@@ -170,11 +170,10 @@ func getAccessModifier(token string) (string, string) {
 	return accessModifiers[token], token
 }
 
-func readVariable(name string) variable {
+func readVariable(token string, name string) variable {
 	vr := variable{}
 	vr.name = name
 	vr.dType = "any"
-	token := next()
 	if token == ":" {
 		vr.dType, token = readVariableDataType()
 	}
