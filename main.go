@@ -13,17 +13,7 @@ import (
 )
 
 func main() {
-	content := `function considerCase(callback: (data1)=>Promise<string>): Promise<void> {
-
-	}
-
-	function considerCase2(callback: (data1, data2) =>void) {
-	
-	}
-	export async function demo(){}`
-	parser.Tokenize(content)
-	parser.ParseLoop()
-	// prepareCliParser()
+	prepareCliParser()
 }
 
 func prepareCliParser() {

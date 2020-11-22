@@ -8,6 +8,12 @@ var words = map[string]string{
 	"class":    "class",
 }
 
+var accessModifiers = map[string]string{
+	"public":    "public",
+	"private":   "private",
+	"protected": "protected",
+}
+
 type param struct {
 	name  string
 	dtype string
@@ -19,13 +25,28 @@ type function struct {
 	declare        bool
 	async          bool
 	annotations    []annotation
-	docs           docstring
+	docs           *docstring
 	name           string
 	rtype          string
 	body           *fbody
 	sbody          string
 	params         []param
 	static         bool
+}
+
+// TSFile ...
+type TSFile struct {
+	classes    []class
+	functions  []function
+	interfaces []tinterface
+	variables  []variable
+	enums      []enum
+}
+
+type enum struct {
+}
+
+type tinterface struct {
 }
 
 type docstring struct {
@@ -64,7 +85,7 @@ type class struct {
 }
 
 // ParseLoop ...
-func ParseLoop() {
+func ParseLoop() *TSFile {
 	classes := []class{}
 	functions := []function{}
 	variables := []variable{}
@@ -78,18 +99,18 @@ func ParseLoop() {
 			if value == "class" {
 				classes = append(classes, readClass())
 			} else if value == "function" {
-				functions = append(functions, readFunction(next()))
+				name := next()
+				next() // opening paranthesis
+				functions = append(functions, readFunction(name))
 			} else if value == "variable" {
-				variables = append(variables, readVariable(next(), token))
+				name := next()
+				token = next() // ':' or '=' or ';'
+				variables = append(variables, readVariable(token, name))
 			}
 		}
 	}
-}
 
-var accessModifiers = map[string]string{
-	"public":    "public",
-	"private":   "private",
-	"protected": "protected",
+	return &TSFile{classes: classes, functions: functions, variables: variables}
 }
 
 func readClass() class {
@@ -103,7 +124,7 @@ func readClass() class {
 	}
 	if token == "implements" {
 		class.implements = true
-		token = readInterfaces(&class)
+		token = readImplementedInterfaces(&class)
 	}
 	for token := next(); token != "}"; token = next() {
 		accessModifier, token := getAccessModifier(token)
@@ -180,6 +201,7 @@ func readVariable(token string, name string) variable {
 	if token == "=" {
 		vr.dValue = readVariableDataValue()
 	}
+
 	return vr
 }
 
@@ -187,6 +209,14 @@ func readVariable(token string, name string) variable {
 func readVariableDataValue() string {
 	dataValue := ""
 	for token := next(); token != ";"; token = next() {
+		if keywords[token] {
+			// if there is no semi colon end of the statement.
+			// it will check the next one so we one it is a keyword we need to
+			// keep track of the token's index. To not lose it we are using the function
+			// prev.
+			token = prev()
+			break
+		}
 		dataValue += token
 	}
 	return dataValue
@@ -197,11 +227,19 @@ func readVariableDataType() (string, string) {
 	dataType := ""
 	var token string
 	for token = next(); token != "=" && token != ";"; token = next() {
+		if keywords[token] {
+			// if there is no semi colon end of the statement.
+			// it will check the next one so we one it is a keyword we need to
+			// keep track of the token's index. To not lose it we are using the function
+			// prev.
+			token = prev()
+			break
+		}
 		dataType += token
 	}
 	return dataType, token
 }
-func readInterfaces(class *class) string {
+func readImplementedInterfaces(class *class) string {
 	token := next()
 	for ; token != "{"; token = next() {
 		if token == "," {
@@ -297,5 +335,14 @@ func next() string {
 	}
 	token := tokens[idx]
 	idx++
+	return token
+}
+
+func prev() string {
+	if idx <= 0 {
+		panic("Index is smaller than 0")
+	}
+	token := tokens[idx-1]
+	idx--
 	return token
 }
