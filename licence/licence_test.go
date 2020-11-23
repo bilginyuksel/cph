@@ -70,17 +70,41 @@ func TestStringArrayToMap_Sample1(t *testing.T) {
 
 func TestFindEndIdxOfTheBlockComment_Sample1(t *testing.T) {
 	sampleContent := "/*hello world*//*hello world*/"
-	endIdx := findEndIdxOfTheBlockComment(sampleContent, 1)
+	endIdx := findEndIdxOfTheBlockComment(sampleContent, 1, "*/")
 	if 14 != endIdx {
 		t.Errorf("End Idx= %d", endIdx)
 	}
 }
 
 func TestFindEndIdxOfTheBlockComment_Sample2(t *testing.T) {
+	sampleContent := "<!--hello world--><!--hello world-->"
+	endIdx := findEndIdxOfTheBlockComment(sampleContent, 3, "-->")
+	if 17 != endIdx {
+		t.Errorf("given %d and expected is %d", endIdx, 17)
+	}
+}
+
+func TestFindEndIdxOfTheBlockComment_Sample4(t *testing.T) {
+	sampleContent := "<!--hello world--><!--hello world-->"
+	endIdx := findEndIdxOfTheBlockComment(sampleContent, 18, "-->")
+	if 35 != endIdx {
+		t.Errorf("given %d and expected is %d", endIdx, 35)
+	}
+}
+
+func TestFindEndIdxOfTheBlockComment_Sample5(t *testing.T) {
 	sampleContent := "/*hello world*//*hello world*/"
-	endIdx := findEndIdxOfTheBlockComment(sampleContent, 16)
+	endIdx := findEndIdxOfTheBlockComment(sampleContent, 16, "*/")
 	if 29 != endIdx {
 		t.Errorf("End Idx= %d", endIdx)
+	}
+}
+
+func TestFindHowManyCommentExists_Sample0(t *testing.T) {
+	sampleContent := "/*hello world*//*hello world*/"
+	commentCount := findHowManyCommentExists(sampleContent, ".java")
+	if 2 != commentCount {
+		t.Errorf("Comment count= %d", commentCount)
 	}
 }
 
@@ -118,7 +142,7 @@ func TestDeleteInvalidLicence_DeleteInvalid(t *testing.T) {
 }
 
 func TestFindCommentedInvalidLicenceToDelete_Similar(t *testing.T) {
-	licSim := findCommentedInvalidLicenceToDelete("/*"+LICENCE+"*/", 0.8)
+	licSim := findCommentedInvalidLicenceToDelete("/*"+LICENCE+"*/", 0.8, ".java")
 	t.Logf("Licsim prob= %f", licSim.prob)
 	if !licSim.similar {
 		t.Error()
@@ -127,7 +151,7 @@ func TestFindCommentedInvalidLicenceToDelete_Similar(t *testing.T) {
 
 func TestFindCommentedInvalidLicenceToDelete_NotSimilar(t *testing.T) {
 	content := "hello world/*hello world*/hello world"
-	licSim := findCommentedInvalidLicenceToDelete(content, 0.1)
+	licSim := findCommentedInvalidLicenceToDelete(content, 0.1, ".java")
 	t.Logf("Licsim prob= %f", licSim.prob)
 	if licSim.similar {
 		t.Error()

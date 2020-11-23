@@ -76,7 +76,7 @@ func Write(filePath string) {
 	}
 	numberOfComments := findHowManyCommentExists(content, extension)
 	for i := 0; i < numberOfComments; i++ {
-		similarity := findCommentedInvalidLicenceToDelete(content, 0.6)
+		similarity := findCommentedInvalidLicenceToDelete(content, 0.6, extension)
 		if similarity.similar {
 			content = deleteInvalidLicence(content, similarity.startIdx, similarity.endIdx)
 		}
@@ -104,13 +104,20 @@ func deleteInvalidLicence(content string, startIdx int, endIdx int) string {
 	return clearedContent
 }
 
-func findCommentedInvalidLicenceToDelete(content string, bound float64) licenceSimilarity {
+func isStartOfBlockComment(content string, startIdx int, tag string) bool {
+	return content[startIdx-len(tag)+1:startIdx+1] == tag
+}
+
+func findCommentedInvalidLicenceToDelete(content string, bound float64, extension string) licenceSimilarity {
 	var prop float64
 	var startIdx = 0
 	var endIdx = 0
-	for i := 0; i < len(content); i++ {
-		if content[i] == '*' && content[i-1] == '/' {
-			end := findEndIdxOfTheBlockComment(content, i)
+	tag := extensions[extension]
+	startTag := tag[0]
+	endTag := tag[1]
+	for i := 1; i < len(content); i++ {
+		if isStartOfBlockComment(content, i, startTag) {
+			end := findEndIdxOfTheBlockComment(content, i, endTag)
 			potentialLicence := content[i+1 : end-1]
 			prop := comparePotentialLicenceToActualLicence(potentialLicence)
 			if prop > bound {
@@ -158,9 +165,9 @@ func stringArrayToMap(arr []string) map[string]int {
 	return tempMap
 }
 
-func findEndIdxOfTheBlockComment(content string, startIdx int) int {
-	for i := startIdx + 1; i < len(content); i++ {
-		if content[i] == '/' && content[i-1] == '*' {
+func findEndIdxOfTheBlockComment(content string, startIdx int, tag string) int {
+	for i := startIdx; i < len(content); i++ {
+		if isCommentEndingFound(content, i, tag) {
 			return i
 		}
 	}
