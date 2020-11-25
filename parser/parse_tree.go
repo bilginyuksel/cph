@@ -1,6 +1,9 @@
 package parser
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 var words = map[string]string{
 	"function":  "function",
@@ -65,7 +68,11 @@ type tinterface struct {
 type docstring struct {
 	paramDocs map[string]string
 	desc      string
-	rtype     string
+	rtype     docrtype
+}
+type docrtype struct {
+	rtype string
+	desc  string
 }
 
 type variable struct {
@@ -118,7 +125,7 @@ func ParseLoop() *TSFile {
 		token := next()
 		if token == "//" || token == "/*" {
 			docS := next()
-			fmt.Println(docS)
+			parseDoc(docS)
 			continue
 		}
 		identifiers, token := getIdentifiersAndReturnToken(token)
@@ -142,6 +149,72 @@ func ParseLoop() *TSFile {
 	}
 
 	return &TSFile{classes: classes, functions: functions, variables: variables, interfaces: tinterfaces, enums: enums}
+}
+
+func parseDoc(docS string) docstring {
+	docstring := docstring{}
+	docS = strings.Replace(docS, "*", "", -1)
+	docstring.desc = readDocDesc(docS)
+	docstring.paramDocs = readDocParams(docS)
+	docstring.rtype = readReturnType(docS)
+	fmt.Println(docS)
+	return docstring
+}
+
+func readReturnType(doc string) docrtype {
+	docrtype := docrtype{}
+	if !strings.Contains(doc, "@return") {
+		return docrtype
+	}
+	startIdx := strings.Index(doc, "@return") + 7
+	endIdx := findEndIdxOfDocReturnType(doc, startIdx)
+	pieces := strings.SplitN(doc[startIdx+1:endIdx-1], " ", 2)
+	fmt.Println(pieces)
+	docrtype.rtype = pieces[0]
+	docrtype.desc = pieces[1]
+	return docrtype
+}
+
+func findEndIdxOfDocReturnType(doc string, startIdx int) int {
+	endIdx := startIdx
+	for i := startIdx; i < len(doc) && doc[i] != '@'; i++ {
+		endIdx++
+	}
+	return endIdx
+}
+
+func readDocParams(doc string) map[string]string {
+	paramMap := map[string]string{}
+	if !strings.Contains(doc, "@param") {
+		return paramMap
+	}
+	for i := 1; i < len(doc); i++ {
+		if doc[i-1] == '@' && doc[i] == 'p' {
+			key, value := readNextDocParam(doc, i+6)
+			paramMap[key] = value
+		}
+	}
+	return paramMap
+}
+
+func readNextDocParam(doc string, startIdx int) (string, string) {
+	endIdx := startIdx
+	for i := endIdx; i < len(doc) && doc[i] != '@'; i++ {
+		endIdx++
+	}
+	pieces := strings.SplitN(doc[startIdx:endIdx], " ", 2)
+	return pieces[0], pieces[1]
+}
+
+func readDocDesc(doc string) string {
+	desc := ""
+	for i := 0; i < len(doc); i++ {
+		if doc[i] == '@' {
+			return desc
+		}
+		desc += string(doc[i])
+	}
+	return desc
 }
 
 func readEnum(identifiers []string) enum {
