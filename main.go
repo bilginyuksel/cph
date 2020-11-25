@@ -13,7 +13,19 @@ import (
 )
 
 func main() {
-	prepareCliParser()
+	content := `/**
+	* This is an interface.
+	* @param value This is a random value.
+	* @return Promise<boolean> This function returns anything.
+	* @param callback callback function to pass bilmem ne.
+	* nextnext
+	*/
+	function considerCase(value:number, callback: ()=>void = () => {console.log("hello world")}) {
+	
+	}`
+	parser.Tokenize(content)
+	parser.ParseLoop()
+	//prepareCliParser()
 }
 
 func prepareCliParser() {

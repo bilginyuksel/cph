@@ -23,10 +23,10 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 		private readonly id: number;
 		private readonly uiSettings: UiSettings;
 
-		/*
-		*This is an interface.
-		*@param callback callback function to pass bilmem ne
-		*@return any
+		/**
+		* This is an interface.
+		* @param callback callback function to pass bilmem ne
+		* @return any
 		*/
 		scroll(): void {
 			const mapRect = document.getElementById(this.divId).getBoundingClientRect();
@@ -68,10 +68,10 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 	}
 	
 	
-	/*
-	*This is an interface.
-	*@param callback callback function to pass bilmem ne
-	*@return any
+	/**
+	* This is an interface.
+	* @param callback callback function to pass bilmem ne
+	* @return any
 	*/
 	function considerCase(callback: ()=>void = () => {console.log("hello world")}) {
 	
