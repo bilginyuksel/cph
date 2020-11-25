@@ -169,9 +169,11 @@ func readReturnType(doc string) docrtype {
 	startIdx := strings.Index(doc, "@return") + 7
 	endIdx := findEndIdxOfDocReturnType(doc, startIdx)
 	pieces := strings.SplitN(doc[startIdx+1:endIdx-1], " ", 2)
-	fmt.Println(pieces)
 	docrtype.rtype = pieces[0]
-	docrtype.desc = pieces[1]
+	docrtype.desc = ""
+	if len(pieces) > 1 {
+		docrtype.desc = pieces[1]
+	}
 	return docrtype
 }
 
