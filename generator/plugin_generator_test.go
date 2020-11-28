@@ -10,7 +10,7 @@ import (
 )
 
 func TestCreatePluginWithGivenName_ExpectPluginFilesCreated(t *testing.T) {
-	CreateBasePlugin(".", "group", "project")
+	CreateBasePlugin("group", "project")
 
 	linuxFileList := []string{"cordova-plugin-group-project/README.md", "cordova-plugin-group-project/tsconfig.json",
 		"cordova-plugin-group-project/scripts/util.ts", "cordova-plugin-group-project/scripts/Project.ts",

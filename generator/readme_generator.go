@@ -1,9 +1,5 @@
 package generator
 
-func Parse(content string) *TSFile {
-	return nil
-}
-
 type AccessSpecifier string
 
 const (

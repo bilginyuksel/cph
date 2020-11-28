@@ -6,32 +6,49 @@ import (
 	"os"
 )
 
-// CreateBasePlugin ...
-func CreateBasePlugin(path string, group string, projectName string) {
-	createFile := func(filename string, content string) {
-		d := []byte(content)
-		err := ioutil.WriteFile(filename, d, 0644)
-		if err != nil {
-			panic(err)
-		}
-	}
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s", group, projectName), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src", group, projectName), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main", group, projectName), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java", group, projectName), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com", group, projectName), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/", group, projectName), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s", group, projectName, group), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova", group, projectName, group), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova/%s", group, projectName, group, projectName), 0755)
+const PACKAGE_JSON = `{
+	"name": "%s",
+	"title": "Cordova %s Plugin",
+	"version":"1.0.0",
+	"repository": {
+		"type": "git",
+		"url": ""
+	},
+	"licence": "Apache-2.0",
+	"keywords": [
+		"cordova"
+	],
+	"cordova": {
+		"id": "%s",
+		"platforms": [
+			"android"
+		]
+	},
+	"engines": {
+		"name": "cordova",
+		"version": ">=3.0.0"
+	},
+	"devDependencies": {
+		"eslint": "^3.19.0",
+		"eslint-config-semistandard": "^11.0.0",
+		"eslint-config-standard": "^10.2.1",
+		"eslint-plugin-import": "^2.3.0",
+		"eslint-plugin-node": "^5.0.0",
+		"eslint-plugin-promise": "^3.5.0",
+		"eslint-plugin-standard": "^3.0.1"
+	},
+	"dependencies": {},
+	"files": [
+		"src/**",
+		"www/**",
+		"LICENCE",
+		"package.json",
+		"plugin.xml",
+		"README.md"
+	]
+}`
 
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/www", group, projectName), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/scripts", group, projectName), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/tests", group, projectName), 0755)
-	os.Mkdir(fmt.Sprintf("cordova-plugin-%s-%s/types", group, projectName), 0755)
-
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/README.md", group, projectName), fmt.Sprintf("## cordova-plugin-%s-%s", group, projectName))
-	createFile(fmt.Sprintf("cordova-plugin-%s-%s/tsconfig.json", group, projectName), `{
+const TS_CONFIG = `{
 	"compileOnSave": true,
 	"compilerOptions": {
 		"noImplicitAny": true,
@@ -46,7 +63,149 @@ func CreateBasePlugin(path string, group string, projectName string) {
 		"declarationDir": "types"
 	},
 	"exclude": ["node_modules", "src", "www", "types"]
-}`)
+}`
+
+const PLUGIN_XML = `<?xml version='1.0' encoding='utf-8'?>
+<plugin id="%s"
+		version="1.0.0"
+		xmlns="http://apache.org/cordova/ns/plugins/1.0"
+		xmlns:android="http://schemas.android.com/apk/res/android">
+	<name>Cordova Plugin %s</name>
+	<description>Cordova Plugin %s</description>
+	<license>Apache 2.0</license>
+	<keywords>android, hms</keywords>
+
+	<platform name="android">
+	</platform>
+	</plugin>`
+
+const JAVA_MAIN = `package com.huawei.hms.cordova.%s;
+
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaInterface;
+
+import org.json.JSONArray;
+
+import com.huawei.hms.cordova.%s.basef.CordovaBaseModule;
+import com.huawei.hms.cordova.%s.basef.handler.CordovaController;
+
+import java.util.Arrays;
+
+public class HMS%s extends CordovaPlugin {
+
+	private CordovaController cordovaController;
+
+	@Override
+	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+		super.initialize(cordova, webView);
+		final String SERVICE = "<service-name>";
+		final String VERSION = "<version>";
+		cordovaController = new CordovaController(this, SERVICE, VERSION,
+				Arrays.asList(new CordovaBaseModule[]{
+						new Test1(webView.getContext(), cordova.getActivity())
+				}));
+	}
+
+	@Override
+	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
+		return cordovaController.execute(action, args, callbackContext);
+	}
+}
+`
+
+const TS_UTILS = `import { exec } from 'cordova';
+
+export function asyncExec(clazz: string, reference: string, args: any = []) {
+	return new Promise((resolve, reject) => {
+		exec(resolve, reject, clazz, reference, args);
+	});
+}
+`
+
+const TS_MAIN = `import { asyncExec } from './utils';
+`
+
+func createFile(filename string, content string) {
+	d := []byte(content)
+	err := ioutil.WriteFile(filename, d, 0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func createDir(directory string) {
+	os.Mkdir(directory, 0755)
+}
+
+// CreateHMSPlugin ...
+func CreateHMSPlugin(project string) {
+
+	root := fmt.Sprintf("cordova-plugin-hms-%s", project)
+
+	firstLetterCapitalProject := project
+
+	createDir(root)
+	createDir(fmt.Sprintf("%s/src", root))
+	createDir(fmt.Sprintf("%s/src/main", root))
+	createDir(fmt.Sprintf("%s/src/main/java", root))
+	createDir(fmt.Sprintf("%s/src/main/java/com", root))
+	createDir(fmt.Sprintf("%s/src/main/java/com/huawei", root))
+	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms", root))
+	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova", root))
+	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/%s", root, project))
+	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/basef", root))
+	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/basef/handler", root))
+
+	createDir(fmt.Sprintf("%s/scripts", root))
+	createDir(fmt.Sprintf("%s/www", root))
+	createDir(fmt.Sprintf("%s/tests", root))
+	createDir(fmt.Sprintf("%s/types", root))
+
+	// CREATE FILES IN ThE ROOT DIRECTORY
+	createFile(fmt.Sprintf("%s/README.md", root), root)
+	createFile(fmt.Sprintf("%s/tsconfig.json", root), TS_CONFIG)
+	createFile(fmt.Sprintf("%s/package.json", root), fmt.Sprintf(PACKAGE_JSON, root, project, root))
+	createFile(fmt.Sprintf("%s/plugin.xml", root), fmt.Sprintf(PLUGIN_XML, root, project, project))
+
+	// CREATE TS FILES
+	createFile(fmt.Sprintf("%s/scripts/utils.ts", root), TS_UTILS)
+	createFile(fmt.Sprintf("%s/scripts/HMS%s.ts", root, project), TS_MAIN)
+
+	// CREATE JAVA FILES
+	javaPrefix := fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/%s", root, project)
+	createFile(fmt.Sprintf("%s/HMS%s.java", javaPrefix, firstLetterCapitalProject), fmt.Sprintf(JAVA_MAIN, project, project, project, firstLetterCapitalProject))
+	// createFile(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/"))
+}
+
+func includeFramework(javaPath string) {
+	createDir(fmt.Sprintf("%s/basef", javaPath))
+	createDir(fmt.Sprintf("%s/basef/handler", javaPath))
+
+	// createFile(fmt.Sprintf("%s/basef/"))
+}
+
+// CreateBasePlugin ...
+func CreateBasePlugin(group string, projectName string) {
+
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s", group, projectName))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/src", group, projectName))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/src/main", group, projectName))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java", group, projectName))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com", group, projectName))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/", group, projectName))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s", group, projectName, group))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova", group, projectName, group))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/src/main/java/com/%s/cordova/%s", group, projectName, group, projectName))
+
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/www", group, projectName))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/scripts", group, projectName))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/tests", group, projectName))
+	createDir(fmt.Sprintf("cordova-plugin-%s-%s/types", group, projectName))
+
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/README.md", group, projectName), fmt.Sprintf("## cordova-plugin-%s-%s", group, projectName))
+	createFile(fmt.Sprintf("cordova-plugin-%s-%s/tsconfig.json", group, projectName), TS_CONFIG)
 
 	createFile(fmt.Sprintf("cordova-plugin-%s-%s/scripts/util.ts", group, projectName),
 		`import { exec } from 'cordova';
