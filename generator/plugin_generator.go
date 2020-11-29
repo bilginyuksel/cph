@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 func createFile(filename string, content string) {
@@ -23,7 +24,7 @@ func CreateHMSPlugin(project string) {
 
 	root := fmt.Sprintf("cordova-plugin-hms-%s", project)
 
-	firstLetterCapitalProject := project
+	firstLetterCapitalProject := strings.ToUpper(string(project[0])) + project[1:]
 
 	createDir(root)
 	createDir(fmt.Sprintf("%s/src", root))
@@ -35,31 +36,43 @@ func CreateHMSPlugin(project string) {
 	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova", root))
 	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/%s", root, project))
 
-	createDir(fmt.Sprintf("%s/scripts", root))
+	// createDir(fmt.Sprintf("%s/scripts", root))
 	createDir(fmt.Sprintf("%s/www", root))
-	createDir(fmt.Sprintf("%s/tests", root))
-	createDir(fmt.Sprintf("%s/types", root))
+	createDir(fmt.Sprintf("%s/hooks", root))
+
+	// CREATE HOOK FILES
+	createFile(fmt.Sprintf("%s/hooks/after_plugin_install.js", root), AFTER_PLUGIN_INSTALL)
+	createFile(fmt.Sprintf("%s/hooks/after_prepare.js", root), AFTER_PREPARE)
+	createFile(fmt.Sprintf("%s/hooks/before_plugin_uninstall.js", root), BEFORE_PLUGIN_UNINSTALL)
+	createFile(fmt.Sprintf("%s/hooks/FSUtils.js", root), FS_UTILS)
+
+	// createDir(fmt.Sprintf("%s/tests", root))
+	// createDir(fmt.Sprintf("%s/types", root))
 
 	// CREATE FILES IN ThE ROOT DIRECTORY
 	createFile(fmt.Sprintf("%s/README.md", root), root)
 	createFile(fmt.Sprintf("%s/tsconfig.json", root), TS_CONFIG)
 	createFile(fmt.Sprintf("%s/package.json", root), fmt.Sprintf(PACKAGE_JSON, root, project, root))
 	createFile(fmt.Sprintf("%s/plugin.xml", root), fmt.Sprintf(PLUGIN_XML, root, project, project))
+	createFile(fmt.Sprintf("%s/src/main/AndroidManifest.xml", root), fmt.Sprintf(ANDROID_MANIFEST, project))
 
 	// CREATE TS FILES
-	createFile(fmt.Sprintf("%s/scripts/utils.ts", root), TS_UTILS)
-	createFile(fmt.Sprintf("%s/scripts/HMS%s.ts", root, project), TS_MAIN)
+	// createFile(fmt.Sprintf("%s/scripts/utils.ts", root), TS_UTILS)
+	// createFile(fmt.Sprintf("%s/scripts/HMS%s.ts", root, project), TS_MAIN)
+	className := fmt.Sprintf("HMS%s", firstLetterCapitalProject)
+	createFile(fmt.Sprintf("%s/www/HMS%s.js", root, firstLetterCapitalProject), fmt.Sprintf(JS_MAIN, className))
 
 	// CREATE JAVA FILES
 	javaPrefix := fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/%s", root, project)
 	createFile(fmt.Sprintf("%s/HMS%s.java", javaPrefix, firstLetterCapitalProject), fmt.Sprintf(JAVA_MAIN, project, project, project, firstLetterCapitalProject))
+	createFile(fmt.Sprintf("%s/Test.java", javaPrefix), fmt.Sprintf(JAVA_EXAMPLE, project, project, project, project, project, project))
 	// createFile(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/"))
 	IncludeFramework(project)
 }
 
 // IncludeFramework ...
 func IncludeFramework(project string) {
-	javaPath := fmt.Sprintf("cordova-hms-plugin-%s/src/main/java/com/huawei/hms/cordova/%s", project, project)
+	javaPath := fmt.Sprintf("cordova-plugin-hms-%s/src/main/java/com/huawei/hms/cordova/%s", project, project)
 	createDir(fmt.Sprintf("%s/basef", javaPath))
 	createDir(fmt.Sprintf("%s/basef/handler", javaPath))
 

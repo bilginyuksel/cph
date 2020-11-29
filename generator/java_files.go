@@ -25,7 +25,7 @@ public class HMS%s extends CordovaPlugin {
 		final String VERSION = "<version>";
 		cordovaController = new CordovaController(this, SERVICE, VERSION,
 				Arrays.asList(new CordovaBaseModule[]{
-						new Test1(webView.getContext(), cordova.getActivity())
+						new Test(webView.getContext())
 				}));
 	}
 
@@ -35,6 +35,38 @@ public class HMS%s extends CordovaPlugin {
 	}
 }
 `
+
+const JAVA_EXAMPLE = `package com.huawei.hms.cordova.%s;
+
+import android.content.Context;
+import android.widget.Toast;
+
+import com.huawei.hms.cordova.%s.basef.CordovaBaseModule;
+import com.huawei.hms.cordova.%s.basef.CordovaMethod;
+import com.huawei.hms.cordova.%s.basef.HMSLog;
+import com.huawei.hms.cordova.%s.basef.handler.CorPack;
+import com.huawei.hms.cordova.%s.basef.handler.Promise;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+public class Test extends CordovaBaseModule {
+	private Context context;
+	public Test(Context context) {
+		this.context = context;
+	}
+
+	@HMSLog
+	@CordovaMethod
+	public void showToast(final CorPack corPack, JSONArray args, final Promise promise) throws JSONException {
+		String message = args.getString(0);
+		Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+	    promise.success();
+	}
+}
+
+`
+
 const JAVAC_BASE_ANNOTATION = `package com.huawei.hms.cordova.%s.basef;
 
 import java.lang.annotation.ElementType;

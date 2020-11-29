@@ -51,6 +51,23 @@ func SyncPluginXML(path string) error {
 	plugin.Platform.NewSourceFrom(sourceFiles)
 	jsModules, _ := reader.FilePathWalkDir("www", []string{})
 	plugin.NewJsModulesFrom(jsModules)
+	splittedPluginIDString := strings.Split(plugin.ID, "-")
+	pluginName := "Example"
+	if len(splittedPluginIDString) > 1 {
+		pluginName = splittedPluginIDString[len(splittedPluginIDString)-1]
+	}
+	firstLetterUpper := strings.ToUpper(string(pluginName[0])) + pluginName[1:]
+	configFile := parser.ConfigFile{Target: "config.xml", Parent: "/*", Features: []parser.Feature{parser.Feature{Name: "HMS" + firstLetterUpper, Params: []parser.Param{parser.Param{Name: "android-package", Value: fmt.Sprintf("com.huawei.hms.cordova.%s.HMS%s", pluginName, firstLetterUpper)}}}}}
+	plugin.Platform.ConfigFiles = append(plugin.Platform.ConfigFiles, configFile)
+
+	// ADD HOOKS
+	hooks := parser.Hook{Src: "hooks/before_plugin_uninstall.js", Type: "before_plugin_uninstall"}
+	plugin.Platform.Hooks = append(plugin.Platform.Hooks, hooks)
+	hooks = parser.Hook{Src: "hooks/after_plugin_install.js", Type: "after_plugin_install"}
+	plugin.Platform.Hooks = append(plugin.Platform.Hooks, hooks)
+	hooks = parser.Hook{Src: "hooks/after_prepare.js", Type: "after_prepare"}
+	plugin.Platform.Hooks = append(plugin.Platform.Hooks, hooks)
+	// ADD HOOKS
 
 	err = parser.CreateXML(plugin, "plugin.xml")
 	return err

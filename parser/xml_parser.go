@@ -79,6 +79,8 @@ func (p *Platform) NewSourceFrom(javaFiles []string) {
 		ext := filepath.Ext(path)
 		if ext == ".java" {
 			dir, _ := filepath.Split(javaFiles[i])
+			dir = strings.Replace(dir, "main/java/", "", -1)
+			dir = strings.Replace(dir, "main\\java\\", "", -1)
 			sourceFiles = append(sourceFiles, SourceFile{
 				Src:       path,
 				TargetDir: dir,
@@ -101,6 +103,7 @@ func (p *Plugin) NewJsModulesFrom(jsFiles []string) {
 				Src:  path,
 			}
 			if name[0] >= 'A' && name[0] <= 'Z' {
+				name = strings.Replace(name, ".js", "", -1)
 				jsModule.Clobbers = &Clobbers{Target: name}
 			}
 			jsModules = append(jsModules, jsModule)
