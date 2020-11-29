@@ -1,9 +1,9 @@
-package generator
+package tsc
 
 import "testing"
 
 func TestHasCordovaMethod_NoCordovaMethod(t *testing.T) {
-	given := hasCormet("content")
+	given := HasCormet("content")
 	expected := false
 	if given != expected {
 		t.Error()
@@ -16,7 +16,7 @@ func TestHasCordovaMethod_CordovaMethodExists(t *testing.T) {
 	public void something(final CorPack corPack, JSONArray args, final Promise promise) {
 		promise.success();
 	}`
-	given := hasCormet(content)
+	given := HasCormet(content)
 	expected := true
 	if given != expected {
 		t.Error()

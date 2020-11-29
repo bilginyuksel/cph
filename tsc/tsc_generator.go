@@ -1,6 +1,9 @@
-package generator
+package tsc
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -42,7 +45,8 @@ func GetCormetRef(content string, reference string) *CormetRef {
 	return &CormetRef{CormetList: cormetList, Reference: reference}
 }
 
-func hasCormet(content string) bool {
+// HasCormet ...
+func HasCormet(content string) bool {
 	return strings.Contains(content, "@CordovaMethod")
 }
 
@@ -102,6 +106,46 @@ func getCormet(content string) *CormetFun {
 	convertParameterTypesToTS(parameters)
 
 	return &CormetFun{Name: name, Params: parameters}
+}
+
+func createFile(filename string, content string) {
+	d := []byte(content)
+	err := ioutil.WriteFile(filename, d, 0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func createTSContentOf(ref string, cormetList []CormetFun) string {
+	content := fmt.Sprintf(`import { asyncExec } from './utils';
+
+export class %s {
+`, ref)
+	for _, val := range cormetList {
+		content += "\t" + val.Name + "("
+		paramName := ""
+		for i := 0; i < len(val.Params); i++ {
+			content += val.Params[i].name + ":" + val.Params[i].typo
+			if i != len(val.Params)-1 {
+				content += ", "
+			}
+			paramName += ", " + val.Params[i].name
+		}
+
+		content += fmt.Sprintf("): Promise<any> {\n\t\treturn asyncExec('<class-name>', '%s', ['%s'%s]);\n\t}\n", ref, val.Name, paramName)
+	}
+	return content + "}\n"
+}
+
+// WriteCormetRefListToFiles ...
+func WriteCormetRefListToFiles(cormetRef []CormetRef) {
+	os.Mkdir("scripts", 0755)
+
+	for _, val := range cormetRef {
+		fname := fmt.Sprintf("scripts/%s.ts", val.Reference)
+		fcontent := createTSContentOf(val.Reference, val.CormetList)
+		createFile(fname, fcontent)
+	}
 }
 
 func findUsagesAndReturnVarTypePairs(content string, key string) []Parameter {
