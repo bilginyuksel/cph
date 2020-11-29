@@ -69,8 +69,12 @@ func AddLicenceTo(path string, ignored []string) error {
 }
 
 // PluginGenerator ...
-func PluginGenerator(group string, project string, homePage string) error {
-	generator.CreateBasePlugin(group, project, homePage)
+func PluginGenerator(project string, include bool) error {
+	if include {
+		generator.IncludeFramework(project)
+	} else {
+		generator.CreateHMSPlugin(project)
+	}
 	return nil
 }
 
@@ -86,7 +90,7 @@ func (l *AddLicenseCmd) Run(ctx *Context) error {
 
 // Run ...
 func (p *PluginCmd) Run(ctx *Context) error {
-	return PluginGenerator(p.Group, p.ProjectName, p.HomePage)
+	return PluginGenerator(p.Project, p.Include)
 }
 
 // Context ...
@@ -107,9 +111,9 @@ type AddLicenseCmd struct {
 
 // PluginCmd ...
 type PluginCmd struct {
-	ProjectName string `required name:"project-name" help:"Project name for the plugin."`
-	Group       string `required name:"domain" help:"Group name for the plugin."`
-	HomePage    string `required name:"home-page" help:"Home page for the plugin."`
+	Create  bool   `group:"choice" xor:"choice"`
+	Include bool   `group:"choice" xor:"choice"`
+	Project string `required:"" name:"project" help:"Project name for the plugin."`
 }
 
 var cli struct {

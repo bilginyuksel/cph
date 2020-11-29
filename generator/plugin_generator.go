@@ -6,127 +6,6 @@ import (
 	"os"
 )
 
-const PACKAGE_JSON = `{
-	"name": "%s",
-	"title": "Cordova %s Plugin",
-	"version":"1.0.0",
-	"repository": {
-		"type": "git",
-		"url": ""
-	},
-	"licence": "Apache-2.0",
-	"keywords": [
-		"cordova"
-	],
-	"cordova": {
-		"id": "%s",
-		"platforms": [
-			"android"
-		]
-	},
-	"engines": {
-		"name": "cordova",
-		"version": ">=3.0.0"
-	},
-	"devDependencies": {
-		"eslint": "^3.19.0",
-		"eslint-config-semistandard": "^11.0.0",
-		"eslint-config-standard": "^10.2.1",
-		"eslint-plugin-import": "^2.3.0",
-		"eslint-plugin-node": "^5.0.0",
-		"eslint-plugin-promise": "^3.5.0",
-		"eslint-plugin-standard": "^3.0.1"
-	},
-	"dependencies": {},
-	"files": [
-		"src/**",
-		"www/**",
-		"LICENCE",
-		"package.json",
-		"plugin.xml",
-		"README.md"
-	]
-}`
-
-const TS_CONFIG = `{
-	"compileOnSave": true,
-	"compilerOptions": {
-		"noImplicitAny": true,
-		"noEmitOnError": true,
-		"removeComments": false,
-		"sourceMap": true,
-		"inlineSources": true,
-		"outDir": "www",
-		"module": "commonjs",
-		"target": "es2015",
-		"declaration": true,
-		"declarationDir": "types"
-	},
-	"exclude": ["node_modules", "src", "www", "types"]
-}`
-
-const PLUGIN_XML = `<?xml version='1.0' encoding='utf-8'?>
-<plugin id="%s"
-		version="1.0.0"
-		xmlns="http://apache.org/cordova/ns/plugins/1.0"
-		xmlns:android="http://schemas.android.com/apk/res/android">
-	<name>Cordova Plugin %s</name>
-	<description>Cordova Plugin %s</description>
-	<license>Apache 2.0</license>
-	<keywords>android, hms</keywords>
-
-	<platform name="android">
-	</platform>
-	</plugin>`
-
-const JAVA_MAIN = `package com.huawei.hms.cordova.%s;
-
-import org.apache.cordova.CordovaWebView;
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaInterface;
-
-import org.json.JSONArray;
-
-import com.huawei.hms.cordova.%s.basef.CordovaBaseModule;
-import com.huawei.hms.cordova.%s.basef.handler.CordovaController;
-
-import java.util.Arrays;
-
-public class HMS%s extends CordovaPlugin {
-
-	private CordovaController cordovaController;
-
-	@Override
-	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-		super.initialize(cordova, webView);
-		final String SERVICE = "<service-name>";
-		final String VERSION = "<version>";
-		cordovaController = new CordovaController(this, SERVICE, VERSION,
-				Arrays.asList(new CordovaBaseModule[]{
-						new Test1(webView.getContext(), cordova.getActivity())
-				}));
-	}
-
-	@Override
-	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
-		return cordovaController.execute(action, args, callbackContext);
-	}
-}
-`
-
-const TS_UTILS = `import { exec } from 'cordova';
-
-export function asyncExec(clazz: string, reference: string, args: any = []) {
-	return new Promise((resolve, reject) => {
-		exec(resolve, reject, clazz, reference, args);
-	});
-}
-`
-
-const TS_MAIN = `import { asyncExec } from './utils';
-`
-
 func createFile(filename string, content string) {
 	d := []byte(content)
 	err := ioutil.WriteFile(filename, d, 0644)
@@ -155,8 +34,6 @@ func CreateHMSPlugin(project string) {
 	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms", root))
 	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova", root))
 	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/%s", root, project))
-	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/basef", root))
-	createDir(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/basef/handler", root))
 
 	createDir(fmt.Sprintf("%s/scripts", root))
 	createDir(fmt.Sprintf("%s/www", root))
@@ -177,13 +54,40 @@ func CreateHMSPlugin(project string) {
 	javaPrefix := fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/%s", root, project)
 	createFile(fmt.Sprintf("%s/HMS%s.java", javaPrefix, firstLetterCapitalProject), fmt.Sprintf(JAVA_MAIN, project, project, project, firstLetterCapitalProject))
 	// createFile(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/"))
+	IncludeFramework(project)
 }
 
-func includeFramework(javaPath string) {
+// IncludeFramework ...
+func IncludeFramework(project string) {
+	javaPath := fmt.Sprintf("cordova-hms-plugin-%s/src/main/java/com/huawei/hms/cordova/%s", project, project)
 	createDir(fmt.Sprintf("%s/basef", javaPath))
 	createDir(fmt.Sprintf("%s/basef/handler", javaPath))
 
-	// createFile(fmt.Sprintf("%s/basef/"))
+	corMethod := fmt.Sprintf(JAVAC_BASE_ANNOTATION, project, "CordovaMethod")
+	corEvent := fmt.Sprintf(JAVAC_BASE_ANNOTATION, project, "CordovaEvent")
+	hmsLog := fmt.Sprintf(JAVAC_BASE_ANNOTATION, project, "HMSLog")
+	corBaseModule := fmt.Sprintf(JAVAC_CORBASE_MODULE, project)
+	promise := fmt.Sprintf(JAVAC_PROMISE, project)
+	nscmException := fmt.Sprintf(JAVAC_NSCM_EXCEPTION, project)
+	hmsLogger := fmt.Sprintf(JAVAC_HMS_LOGGER, project)
+	corpack := fmt.Sprintf(JAVAC_CORPACK, project)
+	cmh := fmt.Sprintf(JAVAC_CMH, project, project, project, project)
+	cmgh := fmt.Sprintf(JAVAC_CMGH, project)
+	corController := fmt.Sprintf(JAVAC_CORCONTROLLER, project, project, project)
+	corEventRunner := fmt.Sprintf(JAVAC_COREVENTRUNNER, project, project)
+	createFile(fmt.Sprintf("%s/basef/CordovaMethod.java", javaPath), corMethod)
+	createFile(fmt.Sprintf("%s/basef/CordovaEvent.java", javaPath), corEvent)
+	createFile(fmt.Sprintf("%s/basef/HMSLog.java", javaPath), hmsLog)
+	createFile(fmt.Sprintf("%s/basef/CordovaBaseModule.java", javaPath), corBaseModule)
+
+	createFile(fmt.Sprintf("%s/basef/handler/Promise.java", javaPath), promise)
+	createFile(fmt.Sprintf("%s/basef/handler/NoSuchCordovaModuleException.java", javaPath), nscmException)
+	createFile(fmt.Sprintf("%s/basef/handler/HMSLogger.java", javaPath), hmsLogger)
+	createFile(fmt.Sprintf("%s/basef/handler/CorPack.java", javaPath), corpack)
+	createFile(fmt.Sprintf("%s/basef/handler/CordovaModuleHandler.java", javaPath), cmh)
+	createFile(fmt.Sprintf("%s/basef/handler/CordovaModuleGroupHandler.java", javaPath), cmgh)
+	createFile(fmt.Sprintf("%s/basef/handler/CordovaController.java", javaPath), corController)
+	createFile(fmt.Sprintf("%s/basef/handler/CordovaEventRunner.java", javaPath), corEventRunner)
 }
 
 // CreateBasePlugin ...
