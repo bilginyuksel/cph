@@ -1,113 +1,55 @@
 package generator
 
-type AccessSpecifier string
+import (
+	"fmt"
+	"strings"
 
-const (
-	Private   AccessSpecifier = "private"
-	Protected AccessSpecifier = "protected"
-	Public    AccessSpecifier = "public"
-	Default   AccessSpecifier = "default"
+	"github.com/bilginyuksel/cph/parser"
 )
 
-type TSFile struct {
-	Name      string
-	Imports   map[string][]string
-	Exports   map[string][]string
-	Functions map[string]Function
-	Classes   map[string]Class
-	Variables map[string]Variable
-	Interface map[string]Interface
-	Enum      map[string]Enum
-	Comments  []string
+// HeaderRow ...
+type HeaderRow struct {
+	field1 string
+	field2 string
+	field3 string
 }
 
-type Class struct {
-	Abstract bool
-	Export   bool
-	Default  bool
-	// Inner class...
-	Name         string
-	Inherited    *Class
-	Implemented  []Interface
-	Annotations  []Annotation
-	Attributes   []Attribute
-	Methods      []Method
-	Constructors []Constructor
-}
+var ClassHeader = HeaderRow{"Name", "Type", "Description"}
+var EnumHeader = HeaderRow{"Name", "Value", "Description"}
+var InterfaceHeader = HeaderRow{"Name", "Type", "Description"}
 
-type Interface struct {
-	Export    bool
-	Name      string
-	Inherited []Interface
-	Variables map[string]string
-	Methods   []Method
-}
-
-type Enum struct {
-	Name   string
-	Values map[string]string
-}
-
-type Constructor struct {
-	AccessSpecifier AccessSpecifier
-	Parameters      []Parameter
-	Parent          *Class
-}
-
-type Method struct {
-	Static          bool
-	Abstract        bool
-	Async           bool
-	Name            string
-	Annotations     []Annotation
-	Parameters      []Parameter
-	Return          string
-	AccessSpecifier AccessSpecifier
-	Parent          *Class
-	DocString       *DocString
-}
-
-type Function struct {
-	Export      bool
-	Async       bool
+// TableEnum ...
+type TableEnum struct {
 	Name        string
-	Annotations []Annotation
-	Parameters  []Parameter
-	Return      string
-	Parent      *TSFile
-	DocString   *DocString
+	Description string
+	Rows        []EnumRow
 }
 
-type Variable struct {
-	Export bool
-	Name   string
-	Type   string
-}
-
-type Attribute struct {
-	AccessSpecifier AccessSpecifier
-	Name            string
-	Type            string
-}
-
-type Annotation struct {
-	Name  string
-	Param string
-}
-
-type Parameter struct {
-	Name         string
-	Type         string
-	DefaultValue string
-}
-
-type ReturnDoc struct {
-	Return      string
+// EnumRow ...
+type EnumRow struct {
+	Name        string
+	Value       string
 	Description string
 }
 
-type DocString struct {
-	Description string
-	Params      map[string]string
-	ReturnDoc   ReturnDoc
+func createTableEnum(content *parser.Enum) *TableEnum {
+	rows := []EnumRow{}
+	for _, item := range content.Items {
+		rows = append(rows, EnumRow{Name: item.Name, Value: item.Value, Description: "-"})
+	}
+	return &TableEnum{Name: content.Name, Description: "-", Rows: rows}
+}
+
+func (row EnumRow) toSTR() string {
+	return fmt.Sprintf("|%s|%s|%s|", row.Name, row.Value, row.Description)
+}
+
+func (table TableEnum) toSTR(level int) string {
+	title := strings.Repeat("#", level) + " " + table.Name
+	desc := table.Description
+	rtable := fmt.Sprintf("|%s|%s|%s|\n|---|---|---|\n", EnumHeader.field1, EnumHeader.field2, EnumHeader.field3)
+	for _, row := range table.Rows {
+		rtable += row.toSTR() + "\n"
+	}
+	return title + "\n" + desc + "\n" + rtable
 }
