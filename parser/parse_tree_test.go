@@ -2,7 +2,7 @@ package parser
 
 import "testing"
 
-func TestParseLoop_ParseSample1(t *testing.T) {
+func TestParse_ParseSample1(t *testing.T) {
 	content := `
 
 	export enum Color {
@@ -16,7 +16,7 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 		getVisibleRegion(): Promise<VisibleRegion>;
 		toScreenLocation(latLng: LatLng): Promise<Point>;
 	}
-	//@class This is a base class represent map object.
+	//@class This is a base Class represent map object.
 	class HuaweiMapImpl implements HuaweiMap,HuaweiMap2,HuaweiMap3 {
 
 		public readonly components: Map<string, any> = new Map<string, any>();
@@ -25,7 +25,7 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 
 		/**
 		* This is an interface.
-		* @param callback callback function to pass bilmem ne
+		* @param callback callback Function to pass bilmem ne
 		* @return any
 		*/
 		scroll(): void {
@@ -42,7 +42,7 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 			const fixedFunctionNameForJava: string = 'set${event[0].toUpperCase()}${event.substr(1)}Listener';
 
 			return asyncExec('HMSMap', 'mapOptions', [this.divId, 'setListener', fixedFunctionNameForJava, {'content': callback.toString()}])
-				.then(value => {
+				.then(Value => {
 					//(<any>window)[fixedFunctionNameForJavaScript] = callback;
 					window.subscribeHMSEvent(fixedFunctionNameForJavaScript, callback);
 				}).catch(err => console.log(err));
@@ -70,7 +70,7 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 	
 	/**
 	* This is an interface.
-	* @param callback callback function to pass bilmem ne
+	* @param callback callback Function to pass bilmem ne
 	* @return any
 	*/
 	function considerCase(callback: ()=>void = () => {console.log("hello world")}) {
@@ -88,254 +88,253 @@ func TestParseLoop_ParseSample1(t *testing.T) {
 
 	`
 	Tokenize(content)
-	given := ParseLoop()
+	given := Parse()
 	expected := &TSFile{
-		classes: []class{
+		Classes: []Class{
 			{
-				name:               "HuaweiMapImpl",
-				implements:         true,
-				implementedClasses: []string{"HuaweiMap", "HuaweiMap2", "HuaweiMap3"},
-				variables: []variable{
-					{accessModifier: "public", readonly: true, name: "components", dType: "Map<string,any>", dValue: "newMap<string,any>()"},
-					{accessModifier: "private", readonly: true, name: "id", dType: "number"},
-					{accessModifier: "private", readonly: true, name: "uiSettings", dType: "UiSettings"},
+				Name:               "HuaweiMapImpl",
+				Implements:         true,
+				ImplementedClasses: []string{"HuaweiMap", "HuaweiMap2", "HuaweiMap3"},
+				Variables: []Variable{
+					{AccessModifier: "public", Readonly: true, Name: "components", DType: "Map<string,any>", DValue: "newMap<string,any>()"},
+					{AccessModifier: "private", Readonly: true, Name: "id", DType: "number"},
+					{AccessModifier: "private", Readonly: true, Name: "uiSettings", DType: "UiSettings"},
 				},
-				functions: []function{
-					{name: "scroll", rtype: "void", sbody: "constmapRect=document.getElementById(this.divId).getBoundingClientRect();this.forceUpdateXAndY(mapRect.x,mapRect.y);"},
-					{async: true, name: "hideMap", rtype: "Promise<void>", sbody: "returnasyncExec(HMSMap,hideMap,[this.divId]);"},
-					{async: true, name: "on", params: []param{{name: "callback", dtype: "(val:any)=>void"}, {name: "event", dtype: "MapEvent"}}, rtype: "Promise<void>", sbody: "constfixedFunctionNameForJavaScript:string=${event}_${this.id};constfixedFunctionNameForJava:string=set${event[0].toUpperCase()}${event.substr(1)}Listener;returnasyncExec(HMSMap,mapOptions,[this.divId,setListener,fixedFunctionNameForJava,{content:callback.toString()}]).then(value=>{//(<any>window)[fixedFunctionNameForJavaScript] = callback;window.subscribeHMSEvent(fixedFunctionNameForJavaScript,callback);}).catch(err=>console.log(err));"},
-					{async: true, name: "addCircle", params: []param{{name: "circleOptions", dtype: "CircleOptions"}}, rtype: "Promise<Circle>", sbody: "if(!circleOptions[center])returnPromise.reject(ErrorCodes.toString(ErrorCodes.CENTER_PROPERTY_MUST_DEFINED));constcomponentId=awaitasyncExec(HMSMap,addComponent,[this.divId,CIRCLE,circleOptions]);constcircle:Circle=newCircleImpl(this.divId,this.id,componentId);this.components.set(circle.getId(),circle);returncircle;"},
+				Functions: []Function{
+					{Name: "scroll", Rtype: "void", Sbody: "constmapRect=document.getElementById(this.divId).getBoundingClientRect();this.forceUpdateXAndY(mapRect.x,mapRect.y);"},
+					{Async: true, Name: "hideMap", Rtype: "Promise<void>", Sbody: "returnasyncExec(HMSMap,hideMap,[this.divId]);"},
+					{Async: true, Name: "on", Params: []FParam{{Name: "callback", Dtype: "(val:any)=>void"}, {Name: "event", Dtype: "MapEvent"}}, Rtype: "Promise<void>", Sbody: "constfixedFunctionNameForJavaScript:string=${event}_${this.id};constfixedFunctionNameForJava:string=set${event[0].toUpperCase()}${event.substr(1)}Listener;returnasyncExec(HMSMap,mapOptions,[this.divId,setListener,fixedFunctionNameForJava,{content:callback.toString()}]).then(Value=>{//(<any>window)[fixedFunctionNameForJavaScript] = callback;window.subscribeHMSEvent(fixedFunctionNameForJavaScript,callback);}).catch(err=>console.log(err));"},
+					{Async: true, Name: "addCircle", Params: []FParam{{Name: "circleOptions", Dtype: "CircleOptions"}}, Rtype: "Promise<Circle>", Sbody: "if(!circleOptions[center])returnPromise.reject(ErrorCodes.toString(ErrorCodes.CENTER_PROPERTY_MUST_DEFINED));constcomponentId=awaitasyncExec(HMSMap,addComponent,[this.divId,CIRCLE,circleOptions]);constcircle:Circle=newCircleImpl(this.divId,this.id,componentId);this.components.set(circle.getId(),circle);returncircle;"},
 				},
 			}},
-		functions: []function{
+		Functions: []Function{
 			{
-				name: "demo", rtype: "any", sbody: "console.log(hello world);returnasyncExec(HMSMap,ssda,{dothis:nottodothis});",
-				params: []param{{name: "data1", dtype: "()=>void"}, {name: "data", dtype: "string"}},
+				Name: "demo", Rtype: "any", Sbody: "console.log(hello world);returnasyncExec(HMSMap,ssda,{dothis:nottodothis});",
+				Params: []FParam{{Name: "data1", Dtype: "()=>void"}, {Name: "data", Dtype: "string"}},
 			},
 			{
-				name: "fooCreator", rtype: "Promise<string>", sbody: "returnpromise<string>;",
-				params: []param{{name: "safa", dtype: "number",value: "5"}},
+				Name: "fooCreator", Rtype: "Promise<string>", Sbody: "returnpromise<string>;",
+				Params: []FParam{{Name: "safa", Dtype: "number", Value: "5"}},
 			},
 			{
-				name:   "considerCase",
-				rtype:  "any",
-				params: []param{{name: "callback", dtype: "()=>void", value: "()=>{console.log(hello world)}"}},
+				Name:   "considerCase",
+				Rtype:  "any",
+				Params: []FParam{{Name: "callback", Dtype: "()=>void", Value: "()=>{console.log(hello world)}"}},
 			},
 			{
-				name:  "considerCase2",
-				rtype: "any",
-				params: []param{
+				Name:  "considerCase2",
+				Rtype: "any",
+				Params: []FParam{
 					{
-						name:  "callback",
-						dtype: "(data1:string,data2:any)=>void",
-						value: "(data1,data2)=>{console.log(Hello world);consttest=()=>{console.log(data1);console.log(data2);}}",
+						Name:  "callback",
+						Dtype: "(data1:string,data2:any)=>void",
+						Value: "(data1,data2)=>{console.log(Hello world);consttest=()=>{console.log(data1);console.log(data2);}}",
 					},
 				},
 			},
 		},
-		variables: []variable{
+		Variables: []Variable{
 			{
-				name:  "foo",
-				dType: "string",
+				Name:  "foo",
+				DType: "string",
 			},
 			{
-				name: "baz", dType: "number", dValue: "5",
+				Name: "baz", DType: "number", DValue: "5",
 			},
 		},
-		interfaces:
-		[]tinterface{{
-			name: "Projection",
-			functions: []function{
-				{name: "fromScreenLocation", params: []param{{name: "point", dtype: "Point"}}, rtype: "Promise<LatLng>"},
-				{name: "getVisibleRegion", rtype: "Promise<VisibleRegion>"},
-				{name: "toScreenLocation", params: []param{{name: "latLng", dtype: "LatLng"}}, rtype: "Promise<Point>"}},
+		Interfaces: []Tinterface{{
+			Name: "Projection",
+			Functions: []Function{
+				{Name: "fromScreenLocation", Params: []FParam{{Name: "point", Dtype: "Point"}}, Rtype: "Promise<LatLng>"},
+				{Name: "getVisibleRegion", Rtype: "Promise<VisibleRegion>"},
+				{Name: "toScreenLocation", Params: []FParam{{Name: "latLng", Dtype: "LatLng"}}, Rtype: "Promise<Point>"}},
 		},
 		},
-		enums: []enum{
+		Enums: []Enum{
 			{
-				export: true, name: "Color",
-				items: []enumItem{{name: "RED", value: "-65536"}, {name: "DARK_GRAY", value: "-12303292"}, {name: "TRANSPARENT", value: "0"}},
+				Export: true, Name: "Color",
+				Items: []EnumItem{{Name: "RED", Value: "-65536"}, {Name: "DARK_GRAY", Value: "-12303292"}, {Name: "TRANSPARENT", Value: "0"}},
 			},
 		},
 	}
 
-	if len(given.classes) != len(expected.classes) {
-		t.Errorf("given:%d but expected:%d", len(given.classes), len(expected.classes))
+	if len(given.Classes) != len(expected.Classes) {
+		t.Errorf("given:%d but expected:%d", len(given.Classes), len(expected.Classes))
 	}
-	if len(given.functions) != len(expected.functions) {
-		t.Errorf("given:%d but expected:%d", len(given.functions), len(expected.functions))
+	if len(given.Functions) != len(expected.Functions) {
+		t.Errorf("given:%d but expected:%d", len(given.Functions), len(expected.Functions))
 	}
-	if len(given.variables) != len(expected.variables) {
-		t.Errorf("given:%d but expected:%d", len(given.variables), len(expected.variables))
+	if len(given.Variables) != len(expected.Variables) {
+		t.Errorf("given:%d but expected:%d", len(given.Variables), len(expected.Variables))
 	}
-	if len(given.interfaces) != len(expected.interfaces) {
-		t.Errorf("given:%d but expected:%d", len(given.interfaces), len(expected.interfaces))
+	if len(given.Interfaces) != len(expected.Interfaces) {
+		t.Errorf("given:%d but expected:%d", len(given.Interfaces), len(expected.Interfaces))
 	}
-	if len(given.enums) != len(expected.enums) {
-		t.Errorf("given:%d but expected:%d", len(given.enums), len(expected.enums))
+	if len(given.Enums) != len(expected.Enums) {
+		t.Errorf("given:%d but expected:%d", len(given.Enums), len(expected.Enums))
 	}
-	for i := 0; i < len(given.interfaces); i++ {
-		compareInterface(t, &given.interfaces[i], &expected.interfaces[i])
+	for i := 0; i < len(given.Interfaces); i++ {
+		compareInterface(t, &given.Interfaces[i], &expected.Interfaces[i])
 	}
-	for i := 0; i < len(given.enums); i++ {
-		compareEnums(t, &given.enums[i], &expected.enums[i])
+	for i := 0; i < len(given.Enums); i++ {
+		compareEnums(t, &given.Enums[i], &expected.Enums[i])
 	}
-	for i := 0; i < len(expected.classes); i++ {
-		compareClass(t, &given.classes[i], &expected.classes[i])
+	for i := 0; i < len(expected.Classes); i++ {
+		compareClass(t, &given.Classes[i], &expected.Classes[i])
 	}
-	for i := 0; i < len(expected.functions); i++ {
-		compareFunctions(t, &given.functions[i], &expected.functions[i])
+	for i := 0; i < len(expected.Functions); i++ {
+		compareFunctions(t, &given.Functions[i], &expected.Functions[i])
 	}
-	for i := 0; i < len(expected.variables); i++ {
-		compareVariables(t, &given.variables[i], &expected.variables[i])
-	}
-}
-
-func compareEnums(t *testing.T, given *enum, expected *enum) {
-	if given.export != expected.export {
-		t.Errorf("given:%t but expected:%t", given.export, expected.export)
-	}
-	if given.name != expected.name {
-		t.Errorf("given:%s but expected:%s", given.name, expected.name)
-	}
-	for i := 0; i < len(given.items); i++ {
-		compareEnumItem(t, &given.items[i], &expected.items[i])
+	for i := 0; i < len(expected.Variables); i++ {
+		compareVariables(t, &given.Variables[i], &expected.Variables[i])
 	}
 }
 
-func compareEnumItem(t *testing.T, given *enumItem, expected *enumItem) {
-	if given.name != expected.name {
-		t.Errorf("given:%s but expected:%s", given.name, expected.name)
+func compareEnums(t *testing.T, given *Enum, expected *Enum) {
+	if given.Export != expected.Export {
+		t.Errorf("given:%t but expected:%t", given.Export, expected.Export)
 	}
-	if given.value != expected.value {
-		t.Errorf("given:%s but expected:%s", given.value, expected.value)
+	if given.Name != expected.Name {
+		t.Errorf("given:%s but expected:%s", given.Name, expected.Name)
 	}
-}
-
-func compareInterface(t *testing.T, given *tinterface, expected *tinterface) {
-	if given.name != expected.name {
-		t.Errorf("given:%s but expected:%s", given.name, expected.name)
-	}
-	for i := 0; i < len(given.functions); i++ {
-		compareFunctions(t, &given.functions[i], &expected.functions[i])
-	}
-
-	for i := 0; i < len(given.variables); i++ {
-		compareVariables(t, &given.variables[i], &expected.variables[i])
-	}
-
-}
-
-func compareVariables(t *testing.T, given *variable, expected *variable) {
-	if given.accessModifier != expected.accessModifier {
-		t.Errorf("given:%s but expected:%s", given.accessModifier, expected.accessModifier)
-	}
-	if given.name != expected.name {
-		t.Errorf("given:%s but expected:%s", given.name, expected.name)
-	}
-	if given.readonly != expected.readonly {
-		t.Errorf("given:%t but expected:%t", given.readonly, expected.readonly)
-	}
-	if given.static != expected.static {
-		t.Errorf("given:%t but expected:%t", given.static, expected.static)
-	}
-	if given.declare != expected.declare {
-		t.Errorf("given:%t but expected:%t", given.declare, expected.declare)
-	}
-	if given.dType != expected.dType {
-		t.Errorf("given:%s but expected:%s", given.dType, expected.dType)
-	}
-	if given.dValue != expected.dValue {
-		t.Errorf("given:%s but expected:%s", given.dValue, expected.dValue)
+	for i := 0; i < len(given.Items); i++ {
+		compareEnumItem(t, &given.Items[i], &expected.Items[i])
 	}
 }
 
-func compareFunctions(t *testing.T, given *function, expected *function) {
-
-	if given.export != expected.export {
-		t.Errorf("given:%t but expected:%t", given.export, expected.export)
+func compareEnumItem(t *testing.T, given *EnumItem, expected *EnumItem) {
+	if given.Name != expected.Name {
+		t.Errorf("given:%s but expected:%s", given.Name, expected.Name)
 	}
-	if given.accessModifier != expected.accessModifier {
-		t.Errorf("given:%s but expected:%s", given.accessModifier, expected.accessModifier)
-	}
-	if given.name != expected.name {
-		t.Errorf("given:%s but expected:%s", given.name, expected.name)
-	}
-	if given.async != expected.async {
-		t.Errorf("given:%t but expected:%t", given.async, expected.async)
-	}
-	if given.static != expected.static {
-		t.Errorf("given:%t but expected:%t", given.static, expected.static)
-	}
-	if given.declare != expected.declare {
-		t.Errorf("given:%t but expected:%t", given.declare, expected.declare)
-	}
-	if given.rtype != expected.rtype {
-		t.Errorf("given:%s but expected:%s", given.rtype, expected.rtype)
-	}
-	if given.sbody != expected.sbody {
-		t.Errorf("given:%s but expected:%s", given.sbody, expected.sbody)
-	}
-	for i := 0; i < len(given.params); i++ {
-		compareFunctionParameters(t, &given.params[i], &expected.params[i])
+	if given.Value != expected.Value {
+		t.Errorf("given:%s but expected:%s", given.Value, expected.Value)
 	}
 }
 
-func compareFunctionParameters(t *testing.T, given *param, expected *param) {
-	if given.dtype != expected.dtype {
-		t.Errorf("parameter dtype --> given:%s but expected:%s", given.dtype, expected.dtype)
+func compareInterface(t *testing.T, given *Tinterface, expected *Tinterface) {
+	if given.Name != expected.Name {
+		t.Errorf("given:%s but expected:%s", given.Name, expected.Name)
 	}
-	if given.name != expected.name {
-		t.Errorf("parameter name -->  given:%s but expected:%s", given.name, expected.name)
+	for i := 0; i < len(given.Functions); i++ {
+		compareFunctions(t, &given.Functions[i], &expected.Functions[i])
 	}
-	if given.value != expected.value {
-		t.Errorf("parameter value -->  given:%s but expected:%s", given.value, expected.value)
+
+	for i := 0; i < len(given.Variables); i++ {
+		compareVariables(t, &given.Variables[i], &expected.Variables[i])
+	}
+
+}
+
+func compareVariables(t *testing.T, given *Variable, expected *Variable) {
+	if given.AccessModifier != expected.AccessModifier {
+		t.Errorf("given:%s but expected:%s", given.AccessModifier, expected.AccessModifier)
+	}
+	if given.Name != expected.Name {
+		t.Errorf("given:%s but expected:%s", given.Name, expected.Name)
+	}
+	if given.Readonly != expected.Readonly {
+		t.Errorf("given:%t but expected:%t", given.Readonly, expected.Readonly)
+	}
+	if given.Static != expected.Static {
+		t.Errorf("given:%t but expected:%t", given.Static, expected.Static)
+	}
+	if given.Declare != expected.Declare {
+		t.Errorf("given:%t but expected:%t", given.Declare, expected.Declare)
+	}
+	if given.DType != expected.DType {
+		t.Errorf("given:%s but expected:%s", given.DType, expected.DType)
+	}
+	if given.DValue != expected.DValue {
+		t.Errorf("given:%s but expected:%s", given.DValue, expected.DValue)
 	}
 }
 
-func compareClass(t *testing.T, given *class, expected *class) {
-	if given.name != expected.name {
-		t.Errorf("given:%s but expected:%s", given.name, expected.name)
+func compareFunctions(t *testing.T, given *Function, expected *Function) {
+
+	if given.Export != expected.Export {
+		t.Errorf("given:%t but expected:%t", given.Export, expected.Export)
+	}
+	if given.AccessModifier != expected.AccessModifier {
+		t.Errorf("given:%s but expected:%s", given.AccessModifier, expected.AccessModifier)
+	}
+	if given.Name != expected.Name {
+		t.Errorf("given:%s but expected:%s", given.Name, expected.Name)
+	}
+	if given.Async != expected.Async {
+		t.Errorf("given:%t but expected:%t", given.Async, expected.Async)
+	}
+	if given.Static != expected.Static {
+		t.Errorf("given:%t but expected:%t", given.Static, expected.Static)
+	}
+	if given.Declare != expected.Declare {
+		t.Errorf("given:%t but expected:%t", given.Declare, expected.Declare)
+	}
+	if given.Rtype != expected.Rtype {
+		t.Errorf("given:%s but expected:%s", given.Rtype, expected.Rtype)
+	}
+	if given.Sbody != expected.Sbody {
+		t.Errorf("given:%s but expected:%s", given.Sbody, expected.Sbody)
+	}
+	for i := 0; i < len(given.Params); i++ {
+		compareFunctionParameters(t, &given.Params[i], &expected.Params[i])
+	}
+}
+
+func compareFunctionParameters(t *testing.T, given *FParam, expected *FParam) {
+	if given.Dtype != expected.Dtype {
+		t.Errorf("parameter Dtype --> given:%s but expected:%s", given.Dtype, expected.Dtype)
+	}
+	if given.Name != expected.Name {
+		t.Errorf("parameter Name -->  given:%s but expected:%s", given.Name, expected.Name)
+	}
+	if given.Value != expected.Value {
+		t.Errorf("parameter Value -->  given:%s but expected:%s", given.Value, expected.Value)
+	}
+}
+
+func compareClass(t *testing.T, given *Class, expected *Class) {
+	if given.Name != expected.Name {
+		t.Errorf("given:%s but expected:%s", given.Name, expected.Name)
 	}
 	compareImplementedInterfacesAndExtendedClassOfClass(t, given, expected)
 	compareVariablesOfClass(t, given, expected)
 	compareFunctionsOfClass(t, given, expected)
 }
 
-func compareImplementedInterfacesAndExtendedClassOfClass(t *testing.T, given *class, expected *class) {
-	if given.extends != expected.extends {
-		t.Errorf("given:%t but expected:%t", given.extends, expected.extends)
+func compareImplementedInterfacesAndExtendedClassOfClass(t *testing.T, given *Class, expected *Class) {
+	if given.Extends != expected.Extends {
+		t.Errorf("given:%t but expected:%t", given.Extends, expected.Extends)
 	}
-	if given.implements != expected.implements {
-		t.Errorf("given:%t but expected:%t", given.implements, expected.implements)
+	if given.Implements != expected.Implements {
+		t.Errorf("given:%t but expected:%t", given.Implements, expected.Implements)
 	}
-	if len(given.implementedClasses) != len(expected.implementedClasses) {
-		t.Errorf("given:%d but expected:%d", len(given.implementedClasses), len(expected.implementedClasses))
+	if len(given.ImplementedClasses) != len(expected.ImplementedClasses) {
+		t.Errorf("given:%d but expected:%d", len(given.ImplementedClasses), len(expected.ImplementedClasses))
 	}
-	if given.extendedClass != expected.extendedClass {
-		t.Errorf("given:%s but expected:%s", given.extendedClass, expected.extendedClass)
+	if given.ExtendedClass != expected.ExtendedClass {
+		t.Errorf("given:%s but expected:%s", given.ExtendedClass, expected.ExtendedClass)
 	}
-	for i := 0; i < len(given.implementedClasses); i++ {
-		if given.implementedClasses[i] != expected.implementedClasses[i] {
-			t.Errorf("given:%s but expected:%s", given.implementedClasses[i], expected.implementedClasses[i])
+	for i := 0; i < len(given.ImplementedClasses); i++ {
+		if given.ImplementedClasses[i] != expected.ImplementedClasses[i] {
+			t.Errorf("given:%s but expected:%s", given.ImplementedClasses[i], expected.ImplementedClasses[i])
 		}
 	}
 }
 
-func compareVariablesOfClass(t *testing.T, given *class, expected *class) {
-	if len(given.variables) != len(expected.variables) {
-		t.Errorf("given:%d but expected:%d", len(given.variables), len(expected.variables))
+func compareVariablesOfClass(t *testing.T, given *Class, expected *Class) {
+	if len(given.Variables) != len(expected.Variables) {
+		t.Errorf("given:%d but expected:%d", len(given.Variables), len(expected.Variables))
 	}
-	for i := 0; i < len(given.variables); i++ {
-		compareVariables(t, &given.variables[i], &expected.variables[i])
+	for i := 0; i < len(given.Variables); i++ {
+		compareVariables(t, &given.Variables[i], &expected.Variables[i])
 	}
 }
 
-func compareFunctionsOfClass(t *testing.T, given *class, expected *class) {
-	if len(given.functions) != len(expected.functions) {
-		t.Errorf("given:%d but expected:%d", len(given.functions), len(expected.functions))
+func compareFunctionsOfClass(t *testing.T, given *Class, expected *Class) {
+	if len(given.Functions) != len(expected.Functions) {
+		t.Errorf("given:%d but expected:%d", len(given.Functions), len(expected.Functions))
 	}
-	for i := 0; i < len(given.functions); i++ {
-		compareFunctions(t, &given.functions[i], &expected.functions[i])
+	for i := 0; i < len(given.Functions); i++ {
+		compareFunctions(t, &given.Functions[i], &expected.Functions[i])
 	}
 }

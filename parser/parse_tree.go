@@ -23,104 +23,119 @@ var accessModifiers = map[string]bool{
 
 // TSFile ...
 type TSFile struct {
-	classes    []class
-	functions  []function
-	interfaces []tinterface
-	variables  []variable
-	enums      []enum
+	Classes    []Class
+	Functions  []Function
+	Interfaces []Tinterface
+	Variables  []Variable
+	Enums      []Enum
 }
 
-type class struct {
-	export             bool
-	name               string
-	extends            bool
-	extendedClass      string
-	implements         bool
-	implementedClasses []string
-	variables          []variable
-	functions          []function
-	abstract           bool
-	declare            bool
-	cdefault           bool
+// Class ...
+type Class struct {
+	Export             bool
+	Name               string
+	Extends            bool
+	ExtendedClass      string
+	Implements         bool
+	ImplementedClasses []string
+	Variables          []Variable
+	Functions          []Function
+	Abstract           bool
+	Declare            bool
+	Cdefault           bool
 }
 
-type enum struct {
-	export  bool
-	declare bool
-	name    string
-	items   []enumItem
-}
-type enumItem struct {
-	name  string
-	value string
+// Enum ...
+type Enum struct {
+	Export  bool
+	Declare bool
+	Name    string
+	Items   []EnumItem
 }
 
-type tinterface struct {
-	export          bool
-	declare         bool
-	name            string
-	extends         bool
-	extendedClasses []string
-	variables       []variable
-	functions       []function
+// EnumItem ...
+type EnumItem struct {
+	Name  string
+	Value string
 }
 
-type docstring struct {
-	paramDocs map[string]string
-	desc      string
-	rtype     docrtype
+// Tinterface ...
+type Tinterface struct {
+	Export          bool
+	Declare         bool
+	Name            string
+	Extends         bool
+	ExtendedClasses []string
+	Variables       []Variable
+	Functions       []Function
 }
-type docrtype struct {
+
+// Docstring ...
+type Docstring struct {
+	ParamDocs map[string]string
+	Desc      string
+	Rtype     Docrtype
+}
+
+// Docrtype ...
+type Docrtype struct {
 	rtype string
 	desc  string
 }
 
-type variable struct {
-	export         bool
-	accessModifier string
-	readonly       bool
-	name           string
-	dType          string
-	dValue         string
-	static         bool
-	declare        bool
+// Variable ...
+type Variable struct {
+	Export         bool
+	AccessModifier string
+	Readonly       bool
+	Name           string
+	DType          string
+	DValue         string
+	Static         bool
+	Declare        bool
 }
 
-type annotation struct {
+// Annotation ...
+type Annotation struct {
 }
 
-type function struct {
-	export         bool
-	accessModifier string
-	declare        bool
-	async          bool
-	annotations    []annotation
-	docs           *docstring
-	name           string
-	rtype          string
-	body           *fbody
-	sbody          string
-	params         []param
-	static         bool
-}
-type param struct {
-	name  string
-	dtype string
-	value string
-}
-type fbody struct {
-	statements []string
-	variables  []string
-	returns    []string
+// Function ...
+type Function struct {
+	Export         bool
+	AccessModifier string
+	Declare        bool
+	Async          bool
+	Annotations    []Annotation
+	Docs           *Docstring
+	Name           string
+	Rtype          string
+	Body           *Fbody
+	Sbody          string
+	Params         []FParam
+	Static         bool
 }
 
-// ParseLoop ...
-func ParseLoop() *TSFile {
-	classes := []class{}
-	functions := []function{}
-	variables := []variable{}
-	tinterfaces := []tinterface{}
-	enums := []enum{}
+// FParam ...
+type FParam struct {
+	Name  string
+	Dtype string
+	Value string
+}
+
+// Fbody ...
+type Fbody struct {
+	Statements []string
+	Variables  []string
+	Returns    []string
+}
+
+// Parse ...
+func Parse() *TSFile {
+	classes := []Class{}
+	functions := []Function{}
+	variables := []Variable{}
+	tinterfaces := []Tinterface{}
+	enums := []Enum{}
 	for has() {
 		token := next()
 		if token == "//" || token == "/*" {
@@ -148,21 +163,21 @@ func ParseLoop() *TSFile {
 		}
 	}
 
-	return &TSFile{classes: classes, functions: functions, variables: variables, interfaces: tinterfaces, enums: enums}
+	return &TSFile{classes, functions, tinterfaces, variables, enums}
 }
 
-func parseDoc(docS string) docstring {
-	docstring := docstring{}
+func parseDoc(docS string) Docstring {
+	docstring := Docstring{}
 	docS = strings.Replace(docS, "*", "", -1)
-	docstring.desc = readDocDesc(docS)
-	docstring.paramDocs = readDocParams(docS)
-	docstring.rtype = readReturnType(docS)
+	docstring.Desc = readDocDesc(docS)
+	docstring.ParamDocs = readDocParams(docS)
+	docstring.Rtype = readReturnType(docS)
 	fmt.Println(docS)
 	return docstring
 }
 
-func readReturnType(doc string) docrtype {
-	docrtype := docrtype{}
+func readReturnType(doc string) Docrtype {
+	docrtype := Docrtype{}
 	if !strings.Contains(doc, "@return") {
 		return docrtype
 	}
@@ -219,18 +234,18 @@ func readDocDesc(doc string) string {
 	return desc
 }
 
-func readEnum(identifiers []string) enum {
-	enum := enum{}
-	enum.name = next()
+func readEnum(identifiers []string) Enum {
+	enum := Enum{}
+	enum.Name = next()
 	next()
 	for token := next(); token != "}"; token = next() {
-		enum.items = append(enum.items, readEnumItem(token))
+		enum.Items = append(enum.Items, readEnumItem(token))
 	}
 	enum.attachIdentifiers(identifiers)
 	return enum
 }
 
-func readEnumItem(name string) enumItem {
+func readEnumItem(name string) EnumItem {
 	next() // This is =
 	itemValue := ""
 	for token := next(); token != ","; token = next() {
@@ -240,24 +255,24 @@ func readEnumItem(name string) enumItem {
 		}
 		itemValue += token
 	}
-	return enumItem{name: name, value: itemValue}
+	return EnumItem{name, itemValue}
 }
 
-func readInterface(identifiers []string) tinterface {
-	tinterface := tinterface{}
-	tinterface.name = next()
+func readInterface(identifiers []string) Tinterface {
+	tinterface := Tinterface{}
+	tinterface.Name = next()
 	token := next()
 	if token == "extends" {
-		tinterface.extends = true
-		tinterface.extendedClasses = readExtendedInterfaces()
+		tinterface.Extends = true
+		tinterface.ExtendedClasses = readExtendedInterfaces()
 	}
 	for token = next(); token != "}"; token = next() {
 		name := token
 		token = next() // This is => : or (
 		if token == "(" {
-			tinterface.functions = append(tinterface.functions, readFunction(name, []string{}))
+			tinterface.Functions = append(tinterface.Functions, readFunction(name, []string{}))
 		} else {
-			tinterface.variables = append(tinterface.variables, readVariable(token, name, []string{}))
+			tinterface.Variables = append(tinterface.Variables, readVariable(token, name, []string{}))
 		}
 	}
 	tinterface.attachIdentifiers(identifiers)
@@ -275,17 +290,17 @@ func readExtendedInterfaces() []string {
 	return tinterfaces
 }
 
-func readClass(identifiers []string) class {
-	class := class{}
-	class.name = next()
+func readClass(identifiers []string) Class {
+	class := Class{}
+	class.Name = next()
 	token := next()
 	if token == "extends" {
-		class.extends = true
-		class.extendedClass = next()
+		class.Extends = true
+		class.ExtendedClass = next()
 		token = next()
 	}
 	if token == "implements" {
-		class.implements = true
+		class.Implements = true
 		token = readImplementedInterfaces(&class)
 	}
 	for token := next(); token != "}"; token = next() {
@@ -298,10 +313,10 @@ func readClass(identifiers []string) class {
 		name := token
 		token = next()
 		if token == "(" { // class element is a function
-			class.functions = append(class.functions, readFunction(name, identifiers))
+			class.Functions = append(class.Functions, readFunction(name, identifiers))
 		} else { // class element is a variable
 
-			class.variables = append(class.variables, readVariable(token, name, identifiers))
+			class.Variables = append(class.Variables, readVariable(token, name, identifiers))
 		}
 
 	}
@@ -309,67 +324,67 @@ func readClass(identifiers []string) class {
 	return class
 }
 
-func (class *class) attachIdentifiers(identifiers []string) {
+func (class *Class) attachIdentifiers(identifiers []string) {
 	for _, val := range identifiers {
 		if val == "export" {
-			class.export = true
+			class.Export = true
 		} else if val == "abstract" {
-			class.abstract = true
+			class.Abstract = true
 		} else if val == "default" {
-			class.cdefault = true
+			class.Cdefault = true
 		} else if val == "declare" {
-			class.declare = true
+			class.Declare = true
 		}
 	}
 }
 
-func (tinterface *tinterface) attachIdentifiers(identifiers []string) {
+func (tinterface *Tinterface) attachIdentifiers(identifiers []string) {
 	for _, val := range identifiers {
 		if val == "export" {
-			tinterface.export = true
+			tinterface.Export = true
 		} else if val == "declare" {
-			tinterface.declare = true
+			tinterface.Declare = true
 		}
 	}
 }
 
-func (enum *enum) attachIdentifiers(identifiers []string) {
+func (enum *Enum) attachIdentifiers(identifiers []string) {
 	for _, val := range identifiers {
 		if val == "export" {
-			enum.export = true
+			enum.Export = true
 		} else if val == "declare" {
-			enum.declare = true
+			enum.Declare = true
 		}
 	}
 }
 
-func (fun *function) attachIdentifiers(identifiers []string) {
+func (fun *Function) attachIdentifiers(identifiers []string) {
 	for _, val := range identifiers {
 		if val == "async" {
-			fun.async = true
+			fun.Async = true
 		} else if val == "static" {
-			fun.static = true
+			fun.Static = true
 		} else if val == "export" {
-			fun.export = true
+			fun.Export = true
 		} else if val == "declare" {
-			fun.declare = true
+			fun.Declare = true
 		} else if accessModifiers[val] {
-			fun.accessModifier = val
+			fun.AccessModifier = val
 		}
 	}
 }
-func (variable *variable) attachIdentifiers(identifiers []string) {
+func (variable *Variable) attachIdentifiers(identifiers []string) {
 	for _, val := range identifiers {
 		if val == "static" {
-			variable.static = true
+			variable.Static = true
 		} else if val == "readonly" {
-			variable.readonly = true
+			variable.Readonly = true
 		} else if val == "declare" {
-			variable.declare = true
+			variable.Declare = true
 		} else if val == "export" {
-			variable.export = true
+			variable.Export = true
 		} else if accessModifiers[val] {
-			variable.accessModifier = val
+			variable.AccessModifier = val
 		}
 	}
 }
@@ -395,15 +410,15 @@ func getIdentifiersAndReturnToken(token string) ([]string, string) {
 	return identifiers, token
 }
 
-func readVariable(token string, name string, identifiers []string) variable {
-	vr := variable{}
-	vr.name = name
-	vr.dType = "any"
+func readVariable(token string, name string, identifiers []string) Variable {
+	vr := Variable{}
+	vr.Name = name
+	vr.DType = "any"
 	if token == ":" {
-		vr.dType, token = readVariableDataType()
+		vr.DType, token = readVariableDataType()
 	}
 	if token == "=" {
-		vr.dValue = readVariableDataValue()
+		vr.DValue = readVariableDataValue()
 	}
 	vr.attachIdentifiers(identifiers)
 	return vr
@@ -449,13 +464,13 @@ func readVariableDataType() (string, string) {
 	}
 	return dataType, token
 }
-func readImplementedInterfaces(class *class) string {
+func readImplementedInterfaces(class *Class) string {
 	token := next()
 	for ; token != "{"; token = next() {
 		if token == "," {
 			continue
 		}
-		class.implementedClasses = append(class.implementedClasses, token)
+		class.ImplementedClasses = append(class.ImplementedClasses, token)
 	}
 	return token
 }
@@ -472,13 +487,13 @@ func readFunctionReturnType() (string, string) {
 	return returnType, token
 }
 
-func collectParameterDataOfFunction(fun *function, nameOfTheFirstParam string) {
-	prm := param{}
-	prm.name = nameOfTheFirstParam
+func collectParameterDataOfFunction(fun *Function, nameOfTheFirstParam string) {
+	prm := FParam{}
+	prm.Name = nameOfTheFirstParam
 	token := next()
 	if token == "," {
-		prm.dtype = "any"
-		fun.params = append(fun.params, prm)
+		prm.Dtype = "any"
+		fun.Params = append(fun.Params, prm)
 		collectParameterDataOfFunction(fun, next())
 	} else if token == ":" {
 		// get data type
@@ -505,11 +520,11 @@ func collectParameterDataOfFunction(fun *function, nameOfTheFirstParam string) {
 			}
 			dtype += token
 		}
-		prm.dtype = dtype
+		prm.Dtype = dtype
 		if !(token == "," || token == ")") {
-			prm.value = readDefaultValueOfParameter()
+			prm.Value = readDefaultValueOfParameter()
 		}
-		fun.params = append(fun.params, prm)
+		fun.Params = append(fun.Params, prm)
 	}
 }
 
@@ -531,22 +546,22 @@ func readDefaultValueOfParameter() string {
 	return value
 }
 
-func readFunction(name string, identifiers []string) function {
-	fun := function{}
-	fun.name = name
+func readFunction(name string, identifiers []string) Function {
+	fun := Function{}
+	fun.Name = name
 	token := next()
 	if token != ")" { // if there are parameters read them
 		collectParameterDataOfFunction(&fun, token)
 	}
 	token = next() // if given is '{' start of the function body otherwise ':' expected get the rtype
 	if token == "{" {
-		fun.rtype = "any" // if no return type given
+		fun.Rtype = "any" // if no return type given
 	} else {
-		fun.rtype, token = readFunctionReturnType()
+		fun.Rtype, token = readFunctionReturnType()
 	}
 	fun.attachIdentifiers(identifiers)
-	if !fun.declare && token != ";" {
-		fun.sbody = getFunctionBodyToString()
+	if !fun.Declare && token != ";" {
+		fun.Sbody = getFunctionBodyToString()
 	}
 	return fun
 }
