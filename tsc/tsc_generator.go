@@ -147,16 +147,34 @@ func WriteCormetRefListToFiles(cormetRef []CormetRef) {
 	}
 }
 
+func createGlobalTSFunctionsToSingleFile(ref string, cormetList []CormetFun) string {
+	content := ""
+	for _, val := range cormetList {
+		content += "export function " + val.Name + "("
+		paramName := ""
+		for i := 0; i < len(val.Params); i++ {
+			content += val.Params[i].name + ":" + val.Params[i].typo
+			if i != len(val.Params)-1 {
+				content += ", "
+			}
+			paramName += ", " + val.Params[i].name
+		}
+
+		content += fmt.Sprintf("): Promise<any> {\n\treturn asyncExec('<class-name>', '%s', ['%s'%s]);\n}\n", ref, val.Name, paramName)
+	}
+	return content + "\n"
+}
+
 // WriteCormetRefListToFile ...
 func WriteCormetRefListToFile(filename string, cormetRef []CormetRef) {
 	os.Mkdir("scripts", 0755)
 
-	generalContent := ""
+	generalContent := "import { asyncExec } from './utils';\n"
 	for _, val := range cormetRef {
-		fcontent := createTSContentOf(val.Reference, val.CormetList)
+		fcontent := createGlobalTSFunctionsToSingleFile(val.Reference, val.CormetList)
 		generalContent += fcontent
 	}
-	createFile(filename, generalContent)
+	createFile("scripts/"+filename, generalContent)
 }
 
 func findUsagesAndReturnVarTypePairs(content string, key string) []Parameter {
@@ -245,13 +263,13 @@ func getArgType(content string, idx int) string {
 
 var javaToTSTypes = map[string]string{
 	"getJSONObject": "object",
-	"getJSONArray":  "Array",
+	"getJSONArray":  "any",
 	"getString":     "string",
 	"getInt":        "number",
 	"getDouble":     "number",
 	"getBoolean":    "boolean",
 	"optJSONObject": "object",
-	"optJSONArray":  "Array",
+	"optJSONArray":  "any",
 	"optString":     "string",
 	"optInt":        "string",
 	"optDouble":     "number",
