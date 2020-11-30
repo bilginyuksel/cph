@@ -71,7 +71,41 @@ const PLUGIN_XML = `<?xml version='1.0' encoding='utf-8'?>
 
 	<platform name="android">
 	</platform>
-	</plugin>`
+    </plugin>`
+
+const TS_UTILS = `import {exec} from 'cordova';
+
+export function asyncExec(clazz: string, reference: string, args:any[] = []): Promise<any> {
+    return new Promise((resolve, reject) => {
+        exec(resolve, reject, clazz, reference, args);
+    });
+}
+
+declare global {
+    interface Window {
+        hmsEvents: {
+            [key: string]: (data: any) => void
+        },
+        runHMSEvent: (eventName: string, data: any) => void,
+        subscribeHMSEvent: (eventName: string, callback: (data: any) => void) => void
+        [key: string]: any
+    }
+}
+
+function initEventHandler() {
+    if (window.hmsEvents != null) return;
+    window.hmsEvents = {};
+    window.runHMSEvent = (eventName, data) => {
+        if (window.hmsEvents.hasOwnProperty(eventName))
+            window.hmsEvents[eventName](data);
+    };
+    window.subscribeHMSEvent = (eventName, handler) => {
+        window.hmsEvents[eventName] = handler;
+    };
+}
+
+initEventHandler()
+`
 
 const JS_MAIN = `const cordova = require("cordova");
 function asyncExec(clazz, ref, args = []) {

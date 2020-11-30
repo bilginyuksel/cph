@@ -117,8 +117,7 @@ func createFile(filename string, content string) {
 }
 
 func createTSContentOf(ref string, cormetList []CormetFun) string {
-	content := fmt.Sprintf(`import { asyncExec } from './utils';
-
+	content := fmt.Sprintf(`
 export class %s {
 `, ref)
 	for _, val := range cormetList {
@@ -146,6 +145,18 @@ func WriteCormetRefListToFiles(cormetRef []CormetRef) {
 		fcontent := createTSContentOf(val.Reference, val.CormetList)
 		createFile(fname, fcontent)
 	}
+}
+
+// WriteCormetRefListToFile ...
+func WriteCormetRefListToFile(filename string, cormetRef []CormetRef) {
+	os.Mkdir("scripts", 0755)
+
+	generalContent := ""
+	for _, val := range cormetRef {
+		fcontent := createTSContentOf(val.Reference, val.CormetList)
+		generalContent += fcontent
+	}
+	createFile(filename, generalContent)
 }
 
 func findUsagesAndReturnVarTypePairs(content string, key string) []Parameter {

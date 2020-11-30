@@ -15,15 +15,15 @@ import (
 )
 
 var (
-	linuxJavaFiles = []string{"src/main/java/com/group/project/Test1.java",
-		"src/main/java/com/group/project/Test2.java", "src/main/java/com/group/project/test/Test3.java",
-		"src/main/java/com/group/project/test/test/Test4.java", "src/main/java/com/group/project/test/test/Test5.java",
-		"src/main/java/com/group/project/test/test/test/Test6.java"}
+	linuxJavaFiles = []string{"src/com/group/project/Test1.java",
+		"src/com/group/project/Test2.java", "src/com/group/project/test/Test3.java",
+		"src/com/group/project/test/test/Test4.java", "src/com/group/project/test/test/Test5.java",
+		"src/com/group/project/test/test/test/Test6.java"}
 
-	winJavaFiles = []string{"src\\main\\java\\com\\group\\project\\Test1.java",
-		"src\\main\\java\\com\\group\\project\\Test2.java", "src\\main\\java\\com\\group\\project\\test\\Test3.java",
-		"src\\main\\java\\com\\group\\project\\test\\test\\Test4.java", "src\\main\\java\\com\\group\\project\\test\\test\\Test5.java",
-		"src\\main\\java\\com\\group\\project\\test\\test\\test\\Test6.java"}
+	winJavaFiles = []string{"src\\com\\group\\project\\Test1.java",
+		"src\\com\\group\\project\\Test2.java", "src\\com\\group\\project\\test\\Test3.java",
+		"src\\com\\group\\project\\test\\test\\Test4.java", "src\\com\\group\\project\\test\\test\\Test5.java",
+		"src\\com\\group\\project\\test\\test\\test\\Test6.java"}
 
 	linuxJsFiles = []string{"www/Test1.js", "www/test2.js", "www/test/test3.js",
 		"www/test/Test4.js", "www/test/test/Test5.js", "www/test/test/test6.js"}
@@ -34,14 +34,14 @@ var (
 
 func createMockFileStructure() {
 	os.Mkdir("src", 0755)
-	os.Mkdir("src/main", 0755)
-	os.Mkdir("src/main/java", 0755)
-	os.Mkdir("src/main/java/com", 0755)
-	os.Mkdir("src/main/java/com/group", 0755)
-	os.Mkdir("src/main/java/com/group/project", 0755)
-	os.Mkdir("src/main/java/com/group/project/test", 0755)
-	os.Mkdir("src/main/java/com/group/project/test/test", 0755)
-	os.Mkdir("src/main/java/com/group/project/test/test/test", 0755)
+	os.Mkdir("src/", 0755)
+	os.Mkdir("src/", 0755)
+	os.Mkdir("src/com", 0755)
+	os.Mkdir("src/com/group", 0755)
+	os.Mkdir("src/com/group/project", 0755)
+	os.Mkdir("src/com/group/project/test", 0755)
+	os.Mkdir("src/com/group/project/test/test", 0755)
+	os.Mkdir("src/com/group/project/test/test/test", 0755)
 
 	os.Mkdir("www", 0755)
 	os.Mkdir("www/test", 0755)
@@ -123,12 +123,9 @@ func TestSyncPluginXMLNoPathPluginXMLExists_UpdatePluginXML(t *testing.T) {
 
 	for i := 0; i < len(plugin.JsModule); i++ {
 		currentJsModule := plugin.JsModule[i]
-		ansWin, isPresentOnWin := winJsFileMap[currentJsModule.Src]
-		ansLinux, isPresentOnLinux := linuxJsFileMap[currentJsModule.Src]
-		if isPresentOnWin && ansWin == currentJsModule.Name {
-			t.Logf("Passed windows type jsModule file paths... Data= %v", currentJsModule)
-		} else if isPresentOnLinux && ansLinux == currentJsModule.Name {
-			t.Logf("Passed linux type jsModule file paths... Data= %v", currentJsModule)
+		ans, _ := linuxJsFileMap[currentJsModule.Src]
+		if ans == currentJsModule.Name {
+			t.Logf("Passed linux type jsModule file paths... Data= %v,\n\t\tLinux= %v", currentJsModule, ans)
 		} else {
 			t.Error()
 		}
@@ -136,12 +133,9 @@ func TestSyncPluginXMLNoPathPluginXMLExists_UpdatePluginXML(t *testing.T) {
 
 	for i := 0; i < len(linuxJavaFiles); i++ {
 		currentSourceFile := plugin.Platform.SourceFiles[i]
-		ansWin, isPresentOnWin := winJavaFileMap[currentSourceFile.Src]
-		ansLinux, isPresentOnLinux := linuxJavaFileMap[currentSourceFile.Src]
-		if isPresentOnWin && ansWin == currentSourceFile.TargetDir {
-			t.Logf("Passed windows type sourceJava file paths... Data= %v", currentSourceFile)
-		} else if isPresentOnLinux && ansLinux == currentSourceFile.TargetDir {
-			t.Logf("Passed linux type sourceJava file paths... Data= %v", currentSourceFile)
+		ans, _ := linuxJavaFileMap[currentSourceFile.Src]
+		if ans == currentSourceFile.TargetDir {
+			t.Logf("Passed windows type sourceJava file paths... Data= %v,\n\t\tAnswer= %v", currentSourceFile, ans)
 		} else {
 			t.Error()
 		}
@@ -213,7 +207,7 @@ func TestAddLicenceToAllFilesInCurrentPath_AllFilesShouldBeLicensed(t *testing.T
 			content := reader.ReadFile(path)
 			hasLicence := lic.IsExists(content)
 			if !hasLicence {
-				t.Error()
+				t.Errorf("content= %v", content)
 			}
 		}
 	}

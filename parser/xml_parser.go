@@ -35,7 +35,9 @@ func CreateXML(plugin *Plugin, filename string) error {
 		filename += ".xml"
 	}
 	file, _ := xml.MarshalIndent(plugin, "", "\t")
-	file = []byte(xml.Header + string(file))
+	// XML file is creating with backslashes it is having us trouble so replace the backslash content with slashes.
+	newFile := strings.ReplaceAll(string(file), "\\", "/")
+	file = []byte(xml.Header + newFile)
 	error := ioutil.WriteFile(filename, file, 0644)
 	return error
 }

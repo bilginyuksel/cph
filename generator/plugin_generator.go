@@ -70,6 +70,12 @@ func CreateHMSPlugin(project string) {
 	IncludeFramework(project)
 }
 
+// CreateTSUtil ...
+func CreateTSUtil() {
+	createDir("scripts")
+	createFile(fmt.Sprintf("scripts/utils.ts"), TS_UTILS)
+}
+
 // IncludeFramework ...
 func IncludeFramework(project string) {
 	javaPath := fmt.Sprintf("cordova-plugin-hms-%s/src/main/java/com/huawei/hms/cordova/%s", project, project)
