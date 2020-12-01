@@ -174,6 +174,8 @@ func WriteCormetRefListToFile(filename string, cormetRef []CormetRef) {
 		fcontent := createGlobalTSFunctionsToSingleFile(val.Reference, val.CormetList)
 		generalContent += fcontent
 	}
+	generalContent += "\n\n// EVENT REGISTERATION FUNCTION FOR SINGLE FILE\n"
+	generalContent += "export function on(event: string, callback: ()=>void){\n\twindow.subscribeHMSEvent(event, callback);\n}\n"
 	createFile("scripts/"+filename, generalContent)
 }
 

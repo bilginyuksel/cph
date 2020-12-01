@@ -792,7 +792,7 @@ public class CordovaEventRunner {
 		Log.i(TAG,"Periodic event "+ event +" captured and event "+ event +" is sending to JS.");
 		StringBuilder jsFunctionBuilder = new StringBuilder();
 		jsFunctionBuilder.append("javascript:");
-		jsFunctionBuilder.append("window.runHMSEvent('%s'");
+		jsFunctionBuilder.append("window.runHMSEvent('"+event+"'");
 		if(objects.length>0) jsFunctionBuilder.append(buildJSEventParameters(objects));
 		jsFunctionBuilder.append(");");
 
@@ -805,9 +805,8 @@ public class CordovaEventRunner {
 		StringBuilder eventParametersBuilder = new StringBuilder();
 
 		for (Object obj : objects)
-			eventParametersBuilder.append(obj.toString()).append(",");
+			eventParametersBuilder.append(",").append(obj.toString());
 
-		eventParametersBuilder.deleteCharAt(eventParametersBuilder.length() - 1); // delete comma.
 		return eventParametersBuilder.toString();
 	}
 }
