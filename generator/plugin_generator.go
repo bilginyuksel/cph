@@ -93,7 +93,7 @@ func IncludeFramework(project string) {
 	cmh := fmt.Sprintf(JAVAC_CMH, project, project, project, project)
 	cmgh := fmt.Sprintf(JAVAC_CMGH, project)
 	corController := fmt.Sprintf(JAVAC_CORCONTROLLER, project, project, project)
-	corEventRunner := fmt.Sprintf(JAVAC_COREVENTRUNNER, project, project)
+	corEventRunner := fmt.Sprintf(JAVAC_COREVENTRUNNER, project)
 	createFile(fmt.Sprintf("%s/basef/CordovaMethod.java", javaPath), corMethod)
 	createFile(fmt.Sprintf("%s/basef/CordovaEvent.java", javaPath), corEvent)
 	createFile(fmt.Sprintf("%s/basef/HMSLog.java", javaPath), hmsLog)
