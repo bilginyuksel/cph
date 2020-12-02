@@ -38,6 +38,7 @@ var extensions = map[string][]string{
 	".scss": {"/*", "*/"},
 	".js":   {"/*", "*/"},
 	".ts":   {"/*", "*/"},
+	".dart": {"/*", "*/"},
 }
 
 func findHowManyCommentExists(content string, extension string) int {
