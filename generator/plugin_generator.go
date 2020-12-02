@@ -76,6 +76,16 @@ func CreateTSUtil() {
 	createFile(fmt.Sprintf("scripts/utils.ts"), TS_UTILS)
 }
 
+// CreateLayoutUtilJavaClass ...
+func CreateLayoutUtilJavaClass(project string) {
+	path := fmt.Sprintf("cordova-plugin-hms-%s/src/main/java/com/huawei/hms/cordova/basef/utils", project)
+	createDir(path)
+
+	createFile(fmt.Sprintf("%s/PluginFrontLayoutManager.java", path), "")
+	createFile(fmt.Sprintf("%s/Px2Dp.java", path), "")
+	createFile(fmt.Sprintf("%s/PluginViewParams.java", path), "")
+}
+
 // IncludeFramework ...
 func IncludeFramework(project string) {
 	javaPath := fmt.Sprintf("cordova-plugin-hms-%s/src/main/java/com/huawei/hms/cordova/%s", project, project)

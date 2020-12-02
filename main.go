@@ -81,11 +81,13 @@ func AddLicenceTo(path string, ignored []string) error {
 }
 
 // PluginGenerator ...
-func PluginGenerator(project string, include bool, tsutils bool) error {
-	if include {
+func PluginGenerator(project string, include bool, tsutils bool, layoutUtils bool) error {
+	if len(project) > 0 && include {
 		generator.IncludeFramework(project)
 	} else if tsutils {
 		generator.CreateTSUtil()
+	} else if len(project) > 0 && layoutUtils {
+		generator.CreateLayoutUtilJavaClass(project)
 	} else {
 		generator.CreateHMSPlugin(project)
 	}
@@ -104,7 +106,7 @@ func (l *AddLicenseCmd) Run(ctx *Context) error {
 
 // Run ...
 func (p *PluginCmd) Run(ctx *Context) error {
-	return PluginGenerator(p.Project, p.Include, p.TSUtils)
+	return PluginGenerator(p.Project, p.Include, p.TSUtils, p.LayoutUtils)
 }
 
 func getJavaFileNames(files []string) []string {
@@ -165,10 +167,11 @@ type AddLicenseCmd struct {
 
 // PluginCmd ...
 type PluginCmd struct {
-	Create  bool   `group:"choice" xor:"choice"`
-	Include bool   `group:"choice" xor:"choice"`
-	TSUtils bool   `name:"ts-utils" help:"Creates the base ts utils file." short:"ti"`
-	Project string `name:"project" help:"Project name for the plugin."`
+	Create      bool   `group:"choice" xor:"choice"`
+	Include     bool   `group:"choice" xor:"choice"`
+	LayoutUtils bool   `name:"layout-utils" help:"It creates the util files to help your layout management in cordova." short:"lu"`
+	TSUtils     bool   `name:"ts-utils" help:"Creates the base ts utils file." short:"ti"`
+	Project     string `name:"project" help:"Project name for the plugin."`
 }
 
 // GenerateCmd ...
