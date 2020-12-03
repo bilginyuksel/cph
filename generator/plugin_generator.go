@@ -93,7 +93,7 @@ func CreateLayoutUtilJavaClass(project string) {
 	createDir(path)
 
 	createFile(fmt.Sprintf("%s/PluginFrontLayoutManager.java", path), "")
-	createFile(fmt.Sprintf("%s/Px2Dp.java", path), "")
+	createFile(fmt.Sprintf("%s/Px2Dp.java", path), fmt.Sprintf(PX2DP_JAVA, project))
 	createFile(fmt.Sprintf("%s/PluginViewParams.java", path), "")
 }
 
