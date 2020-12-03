@@ -56,8 +56,6 @@ func SyncPluginXML(path string) error {
 		plugin.Platform.Hooks = append(plugin.Platform.Hooks, hooks)
 		hooks = parser.Hook{Src: "hooks/after_plugin_install.js", Type: "after_plugin_install"}
 		plugin.Platform.Hooks = append(plugin.Platform.Hooks, hooks)
-		hooks = parser.Hook{Src: "hooks/after_prepare.js", Type: "after_prepare"}
-		plugin.Platform.Hooks = append(plugin.Platform.Hooks, hooks)
 	}
 	// ADD HOOKS
 
