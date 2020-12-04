@@ -106,16 +106,16 @@ const TS_CONFIG = `{
 
 const PLUGIN_XML = `<?xml version='1.0' encoding='utf-8'?>
 <plugin id="%s"
-		version="$VERSION$"
-		xmlns="http://apache.org/cordova/ns/plugins/1.0"
-		xmlns:android="http://schemas.android.com/apk/res/android">
-	<name>Cordova Plugin $NAME$</name>
-	<description>Cordova Plugin $NAME$</description>
-	<license>Apache 2.0</license>
-	<keywords>cordova,%s,hms-%s,huawei-%s,hms,huawei</keywords>
+        version="$VERSION$"
+        xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>Cordova Plugin $NAME$</name>
+    <description>Cordova Plugin $NAME$</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova,%s,hms-%s,huawei-%s,hms,huawei</keywords>
 
-	<platform name="android">
-	</platform>
+    <platform name="android">
+    </platform>
     </plugin>`
 
 const PLUGIN_GRADLE = `cdvPluginPostBuildExtras.add({
@@ -128,6 +128,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven { url 'https://developer.huawei.com/repo/' }
     }
 
     dependencies {
@@ -210,7 +211,7 @@ function asyncExec(clazz, ref, args = []) {
 exports.asyncExec = asyncExec;
 
 function showToast(msg) {
-	return asyncExec('%s', 'Test', ['showToast', msg]);
+    return asyncExec('%s', 'Test', ['showToast', msg]);
 }
 exports.showToast = showToast;
 `

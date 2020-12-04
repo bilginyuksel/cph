@@ -16,23 +16,23 @@ import java.util.Arrays;
 
 public class HMS%s extends CordovaPlugin {
 
-	private CordovaController cordovaController;
+    private CordovaController cordovaController;
 
-	@Override
-	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-		super.initialize(cordova, webView);
-		final String SERVICE = "<service-name>";
-		final String VERSION = "<version>";
-		cordovaController = new CordovaController(this, SERVICE, VERSION,
-				Arrays.asList(new CordovaBaseModule[]{
-						new Test(webView.getContext())
-				}));
-	}
+    @Override
+    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+        super.initialize(cordova, webView);
+        final String SERVICE = "<service-name>";
+        final String VERSION = "<version>";
+        cordovaController = new CordovaController(this, SERVICE, VERSION,
+                Arrays.asList(new CordovaBaseModule[]{
+                        new Test(webView.getContext())
+                }));
+    }
 
-	@Override
-	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
-		return cordovaController.execute(action, args, callbackContext);
-	}
+    @Override
+    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
+        return cordovaController.execute(action, args, callbackContext);
+    }
 }
 `
 
@@ -51,18 +51,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 public class Test extends CordovaBaseModule {
-	private Context context;
-	public Test(Context context) {
-		this.context = context;
-	}
+    private Context context;
+    public Test(Context context) {
+        this.context = context;
+    }
 
-	@HMSLog
-	@CordovaMethod
-	public void showToast(final CorPack corPack, JSONArray args, final Promise promise) throws JSONException {
-		String message = args.getString(0);
-		Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-	    promise.success();
-	}
+    @HMSLog
+    @CordovaMethod
+    public void showToast(final CorPack corPack, JSONArray args, final Promise promise) throws JSONException {
+        String message = args.getString(0);
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        promise.success();
+    }
 }
 
 `
@@ -116,84 +116,78 @@ import org.json.JSONObject;
 
 public class Promise {
 
-	private final CallbackContext callbackContext;
+    private final CallbackContext callbackContext;
+    private final HMSLogger hmsLogger;
+    private final String methodName;
+    private final boolean isLoggerRunning;
 
-	private HMSLogger hmsLogger;
-	private String methodName;
-	private boolean isLoggerRunning;
+    public Promise(final CallbackContext callbackContext, final HMSLogger logger, String method, boolean isActive) {
+        this.callbackContext = callbackContext;
+        this.hmsLogger = logger;
+        this.methodName = method;
+        this.isLoggerRunning = isActive;
+    }
 
-	public Promise(final CallbackContext callbackContext) {
-		this.callbackContext = callbackContext;
-	}
+    public void success() {
+        callbackContext.success();
+        sendLogEvent(null);
+    }
 
-	public void setHmsLogger(HMSLogger hmsLogger) {
-		this.hmsLogger = hmsLogger;
-	}
+    public void success(int message) {
+        callbackContext.success(message);
+        sendLogEvent(null);
+    }
 
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
-	}
+    public void success(byte[] message) {
+        callbackContext.success(message);
+        sendLogEvent(null);
+    }
 
-	public void setLoggerRunning(boolean loggerRunning) {
-		isLoggerRunning = loggerRunning;
-	}
+    public void success(String message) {
+        callbackContext.success(message);
+        sendLogEvent(null);
+    }
 
-	public void success() {
-		callbackContext.success();
-		sendLogEvent(null);
-	}
+    public void success(JSONArray message) {
+        callbackContext.success(message);
+        sendLogEvent(null);
+    }
 
-	public void success(int message) {
-		callbackContext.success(message);
-		sendLogEvent("" + message);
-	}
+    public void success(JSONObject message) {
+        callbackContext.success(message);
+        sendLogEvent(null);
+    }
 
-	public void success(byte[] message) {
-		callbackContext.success(message);
-		sendLogEvent(message.toString());
-	}
+    public void success(boolean message) {
+        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+        sendLogEvent(null);
+    }
 
-	public void success(String message) {
-		callbackContext.success(message);
-		sendLogEvent(message);
-	}
+    public void error(int message) {
+        callbackContext.error(message);
+        sendLogEvent("" + message);
+    }
 
-	public void success(JSONArray message) {
-		callbackContext.success(message);
-		sendLogEvent(message.toString());
-	}
+    public void error(String message) {
+        callbackContext.error(message);
+        sendLogEvent(message);
+    }
 
-	public void success(JSONObject message) {
-		callbackContext.success(message);
-		sendLogEvent(message.toString());
-	}
+    public void error(JSONObject message) {
+        callbackContext.error(message);
+        sendLogEvent(message.toString());
+    }
 
-	public void success(boolean message) {
-		callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
-		sendLogEvent("" + message);
-	}
+    public void sendPluginResult(PluginResult pluginResult) {
+        callbackContext.sendPluginResult(pluginResult);
+        sendLogEvent(null);
+    }
 
-	public void error(int message) {
-		callbackContext.error(message);
-		sendLogEvent("" + message);
-	}
-
-	public void error(String message) {
-		callbackContext.error(message);
-		sendLogEvent(message);
-	}
-
-	public void error(JSONObject message) {
-		callbackContext.error(message);
-		sendLogEvent(message.toString());
-	}
-
-
-	private void sendLogEvent(String nullable) {
-		if (!isLoggerRunning) return;
-		if (nullable == null) hmsLogger.sendSingleEvent(methodName);
-		else hmsLogger.sendSingleEvent(methodName, nullable);
-	}
+    private void sendLogEvent(String nullable) {
+        if (!isLoggerRunning) return;
+        if (nullable == null) hmsLogger.sendSingleEvent(methodName);
+        else hmsLogger.sendSingleEvent(methodName, nullable);
+    }
 
 }`
 const JAVAC_HMS_LOGGER = `package com.huawei.hms.cordova.%s.basef.handler;
@@ -219,8 +213,8 @@ import java.util.Map;
 final class HMSLogger {
     private static final String TAG = "HMSLogger";
 
-    private static String version;
-    private static String service;
+    private final String version;
+    private final String service;
 
     private static final String SUCCESS = "0";
     private static final String UNKNOWN = "UNKNOWN";
@@ -630,50 +624,62 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 
 public class CorPack {
-	private final HMSLogger hmsLogger;
-	private final CordovaPlugin cordovaPlugin;
-	public final CordovaWebView webView;
-	public final CordovaInterface cordova;
-	public final CordovaEventRunner eventRunner;
+    private final HMSLogger hmsLogger;
+    private final CordovaPlugin cordovaPlugin;
+    private final CordovaWebView webView;
+    private final CordovaInterface cordova;
+    private final CordovaEventRunner eventRunner;
 
-	CorPack(final HMSLogger hmsLogger, final CordovaPlugin cordovaPlugin, final CordovaEventRunner eventRunner) {
-		this.hmsLogger = hmsLogger;
-		this.cordovaPlugin = cordovaPlugin;
-		this.webView = cordovaPlugin.webView;
-		this.cordova = cordovaPlugin.cordova;
-		this.eventRunner = eventRunner;
-	}
+    CorPack(final HMSLogger hmsLogger, final CordovaPlugin cordovaPlugin, final CordovaEventRunner eventRunner) {
+        this.hmsLogger = hmsLogger;
+        this.cordovaPlugin = cordovaPlugin;
+        this.webView = cordovaPlugin.webView;
+        this.cordova = cordovaPlugin.cordova;
+        this.eventRunner = eventRunner;
+    }
 
-	public void requestPermission(int requestCode, String permission) {
-		cordova.requestPermission(cordovaPlugin, requestCode, permission);
-	}
+    public void requestPermission(int requestCode, String permission) {
+        cordova.requestPermission(cordovaPlugin, requestCode, permission);
+    }
 
-	public void requestPermissions(int requestCode, String[] permissions) {
-		cordova.requestPermissions(cordovaPlugin, requestCode, permissions);
-	}
+    public void requestPermissions(int requestCode, String[] permissions) {
+        cordova.requestPermissions(cordovaPlugin, requestCode, permissions);
+    }
 
-	public boolean hasPermission(String permission) {
-		return cordova.hasPermission(permission);
-	}
+    public boolean hasPermission(String permission) {
+        return cordova.hasPermission(permission);
+    }
 
-	public void enableLogger() {
-		hmsLogger.enableLogger();
-	}
+    public void enableLogger() {
+        hmsLogger.enableLogger();
+    }
 
-	public void disableLogger() {
-		hmsLogger.disableLogger();
-	}
+    public void disableLogger() {
+        hmsLogger.disableLogger();
+    }
+
+    public CordovaWebView getCordovaWebView() {
+        return webView;
+    }
+
+    public CordovaInterface getCordova() {
+        return cordova;
+    }
+
+    public CordovaEventRunner getEventRunner() {
+        return eventRunner;
+    }
 
 }
 `
 const JAVAC_CMH = `package com.huawei.hms.cordova.%s.basef.handler;
-
 
 import com.huawei.hms.cordova.%s.basef.CordovaBaseModule;
 import com.huawei.hms.cordova.%s.basef.CordovaEvent;
 import com.huawei.hms.cordova.%s.basef.CordovaMethod;
 
 import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -761,54 +767,54 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class CordovaEventRunner {
-	private static final String TAG = CordovaEventRunner.class.getName();
+    private static final String TAG = CordovaEventRunner.class.getName();
 
-	private final HMSLogger hmsLogger;
-	private final CordovaWebView webView;
-	private final Activity activity;
+    private final HMSLogger hmsLogger;
+    private final CordovaWebView webView;
+    private final Activity activity;
 
-	CordovaEventRunner(final CordovaWebView cordovaWebView, final Activity activity, final HMSLogger hmsLogger) {
-		this.hmsLogger = hmsLogger;
-		this.webView = cordovaWebView;
-		this.activity = activity;
-	}
+    CordovaEventRunner(final CordovaWebView cordovaWebView, final Activity activity, final HMSLogger hmsLogger) {
+        this.hmsLogger = hmsLogger;
+        this.webView = cordovaWebView;
+        this.activity = activity;
+    }
 
-	public void sendEvent(String event, JSONObject... params) {
-		hmsLogger.sendPeriodicEvent(event);
-		sendEventToJS(event, (Object[]) params);
-	}
+    public void sendEvent(String event, JSONObject... params) {
+        hmsLogger.sendPeriodicEvent(event);
+        sendEventToJS(event, (Object[]) params);
+    }
 
-	public void sendEvent(String event, JSONArray... params) {
-		hmsLogger.sendPeriodicEvent(event);
-		sendEventToJS(event, (Object[]) params);
-	}
+    public void sendEvent(String event, JSONArray... params) {
+        hmsLogger.sendPeriodicEvent(event);
+        sendEventToJS(event, (Object[]) params);
+    }
 
-	public void sendEvent(String event) {
-		hmsLogger.sendPeriodicEvent(event);
-		sendEventToJS(event);
-	}
+    public void sendEvent(String event) {
+        hmsLogger.sendPeriodicEvent(event);
+        sendEventToJS(event);
+    }
 
-	private void sendEventToJS(String event, Object... objects) {
-		Log.i(TAG,"Periodic event "+ event +" captured and event "+ event +" is sending to JS.");
-		StringBuilder jsFunctionBuilder = new StringBuilder();
-		jsFunctionBuilder.append("javascript:");
-		jsFunctionBuilder.append("window.runHMSEvent('"+event+"'");
-		if(objects.length>0) jsFunctionBuilder.append(buildJSEventParameters(objects));
-		jsFunctionBuilder.append(");");
+    private void sendEventToJS(String event, Object... objects) {
+        Log.i(TAG,"Periodic event "+ event +" captured and event "+ event +" is sending to JS.");
+        StringBuilder jsFunctionBuilder = new StringBuilder();
+        jsFunctionBuilder.append("javascript:");
+        jsFunctionBuilder.append("window.runHMSEvent('"+event+"'");
+        if(objects.length>0) jsFunctionBuilder.append(buildJSEventParameters(objects));
+        jsFunctionBuilder.append(");");
 
-		activity.runOnUiThread(() -> {
-			webView.loadUrl(jsFunctionBuilder.toString());
-		});
-	}
+        activity.runOnUiThread(() -> {
+            webView.loadUrl(jsFunctionBuilder.toString());
+        });
+    }
 
-	private String buildJSEventParameters(Object... objects) {
-		StringBuilder eventParametersBuilder = new StringBuilder();
+    private String buildJSEventParameters(Object... objects) {
+        StringBuilder eventParametersBuilder = new StringBuilder();
 
-		for (Object obj : objects)
-			eventParametersBuilder.append(",").append(obj.toString());
+        for (Object obj : objects)
+            eventParametersBuilder.append(",").append(obj.toString());
 
-		return eventParametersBuilder.toString();
-	}
+        return eventParametersBuilder.toString();
+    }
 }
 `
 const JAVAC_CORCONTROLLER = `package com.huawei.hms.cordova.%s.basef.handler;
@@ -829,86 +835,81 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CordovaController {
-	private static final String TAG = CordovaController.class.getSimpleName();
+    private static final String TAG = CordovaController.class.getSimpleName();
 
-	private CordovaModuleGroupHandler groupHandler;
-	private final HMSLogger hmsLogger;
-	private final CordovaEventRunner eventRunner;
-	private final CordovaPlugin cordovaPlugin;
-	private final List<String> moduleReferences = new ArrayList<>();
+    private CordovaModuleGroupHandler groupHandler;
+    private final HMSLogger hmsLogger;
+    private final CordovaEventRunner eventRunner;
+    private final CordovaPlugin cordovaPlugin;
+    private final List<String> moduleReferences = new ArrayList<>();
 
-	public <T extends CordovaBaseModule> CordovaController(CordovaPlugin cordovaPlugin,
-														   String service, String version, List<T> cordovaModules) {
-		List<CordovaModuleHandler> moduleHandlerList = new ArrayList<>();
-		for (T cordovaModule : cordovaModules) {
-			CordovaModuleHandler moduleHandler = new CordovaModuleHandler(cordovaModule);
-			moduleHandlerList.add(moduleHandler);
-			moduleReferences.add(cordovaModule.getReference());
-		}
-		this.cordovaPlugin = cordovaPlugin;
-		this.groupHandler = new CordovaModuleGroupHandler(moduleHandlerList);
-		this.hmsLogger = HMSLogger.getInstance(cordovaPlugin.webView.getContext(), service, version);
-		this.eventRunner = new CordovaEventRunner(cordovaPlugin.webView, cordovaPlugin.cordova.getActivity(), hmsLogger);
+    public <T extends CordovaBaseModule> CordovaController(CordovaPlugin cordovaPlugin, String service, String version, List<T> cordovaModules) {
+        List<CordovaModuleHandler> moduleHandlerList = new ArrayList<>();
+        for (T cordovaModule : cordovaModules) {
+            CordovaModuleHandler moduleHandler = new CordovaModuleHandler(cordovaModule);
+            moduleHandlerList.add(moduleHandler);
+            moduleReferences.add(cordovaModule.getReference());
+        }
+        this.cordovaPlugin = cordovaPlugin;
+        this.groupHandler = new CordovaModuleGroupHandler(moduleHandlerList);
+        this.hmsLogger = HMSLogger.getInstance(cordovaPlugin.webView.getContext(), service, version);
+        this.eventRunner = new CordovaEventRunner(cordovaPlugin.webView, cordovaPlugin.cordova.getActivity(), hmsLogger);
 
-		prepareEvents();
-		clearEventCache();
-	}
+        prepareEvents();
+        clearEventCache();
+    }
 
-	private void prepareEvents() {
-		for (String ref : moduleReferences) {
-			List<Method> eventCache = groupHandler.getCordovaModuleHandler(ref).getEventCache();
-			runAllEventMethods(groupHandler.getCordovaModuleHandler(ref).getInstance(), eventCache);
-		}
-	}
+    private void prepareEvents() {
+        for (String ref : moduleReferences) {
+            List<Method> eventCache = groupHandler.getCordovaModuleHandler(ref).getEventCache();
+            runAllEventMethods(groupHandler.getCordovaModuleHandler(ref).getInstance(), eventCache);
+        }
+    }
 
-	private <T> void runAllEventMethods(T instance, List<Method> eventCache) {
-		for (Method method : eventCache) {
-			try {
-				method.invoke(instance, new CorPack(hmsLogger, cordovaPlugin, eventRunner));
-				Log.i(TAG, "Event " + method.getName() + " is ready.");
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				Log.e(TAG, "Event couldn't initialized. " + e.getMessage());
-			}
-		}
-	}
+    private <T> void runAllEventMethods(T instance, List<Method> eventCache) {
+        for (Method method : eventCache) {
+            try {
+                method.invoke(instance, new CorPack(hmsLogger, cordovaPlugin, eventRunner));
+                Log.i(TAG, "Event " + method.getName() + " is ready.");
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                Log.e(TAG, "Event couldn't initialized. " + e.getMessage());
+            }
+        }
+    }
 
-	private void clearEventCache() {
-		for (String ref : moduleReferences)
-			groupHandler.getCordovaModuleHandler(ref).getEventCache().clear();
-	}
+    private void clearEventCache() {
+        for (String ref : moduleReferences)
+            groupHandler.getCordovaModuleHandler(ref).getEventCache().clear();
+    }
 
-	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
-		try {
-			CordovaModuleHandler moduleHandler = groupHandler.getCordovaModuleHandler(action);
-			Log.i(TAG, "Module " + action + " called.");
-			String methodName = args.getString(0); // JSONException if not exists
-			Method method = moduleHandler.getModuleMethod(methodName);
-			Log.i(TAG, "Method " + methodName + " called of module " + action + ".");
-			args.remove(0);
-			boolean isLoggerActive = false;
-			if (method.isAnnotationPresent(HMSLog.class)) {
-				isLoggerActive = true;
-				hmsLogger.startMethodExecutionTimer(methodName);
-			}
-			CorPack corPack = new CorPack(hmsLogger, cordovaPlugin, eventRunner);
-			Promise promise = createPromiseFromCallbackContext(callbackContext, methodName, isLoggerActive);
-			method.invoke(moduleHandler.getInstance(), corPack, args, promise);
-			return true;
-		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | JSONException e) {
-			Log.e(TAG, "Error captured when execute method run for reference= " + action);
-			Log.e(TAG, e.getMessage() + " ---- " + e.getClass().getSimpleName());
-			callbackContext.error(e.getMessage()); // is it necessary ???
-			return false;
-		}
-	}
+    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
+        try {
+            CordovaModuleHandler moduleHandler = groupHandler.getCordovaModuleHandler(action);
+            Log.i(TAG, "Module " + action + " called.");
+            String methodName = args.getString(0); // JSONException if not exists
+            Method method = moduleHandler.getModuleMethod(methodName);
+            Log.i(TAG, "Method " + methodName + " called of module " + action + ".");
+            args.remove(0);
+            boolean isLoggerActive = false;
+            if (method.isAnnotationPresent(HMSLog.class)) {
+                isLoggerActive = true;
+                hmsLogger.startMethodExecutionTimer(methodName);
+            }
+            CorPack corPack = new CorPack(hmsLogger, cordovaPlugin, eventRunner);
+            Promise promise = createPromiseFromCallbackContext(callbackContext, methodName, isLoggerActive);
+            method.invoke(moduleHandler.getInstance(), corPack, args, promise);
+            return true;
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | JSONException e) {
+            Log.e(TAG, "Error captured when execute method run for reference= " + action);
+            Log.e(TAG, e.getMessage() + " ---- " + e.getClass().getSimpleName());
+            callbackContext.error(e.getMessage());
+            return false;
+        }
+    }
 
-	private Promise createPromiseFromCallbackContext(final CallbackContext callbackContext, String methodName, boolean isLoggerActive) {
-		final Promise promise = new Promise(callbackContext);
-		promise.setHmsLogger(hmsLogger);
-		promise.setMethodName(methodName);
-		promise.setLoggerRunning(isLoggerActive);
-		return promise;
-	}
+    private Promise createPromiseFromCallbackContext(final CallbackContext callbackContext, String methodName, boolean isLoggerActive) {
+        return new Promise(callbackContext, hmsLogger, methodName, isLoggerActive);
+    }
 
 }
 
@@ -919,14 +920,14 @@ const PX2DP_JAVA = `package com.huawei.hms.cordova.%s.basef.util;
 import android.content.res.Resources;
 
 public class Px2Dp {
-	private static final float SYSTEM_DENSITY = Resources.getSystem().getDisplayMetrics().density;
+    private static final float SYSTEM_DENSITY = Resources.getSystem().getDisplayMetrics().density;
 
-	public static int pxToDp(int px) {
-		return Math.round(px * SYSTEM_DENSITY);
-	}
+    public static int pxToDp(int px) {
+        return Math.round(px * SYSTEM_DENSITY);
+    }
 
-	public static int dpToPx(int dp) {
-		return Math.round(dp / SYSTEM_DENSITY);
-	}
+    public static int dpToPx(int dp) {
+        return Math.round(dp / SYSTEM_DENSITY);
+    }
 }
 `

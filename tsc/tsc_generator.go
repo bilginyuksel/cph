@@ -167,7 +167,7 @@ func createGlobalTSFunctionsToSingleFile(ref string, cormetList []CormetFun) str
 
 // WriteCormetRefListToFile ...
 func WriteCormetRefListToFile(filename string, cormetRef []CormetRef) {
-	os.Mkdir("scripts", 0755)
+	// os.Mkdir("scripts", 0755)
 
 	generalContent := "import { asyncExec } from './utils';\n"
 	for _, val := range cormetRef {
@@ -176,7 +176,7 @@ func WriteCormetRefListToFile(filename string, cormetRef []CormetRef) {
 	}
 	generalContent += "\n\n// EVENT REGISTERATION FUNCTION FOR SINGLE FILE\n"
 	generalContent += "export function on(event: string, callback: ()=>void){\n\twindow.subscribeHMSEvent(event, callback);\n}\n"
-	createFile("scripts/"+filename, generalContent)
+	createFile("src/www/"+filename, generalContent)
 }
 
 func findUsagesAndReturnVarTypePairs(content string, key string) []Parameter {
