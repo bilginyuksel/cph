@@ -58,6 +58,9 @@ func SyncPluginXML(path string) error {
 		plugin.Platform.Hooks = append(plugin.Platform.Hooks, hooks)
 	}
 	// ADD HOOKS
+	if len(plugin.Platform.Frameworks) == 0 {
+		plugin.Platform.Frameworks = append(plugin.Platform.Frameworks, parser.Framework{Custom: true, Type: "gradleReference", Src: "src/android/plugin.gradle"})
+	}
 
 	err = parser.CreateXML(plugin, "plugin.xml")
 	return err

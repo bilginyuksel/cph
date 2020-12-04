@@ -81,8 +81,8 @@ func (p *Platform) NewSourceFrom(javaFiles []string) {
 		ext := filepath.Ext(path)
 		if ext == ".java" {
 			dir, _ := filepath.Split(javaFiles[i])
-			dir = strings.Replace(dir, "main/java/", "", -1)
-			dir = strings.Replace(dir, "main\\java\\", "", -1)
+			dir = strings.Replace(dir, "android/src/main/java/", "", -1)
+			dir = strings.Replace(dir, "android\\src\\main\\java\\", "", -1)
 			sourceFiles = append(sourceFiles, SourceFile{
 				Src:       path,
 				TargetDir: dir,

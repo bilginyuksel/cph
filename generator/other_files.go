@@ -109,8 +109,8 @@ const PLUGIN_XML = `<?xml version='1.0' encoding='utf-8'?>
         version="$VERSION$"
         xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android">
-    <name>Cordova Plugin $NAME$</name>
-    <description>Cordova Plugin $NAME$</description>
+    <name>HMS $NAME$</name>
+    <description>Cordova HMS $NAME$ Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,%s,hms-%s,huawei-%s,hms,huawei</keywords>
 
