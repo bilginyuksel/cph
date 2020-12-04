@@ -40,13 +40,8 @@ func SyncPluginXML(path string) error {
 	jsModules, _ := reader.FilePathWalkDir("www", []string{})
 	plugin.NewJsModulesFrom(jsModules)
 	if len(plugin.Platform.ConfigFiles) == 0 {
-		splittedPluginIDString := strings.Split(plugin.ID, "-")
-		pluginName := "Example"
-		if len(splittedPluginIDString) > 1 {
-			pluginName = splittedPluginIDString[len(splittedPluginIDString)-1]
-		}
-		firstLetterUpper := strings.ToUpper(string(pluginName[0])) + pluginName[1:]
-		configFile := parser.ConfigFile{Target: "config.xml", Parent: "/*", Features: []parser.Feature{parser.Feature{Name: "HMS" + firstLetterUpper, Params: []parser.Param{parser.Param{Name: "android-package", Value: fmt.Sprintf("com.huawei.hms.cordova.%s.HMS%s", pluginName, firstLetterUpper)}}}}}
+		pluginName := strings.ReplaceAll(plugin.Name, "HMS ", "")
+		configFile := parser.ConfigFile{Target: "config.xml", Parent: "/*", Features: []parser.Feature{parser.Feature{Name: "HMS" + pluginName, Params: []parser.Param{parser.Param{Name: "android-package", Value: fmt.Sprintf("com.huawei.hms.cordova.%s.HMS%s", strings.ToLower(pluginName), pluginName)}}}}}
 		plugin.Platform.ConfigFiles = append(plugin.Platform.ConfigFiles, configFile)
 	}
 

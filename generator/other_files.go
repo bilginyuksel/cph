@@ -2,7 +2,7 @@ package generator
 
 const PACKAGE_JSON = `{
     "name": "@hmscore/%s",
-    "description": "Cordova HMS $NAME$ Plugin",
+    "description": "Cordova HMS %s Plugin",
     "version": "$VERSION$",
     "main": "./www/index.js",
     "types": "./types/index.d.ts",
@@ -59,14 +59,14 @@ const PACKAGE_JSON = `{
 
 const APP_DEFINE = `{
     "fileVersion": "1",
-    "name": "Cordova-Hms-$NAME$",
-    "description": "Cordova HMS $NAME$ Plugin",
+    "name": "Cordova-Hms-%s",
+    "description": "Cordova HMS %s Plugin",
     "zipName": "cordova-%s-package",
     "packageName": "%s",
     "version": "$VERSION$",
     "type": "microService",
     "processes": {
-        "Cordova-Hms-$NAME$": {
+        "Cordova-Hms-%s": {
             "subscribes": []
         }
     },
@@ -109,8 +109,8 @@ const PLUGIN_XML = `<?xml version='1.0' encoding='utf-8'?>
         version="$VERSION$"
         xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android">
-    <name>HMS $NAME$</name>
-    <description>Cordova HMS $NAME$ Plugin</description>
+    <name>HMS %s</name>
+    <description>Cordova HMS %s Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,%s,hms-%s,huawei-%s,hms,huawei</keywords>
 

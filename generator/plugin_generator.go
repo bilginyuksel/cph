@@ -22,9 +22,10 @@ func createDir(directory string) {
 // CreateHMSPlugin ...
 func CreateHMSPlugin(project string) {
 
-	root := fmt.Sprintf("cordova-plugin-hms-%s", project)
+	lowerProjName := strings.ToLower(project) // make all lowrecaseprojectnaem
+	fmt.Println(lowerProjName)
 
-	firstLetterCapitalProject := strings.ToUpper(string(project[0])) + project[1:]
+	root := fmt.Sprintf("cordova-plugin-hms-%s", lowerProjName)
 
 	createDir(root)
 	createDir(fmt.Sprintf("%s/src", root))
@@ -36,7 +37,7 @@ func CreateHMSPlugin(project string) {
 	createDir(fmt.Sprintf("%s/src/android/src/main/java/com/huawei", root))
 	createDir(fmt.Sprintf("%s/src/android/src/main/java/com/huawei/hms", root))
 	createDir(fmt.Sprintf("%s/src/android/src/main/java/com/huawei/hms/cordova", root))
-	createDir(fmt.Sprintf("%s/src/android/src/main/java/com/huawei/hms/cordova/%s", root, project))
+	createDir(fmt.Sprintf("%s/src/android/src/main/java/com/huawei/hms/cordova/%s", root, lowerProjName))
 
 	// createDir(fmt.Sprintf("%s/scripts", root))
 	createDir(fmt.Sprintf("%s/src/www", root))
@@ -47,8 +48,8 @@ func CreateHMSPlugin(project string) {
 	createDir(fmt.Sprintf("%s/hooks", root))
 
 	// CREATE HOOK FILES
-	createFile(fmt.Sprintf("%s/hooks/after_plugin_install.js", root), fmt.Sprintf(AFTER_PLUGIN_INSTALL, project))
-	createFile(fmt.Sprintf("%s/hooks/before_plugin_uninstall.js", root), fmt.Sprintf(BEFORE_PLUGIN_UNINSTALL, project))
+	createFile(fmt.Sprintf("%s/hooks/after_plugin_install.js", root), fmt.Sprintf(AFTER_PLUGIN_INSTALL, lowerProjName))
+	createFile(fmt.Sprintf("%s/hooks/before_plugin_uninstall.js", root), fmt.Sprintf(BEFORE_PLUGIN_UNINSTALL, lowerProjName))
 	createFile(fmt.Sprintf("%s/hooks/FSUtils.js", root), FS_UTILS)
 
 	// createDir(fmt.Sprintf("%s/tests", root))
@@ -60,23 +61,20 @@ func CreateHMSPlugin(project string) {
 	createFile(fmt.Sprintf("%s/README.md", root), root)
 	createFile(fmt.Sprintf("%s/LICENCE", root), LICENCE_FILE)
 	createFile(fmt.Sprintf("%s/tsconfig.json", root), TS_CONFIG)
-	createFile(fmt.Sprintf("%s/package.json", root), fmt.Sprintf(PACKAGE_JSON, root, root, root, project, project, project))
-	createFile(fmt.Sprintf("%s/app_define.json", root), fmt.Sprintf(APP_DEFINE, project, root))
-	createFile(fmt.Sprintf("%s/plugin.xml", root), fmt.Sprintf(PLUGIN_XML, root, project, project, project))
+	createFile(fmt.Sprintf("%s/package.json", root), fmt.Sprintf(PACKAGE_JSON, root, project, root, root, lowerProjName, lowerProjName, lowerProjName))
+	createFile(fmt.Sprintf("%s/app_define.json", root), fmt.Sprintf(APP_DEFINE, project, project, lowerProjName, root, project))
+	createFile(fmt.Sprintf("%s/plugin.xml", root), fmt.Sprintf(PLUGIN_XML, root, project, project, lowerProjName, lowerProjName, lowerProjName))
 	createFile(fmt.Sprintf("%s/src/android/plugin.gradle", root), PLUGIN_GRADLE)
 	createFile(fmt.Sprintf("%s/src/android/build.gradle", root), BUILD_GRADLE)
-	createFile(fmt.Sprintf("%s/src/android/src/main/AndroidManifest.xml", root), fmt.Sprintf(ANDROID_MANIFEST, project))
+	createFile(fmt.Sprintf("%s/src/android/src/main/AndroidManifest.xml", root), fmt.Sprintf(ANDROID_MANIFEST, lowerProjName))
 
-	// CREATE TS FILES
-	// createFile(fmt.Sprintf("%s/scripts/utils.ts", root), TS_UTILS)
-	// createFile(fmt.Sprintf("%s/scripts/HMS%s.ts", root, project), TS_MAIN)
-	className := fmt.Sprintf("HMS%s", firstLetterCapitalProject)
-	createFile(fmt.Sprintf("%s/www/HMS%s.js", root, firstLetterCapitalProject), fmt.Sprintf(JS_MAIN, className))
+	className := fmt.Sprintf("HMS%s", project)
+	createFile(fmt.Sprintf("%s/www/HMS%s.js", root, project), fmt.Sprintf(JS_MAIN, className))
 
 	// CREATE JAVA FILES
-	javaPrefix := fmt.Sprintf("%s/src/android/src/main/java/com/huawei/hms/cordova/%s", root, project)
-	createFile(fmt.Sprintf("%s/HMS%s.java", javaPrefix, firstLetterCapitalProject), fmt.Sprintf(JAVA_MAIN, project, project, project, firstLetterCapitalProject))
-	createFile(fmt.Sprintf("%s/Test.java", javaPrefix), fmt.Sprintf(JAVA_EXAMPLE, project, project, project, project, project, project))
+	javaPrefix := fmt.Sprintf("%s/src/android/src/main/java/com/huawei/hms/cordova/%s", root, lowerProjName)
+	createFile(fmt.Sprintf("%s/HMS%s.java", javaPrefix, project), fmt.Sprintf(JAVA_MAIN, lowerProjName, lowerProjName, lowerProjName, project))
+	createFile(fmt.Sprintf("%s/Test.java", javaPrefix), fmt.Sprintf(JAVA_EXAMPLE, lowerProjName, lowerProjName, lowerProjName, lowerProjName, lowerProjName, lowerProjName))
 	// createFile(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/"))
 	IncludeFramework(project)
 }
@@ -89,32 +87,34 @@ func CreateTSUtil() {
 
 // CreateLayoutUtilJavaClass ...
 func CreateLayoutUtilJavaClass(project string) {
-	path := fmt.Sprintf("cordova-plugin-hms-%s/src/android/src/main/java/com/huawei/hms/cordova/basef/utils", project)
+	lowerProjName := strings.ToLower(project)
+	path := fmt.Sprintf("cordova-plugin-hms-%s/src/android/src/main/java/com/huawei/hms/cordova/basef/utils", lowerProjName)
 	createDir(path)
 
 	createFile(fmt.Sprintf("%s/PluginFrontLayoutManager.java", path), "")
-	createFile(fmt.Sprintf("%s/Px2Dp.java", path), fmt.Sprintf(PX2DP_JAVA, project))
+	createFile(fmt.Sprintf("%s/Px2Dp.java", path), fmt.Sprintf(PX2DP_JAVA, lowerProjName))
 	createFile(fmt.Sprintf("%s/PluginViewParams.java", path), "")
 }
 
 // IncludeFramework ...
 func IncludeFramework(project string) {
-	javaPath := fmt.Sprintf("cordova-plugin-hms-%s/src/android/src/main/java/com/huawei/hms/cordova/%s", project, project)
+	lowerProjName := strings.ToLower(project)
+	javaPath := fmt.Sprintf("cordova-plugin-hms-%s/src/android/src/main/java/com/huawei/hms/cordova/%s", lowerProjName, lowerProjName)
 	createDir(fmt.Sprintf("%s/basef", javaPath))
 	createDir(fmt.Sprintf("%s/basef/handler", javaPath))
 
-	corMethod := fmt.Sprintf(JAVAC_BASE_ANNOTATION, project, "CordovaMethod")
-	corEvent := fmt.Sprintf(JAVAC_BASE_ANNOTATION, project, "CordovaEvent")
-	hmsLog := fmt.Sprintf(JAVAC_BASE_ANNOTATION, project, "HMSLog")
-	corBaseModule := fmt.Sprintf(JAVAC_CORBASE_MODULE, project)
-	promise := fmt.Sprintf(JAVAC_PROMISE, project)
-	nscmException := fmt.Sprintf(JAVAC_NSCM_EXCEPTION, project)
-	hmsLogger := fmt.Sprintf(JAVAC_HMS_LOGGER, project)
-	corpack := fmt.Sprintf(JAVAC_CORPACK, project)
-	cmh := fmt.Sprintf(JAVAC_CMH, project, project, project, project)
-	cmgh := fmt.Sprintf(JAVAC_CMGH, project)
-	corController := fmt.Sprintf(JAVAC_CORCONTROLLER, project, project, project)
-	corEventRunner := fmt.Sprintf(JAVAC_COREVENTRUNNER, project)
+	corMethod := fmt.Sprintf(JAVAC_BASE_ANNOTATION, lowerProjName, "CordovaMethod")
+	corEvent := fmt.Sprintf(JAVAC_BASE_ANNOTATION, lowerProjName, "CordovaEvent")
+	hmsLog := fmt.Sprintf(JAVAC_BASE_ANNOTATION, lowerProjName, "HMSLog")
+	corBaseModule := fmt.Sprintf(JAVAC_CORBASE_MODULE, lowerProjName)
+	promise := fmt.Sprintf(JAVAC_PROMISE, lowerProjName)
+	nscmException := fmt.Sprintf(JAVAC_NSCM_EXCEPTION, lowerProjName)
+	hmsLogger := fmt.Sprintf(JAVAC_HMS_LOGGER, lowerProjName)
+	corpack := fmt.Sprintf(JAVAC_CORPACK, lowerProjName)
+	cmh := fmt.Sprintf(JAVAC_CMH, lowerProjName, lowerProjName, lowerProjName, lowerProjName)
+	cmgh := fmt.Sprintf(JAVAC_CMGH, lowerProjName)
+	corController := fmt.Sprintf(JAVAC_CORCONTROLLER, lowerProjName, lowerProjName, lowerProjName)
+	corEventRunner := fmt.Sprintf(JAVAC_COREVENTRUNNER, lowerProjName)
 	createFile(fmt.Sprintf("%s/basef/CordovaMethod.java", javaPath), corMethod)
 	createFile(fmt.Sprintf("%s/basef/CordovaEvent.java", javaPath), corEvent)
 	createFile(fmt.Sprintf("%s/basef/HMSLog.java", javaPath), hmsLog)
