@@ -13,7 +13,7 @@ Licensed under the Apache License, Version 2.0 (the "License")
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-	https://www.apache.org/licenses/LICENSE-2.0
+    https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software TIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
@@ -274,12 +274,12 @@ func TestWrite_DeleteOneOfTwoValidLicenses(t *testing.T) {
 
 func TestWrite_DeleteOnlyWrongFormatLicense(t *testing.T) {
 	anotherLicence := `    2020 GeniusBros Corp. Ltd. All right is ours.
-	Licence Licence Licence Licence Licence Licence Licence Licence
-	Licence Licence Licence Licence Licence Licence Licence Licence
-	Licence Licence Licence Licence Licence Licence Licence Licence
-	Licence Licence Licence Licence Licence Licence Licence Licence
-	Licence Licence Licence Licence Licence Licence Licence Licence
-	Licence Licence Licence Licence Licence Licence Licence Licence`
+    Licence Licence Licence Licence Licence Licence Licence Licence
+    Licence Licence Licence Licence Licence Licence Licence Licence
+    Licence Licence Licence Licence Licence Licence Licence Licence
+    Licence Licence Licence Licence Licence Licence Licence Licence
+    Licence Licence Licence Licence Licence Licence Licence Licence
+    Licence Licence Licence Licence Licence Licence Licence Licence`
 	content := "/*\n" + falseLicence + "\n*/\n/*\n" + anotherLicence + "\n*/\n/*\n" + LICENCE + "\n*/"
 	ioutil.WriteFile("test.ts", []byte(content), 0644)
 	Write("test.ts")
