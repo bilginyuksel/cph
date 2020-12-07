@@ -12,10 +12,10 @@ func TestHasCordovaMethod_NoCordovaMethod(t *testing.T) {
 
 func TestHasCordovaMethod_CordovaMethodExists(t *testing.T) {
 	content := `
-	@CordovaMethod
-	public void something(final CorPack corPack, JSONArray args, final Promise promise) {
-		promise.success();
-	}`
+    @CordovaMethod
+    public void something(final CorPack corPack, JSONArray args, final Promise promise) {
+        promise.success();
+    }`
 	given := HasCormet(content)
 	expected := true
 	if given != expected {
@@ -25,16 +25,16 @@ func TestHasCordovaMethod_CordovaMethodExists(t *testing.T) {
 
 func TestCountCordovaMethod_FindTwoCordovaMethods(t *testing.T) {
 	content := `
-	@CordovaMethod
-	public void something(final CorPack corPack, JSONArray args, final Promise promise){
-		promise.success();
-	}
+    @CordovaMethod
+    public void something(final CorPack corPack, JSONArray args, final Promise promise){
+        promise.success();
+    }
 
-	@CordovaMethod
-	public void something(final CorPack corPack, JSONArray args, final Promise promise){
-		promise.success();
-	}
-	`
+    @CordovaMethod
+    public void something(final CorPack corPack, JSONArray args, final Promise promise){
+        promise.success();
+    }
+    `
 	given := countCormet(content)
 	expected := 2
 	if expected != given {
@@ -44,11 +44,11 @@ func TestCountCordovaMethod_FindTwoCordovaMethods(t *testing.T) {
 
 func TestGetCormet_GetMethodInfoSample1(t *testing.T) {
 	content := `
-	@CordovaMethod
-	public void something(final CorPack corPack, JSONArray args, final Promise promise){
-		promise.success();
-	}
-	`
+    @CordovaMethod
+    public void something(final CorPack corPack, JSONArray args, final Promise promise){
+        promise.success();
+    }
+    `
 	given := getCormet(content)
 	expected := &CormetFun{Name: "something"}
 	if !isCormetFunctionsSame(given, expected) {
@@ -58,11 +58,11 @@ func TestGetCormet_GetMethodInfoSample1(t *testing.T) {
 
 func TestGetCormet_GetMethodInfoSample2(t *testing.T) {
 	content := `
-	@CordovaMethod
-	public void myCormet(final CorPack corPack, JSONArray args, final Promise promise){
-		promise.success();
-	}
-	`
+    @CordovaMethod
+    public void myCormet(final CorPack corPack, JSONArray args, final Promise promise){
+        promise.success();
+    }
+    `
 	given := getCormet(content)
 	expected := &CormetFun{Name: "myCormet"}
 	if !isCormetFunctionsSame(given, expected) {
@@ -72,13 +72,13 @@ func TestGetCormet_GetMethodInfoSample2(t *testing.T) {
 
 func TestGetCormet_GetMethodInfoWithParameters(t *testing.T) {
 	content := `
-	@CordovaMethod
-	public void myCormet(final CorPack corPack, JSONArray args, final Promise promise) {
-		String id = args.getString(0);
-		int no = args.getInt(1);
-		promise.success();
-	}
-	`
+    @CordovaMethod
+    public void myCormet(final CorPack corPack, JSONArray args, final Promise promise) {
+        String id = args.getString(0);
+        int no = args.getInt(1);
+        promise.success();
+    }
+    `
 	given := getCormet(content)
 	expected := &CormetFun{Name: "myCormet", Params: []Parameter{{"id", 0, "string"},
 		{"no", 1, "number"}}}
@@ -89,15 +89,15 @@ func TestGetCormet_GetMethodInfoWithParameters(t *testing.T) {
 
 func TestGetCormet_GetMethodInfoWithParameters2(t *testing.T) {
 	content := `
-	@CordovaMethod
-	public void myCormet(final CorPack corPack, JSONArray args, final Promise promise) {
-		String id = args.getString(0);
-		int no = args.getInt(1);
-		float obj = (float) args.getDouble(3);
-		JSONObject myObj = args.getJSONObject(2);
-		promise.success();
-	}
-	`
+    @CordovaMethod
+    public void myCormet(final CorPack corPack, JSONArray args, final Promise promise) {
+        String id = args.getString(0);
+        int no = args.getInt(1);
+        float obj = (float) args.getDouble(3);
+        JSONObject myObj = args.getJSONObject(2);
+        promise.success();
+    }
+    `
 	given := getCormet(content)
 	expected := &CormetFun{Name: "myCormet", Params: []Parameter{{"id", 0, "string"},
 		{"no", 1, "number"}, {"obj", 3, "number"}, {"myObj", 2, "object"}}}
@@ -108,27 +108,27 @@ func TestGetCormet_GetMethodInfoWithParameters2(t *testing.T) {
 
 func TestGetCormetRef_GetMultipleMethods(t *testing.T) {
 	content := `
-	@CordovaMethod
-	public void met1(final CorPack corPack, JSONArray args, final Promise promise){
-		String id = args.getString(0);
-		int no = args.getInt(1);
-		promise.success();
-	}
+    @CordovaMethod
+    public void met1(final CorPack corPack, JSONArray args, final Promise promise){
+        String id = args.getString(0);
+        int no = args.getInt(1);
+        promise.success();
+    }
 
-	@CordovaMethod
-	public void myCormet(final CorPack corPack, JSONArray args, final Promise promise) {
-		String id = args.getString(0);
-		int no = args.getInt(1);
-		float obj = (float) args.getDouble(3);
-		JSONObject myObj = args.getJSONObject(2);
-		promise.success();
-	}
+    @CordovaMethod
+    public void myCormet(final CorPack corPack, JSONArray args, final Promise promise) {
+        String id = args.getString(0);
+        int no = args.getInt(1);
+        float obj = (float) args.getDouble(3);
+        JSONObject myObj = args.getJSONObject(2);
+        promise.success();
+    }
 
-	@CordovaMethod
-	public void emptyBody(final CorPack corPack, JSONArray args, final Promise promise) {
-		promise.success();
-	}
-	`
+    @CordovaMethod
+    public void emptyBody(final CorPack corPack, JSONArray args, final Promise promise) {
+        promise.success();
+    }
+    `
 	given := GetCormetRef(content, "MyReference")
 	cormetList := []CormetFun{
 		CormetFun{Name: "met1", Params: []Parameter{{"id", 0, "string"}, {"no", 1, "number"}}},

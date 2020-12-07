@@ -13,12 +13,12 @@ Read the file line by line and try to find a cleaner result.
 Example file:
 ------------------------------------------------------
 class FooClass{
-	constructor() {
-		...
-	}
-	public foo() {
-		...
-	}
+    constructor() {
+        ...
+    }
+    public foo() {
+        ...
+    }
 }
 
 export function foo() { ... };
@@ -32,8 +32,8 @@ let e = 4; let f=5; let k=6
 Example Output:
 ------------------------------------------------------
 FooClass
-	|__ constructor();
-	|__ public foo();
+    |__ constructor();
+    |__ public foo();
 export function foo()
 const a = 1
 const b = 2
@@ -48,120 +48,120 @@ let k = 6
       @  //  /*  <data-type|class|function|export|default|import>
 
 
-		@		//		/*		const|let|var	
-	    |       |        |            |
- 	   name    newline   */          name
-	   / \        *      *          /  | \
-	  (	  -*                       ;   =  :
+        @		//		/*		const|let|var	
+        |       |        |            |
+        name    newline   */          name
+       / \        *      *          /  | \
+      (	  -*                       ;   =  :
       |                            *   |    \
       )*                              value  type
                                        / \     \  \
                                       ;  \n     =  ;
-									  *   *     |  *
- 											   ...
+                                      *   *     |  *
+                                                ...
 
 
-									class
-									  |
-									  |
-									name
-							   /      |     \
-							  /       |      \
-							 /        |       \
-							/         |        \
-						   /   		  |         \
-						  / 		  |          \
-					  extends    implements       ...
-						 |             |
-						name         name
-					   /   |          /  \
+                                    class
+                                      |
+                                      |
+                                    name
+                               /      |     \
+                              /       |      \
+                             /        |       \
+                            /         |        \
+                           /   		  |         \
+                          / 		  |          \
+                      extends    implements       ...
+                         |             |
+                        name         name
+                       /   |          /  \
                       /   ...       ,    ...
                      /              |
-			   implements         recursive
-					|
- 				   name
- 				  /   \
- 				 ,    ...
+               implements         recursive
+                    |
+                    name
+                   /   \
+                  ,    ...
                 |
              recursive
 
 
-								export
-							  /    |   \
- 						     /     |    \
-							{    name   token
+                                export
+                              /    |   \
+                              /     |    \
+                            {    name   token
 
 
 class Exp {
-	constructor(){
-		console.log("Exp");
-	}
-	async foo(): Promise<void>{
-		return asyncExec('s1', 's2', []);
-	}
-	protected boo(): string {
-		return "Hello, World";
-	}
+    constructor(){
+        console.log("Exp");
+    }
+    async foo(): Promise<void>{
+        return asyncExec('s1', 's2', []);
+    }
+    protected boo(): string {
+        return "Hello, World";
+    }
 }
 
 <expression>
-	<token>class</token>
-	<token>Exp</token>
-	<symbol>{</symbol>
-	<token>constructor</token>
-	<symbol>(</symbol>
-	<symbol>)</symbol>
-	<symbol>{</symbol>
-	<token>console.log</token>
-	<symbol>(</symbol>
-	<symbol>"Exp"</symbol>
-	<symbol>)</symbol>
-	<symbol>;</symbol>	
+    <token>class</token>
+    <token>Exp</token>
+    <symbol>{</symbol>
+    <token>constructor</token>
+    <symbol>(</symbol>
+    <symbol>)</symbol>
+    <symbol>{</symbol>
+    <token>console.log</token>
+    <symbol>(</symbol>
+    <symbol>"Exp"</symbol>
+    <symbol>)</symbol>
+    <symbol>;</symbol>	
 </expression>
 
 type token struct {
-	name string
-	value string
+    name string
+    value string
 }
 
 var tokens []token
 
 func parseLine(line string){
-	match := ""
-	for i:=0; i<len(line); i++ {
-		if _, ok := symbols[line[i]]; ok {
-			if len(match) != 0 {
-				tokens = append(tokens, Token{name:Name})
-			}
-			tokens = append(tokens, Token{name:Symbol})
-			match = ""
-			continue
-		}
+    match := ""
+    for i:=0; i<len(line); i++ {
+        if _, ok := symbols[line[i]]; ok {
+            if len(match) != 0 {
+                tokens = append(tokens, Token{name:Name})
+            }
+            tokens = append(tokens, Token{name:Symbol})
+            match = ""
+            continue
+        }
 
-		if line[i] == " " {
-			if _, ok := keywords[match]; ok {
-				tokens = append(tokens, Token{name:Keyword})
-			}
-			match = ""
-			continue
-		}
-		
-		match += line[i]
-	}
+        if line[i] == " " {
+            if _, ok := keywords[match]; ok {
+                tokens = append(tokens, Token{name:Keyword})
+            }
+            match = ""
+            continue
+        }
+        
+        match += line[i]
+    }
 }
 
 func parse(content []string){
-	for _, line := range content {
-		parseLine(line)
-	}
+    for _, line := range content {
+        parseLine(line)
+    }
 }
 
 
 class TrieNode:
-	def __init__(self, val):
-		self.value = val
-		self.children = {}
-		self.end = False
+    def __init__(self, val):
+        self.value = val
+        self.children = {}
+        self.end = False
 
 root = TrieNode()
 root.children["const"] = varTrie

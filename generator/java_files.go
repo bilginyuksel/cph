@@ -33,6 +33,42 @@ public class HMS%s extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
         return cordovaController.execute(action, args, callbackContext);
     }
+
+    @Override
+    public void onPause(boolean multitasking) {
+        super.onPause(multitasking);
+        cordovaController.onPause(multitasking);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cordovaController.onDestroy();
+    }
+
+    @Override
+    public void onReset() {
+        super.onReset();
+        cordovaController.onReset();
+    }
+
+    @Override
+    public void onResume(boolean multitasking) {
+        super.onResume(multitasking);
+        cordovaController.onResume(multitasking);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        cordovaController.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        cordovaController.onStop();
+    }
 }
 `
 
@@ -82,21 +118,22 @@ public @interface %s {
 
 const JAVAC_CORBASE_MODULE = `package com.huawei.hms.cordova.%s.basef;
 
-public class CordovaBaseModule {
-    private boolean isSingle;
-    private String reference;
+public abstract class CordovaBaseModule {
+    private final String reference;
 
     public CordovaBaseModule() {
         this.reference = this.getClass().getSimpleName();
-        this.isSingle = false;
     }
+    public void onDestroy(){}
+    public void onPause(boolean multitasking){}
+    public void onResume(boolean multitasking){}
+    public void onReset(){}
+    public void onStart(){}
+    public void onStop(){}
+
 
     public String getReference(){
         return reference;
-    }
-
-    public boolean isSingle(){
-        return isSingle;
     }
 }
 `
@@ -109,10 +146,11 @@ public class NoSuchCordovaModuleException extends RuntimeException {
 const JAVAC_PROMISE = `package com.huawei.hms.cordova.%s.basef.handler;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import static org.apache.cordova.PluginResult.Status.OK;
 
 public class Promise {
 
@@ -132,52 +170,46 @@ public class Promise {
         callbackContext.success();
         sendLogEvent(null);
     }
-
     public void success(int message) {
         callbackContext.success(message);
         sendLogEvent(null);
     }
-
     public void success(byte[] message) {
         callbackContext.success(message);
         sendLogEvent(null);
     }
-
     public void success(String message) {
         callbackContext.success(message);
         sendLogEvent(null);
     }
-
     public void success(JSONArray message) {
         callbackContext.success(message);
         sendLogEvent(null);
     }
-
     public void success(JSONObject message) {
         callbackContext.success(message);
         sendLogEvent(null);
     }
-
     public void success(boolean message) {
-        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+        callbackContext.sendPluginResult(new PluginResult(OK, message));
         sendLogEvent(null);
     }
-
+    public void success(float message) {
+        callbackContext.sendPluginResult(new PluginResult(OK, message));
+        sendLogEvent(null);
+    }
     public void error(int message) {
         callbackContext.error(message);
         sendLogEvent("" + message);
     }
-
     public void error(String message) {
         callbackContext.error(message);
         sendLogEvent(message);
     }
-
     public void error(JSONObject message) {
         callbackContext.error(message);
         sendLogEvent(message.toString());
     }
-
     public void sendPluginResult(PluginResult pluginResult) {
         callbackContext.sendPluginResult(pluginResult);
         sendLogEvent(null);
@@ -189,7 +221,8 @@ public class Promise {
         else hmsLogger.sendSingleEvent(methodName, nullable);
     }
 
-}`
+}
+`
 const JAVAC_HMS_LOGGER = `package com.huawei.hms.cordova.%s.basef.handler;
 
 import static android.os.Build.DEVICE;
@@ -658,6 +691,18 @@ public class CorPack {
         hmsLogger.disableLogger();
     }
 
+    public void startMethodExecution(String methodName) {
+        hmsLogger.startMethodExecutionTimer(methodName);
+    }
+
+    public void sendSingleEvent(String methodName) {
+        hmsLogger.sendSingleEvent(methodName);
+    }
+
+    public void sendSingleEvent(String methodName, String errorCode) {
+        hmsLogger.sendSingleEvent(methodName, errorCode);
+    }
+
     public CordovaWebView getCordovaWebView() {
         return webView;
     }
@@ -669,7 +714,6 @@ public class CorPack {
     public CordovaEventRunner getEventRunner() {
         return eventRunner;
     }
-
 }
 `
 const JAVAC_CMH = `package com.huawei.hms.cordova.%s.basef.handler;
@@ -686,7 +730,6 @@ import java.util.List;
 import java.util.Map;
 
 class CordovaModuleHandler<T extends CordovaBaseModule> {
-    //private static final String TAG = CordovaModuleHandler.class.getSimpleName();
     private final Map<String, Method> lookupTable = new HashMap<>();
     private final List<Method> eventCache = new ArrayList<>();
     private final T instance;
@@ -701,12 +744,10 @@ class CordovaModuleHandler<T extends CordovaBaseModule> {
         for(Method method : methods) {
             if (method.isAnnotationPresent(CordovaMethod.class))
                 lookupTable.put(method.getName(), method);
-
             if(method.isAnnotationPresent(CordovaEvent.class))
                 eventCache.add(method);
         }
     }
-
 
     Method getModuleMethod(String action) throws NoSuchMethodException {
         if(!lookupTable.containsKey(action)) throw new NoSuchMethodException();
@@ -716,13 +757,16 @@ class CordovaModuleHandler<T extends CordovaBaseModule> {
     List<Method> getEventCache() {
         return eventCache;
     }
-
     T getInstance() {
         return instance;
     }
-
     public Map<String, Method> getLookupTable() {
         return lookupTable;
+    }
+
+    public void clear() {
+        eventCache.clear();
+        lookupTable.clear();
     }
 }
 `
@@ -755,6 +799,13 @@ class CordovaModuleGroupHandler {
         if(!hasCordovaModuleHandler(reference)) throw new NoSuchCordovaModuleException();
         return lookupTable.get(reference);
     }
+
+    void clear() {
+        lookupTable.clear();
+        for(CordovaModuleHandler moduleHandler: cordovaModuleHandlers)
+            moduleHandler.clear();
+        cordovaModuleHandlers.clear();
+    }
 }
 `
 const JAVAC_COREVENTRUNNER = `package com.huawei.hms.cordova.%s.basef.handler;
@@ -763,8 +814,8 @@ import android.app.Activity;
 import android.util.Log;
 
 import org.apache.cordova.CordovaWebView;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import java.util.Locale;
 
 public class CordovaEventRunner {
     private static final String TAG = CordovaEventRunner.class.getName();
@@ -779,14 +830,9 @@ public class CordovaEventRunner {
         this.activity = activity;
     }
 
-    public void sendEvent(String event, JSONObject... params) {
+    public void sendEvent(String event, Object... params) {
         hmsLogger.sendPeriodicEvent(event);
-        sendEventToJS(event, (Object[]) params);
-    }
-
-    public void sendEvent(String event, JSONArray... params) {
-        hmsLogger.sendPeriodicEvent(event);
-        sendEventToJS(event, (Object[]) params);
+        sendEventToJS(event, params);
     }
 
     public void sendEvent(String event) {
@@ -795,27 +841,34 @@ public class CordovaEventRunner {
     }
 
     private void sendEventToJS(String event, Object... objects) {
-        Log.i(TAG,"Periodic event "+ event +" captured and event "+ event +" is sending to JS.");
+        Log.i(TAG, "Periodic event " + event + " captured and event " + event + " is sending to JS.");
         StringBuilder jsFunctionBuilder = new StringBuilder();
         jsFunctionBuilder.append("javascript:");
-        jsFunctionBuilder.append("window.runHMSEvent('"+event+"'");
-        if(objects.length>0) jsFunctionBuilder.append(buildJSEventParameters(objects));
+        jsFunctionBuilder.append("window.runHMSEvent('").append(event).append("'");
+        if (objects.length > 0) jsFunctionBuilder.append(buildJSEventParameters(objects));
         jsFunctionBuilder.append(");");
-
-        activity.runOnUiThread(() -> {
-            webView.loadUrl(jsFunctionBuilder.toString());
-        });
+        activity.runOnUiThread(() -> webView.loadUrl(jsFunctionBuilder.toString()));
     }
 
     private String buildJSEventParameters(Object... objects) {
+        final String TO_STR_NOT_VALID_ERR = "Sent event parameter value is not valid! Please add toString() method to the object you " +
+                "are passing or do not pass this object as an event parameter. Objects current toString value is %s.";
         StringBuilder eventParametersBuilder = new StringBuilder();
-
-        for (Object obj : objects)
+        for (Object obj : objects) {
+            if (!isToStringValueValid(obj))
+                Log.w(TAG, String.format(Locale.ENGLISH, TO_STR_NOT_VALID_ERR, obj.toString()));
             eventParametersBuilder.append(",").append(obj.toString());
-
+        }
         return eventParametersBuilder.toString();
     }
+
+    private boolean isToStringValueValid(Object object) {
+        String originalToStr = object.getClass().getSimpleName() + "@" + Integer.toHexString(object.hashCode());
+        String currentToStr = object.toString();
+        return originalToStr.equals(currentToStr);
+    }
 }
+
 `
 const JAVAC_CORCONTROLLER = `package com.huawei.hms.cordova.%s.basef.handler;
 
@@ -885,7 +938,6 @@ public class CordovaController {
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
         try {
             CordovaModuleHandler moduleHandler = groupHandler.getCordovaModuleHandler(action);
-            Log.i(TAG, "Module " + action + " called.");
             String methodName = args.getString(0); // JSONException if not exists
             Method method = moduleHandler.getModuleMethod(methodName);
             Log.i(TAG, "Method " + methodName + " called of module " + action + ".");
@@ -901,7 +953,7 @@ public class CordovaController {
             return true;
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | JSONException e) {
             Log.e(TAG, "Error captured when execute method run for reference= " + action);
-            Log.e(TAG, e.getMessage() + " ---- " + e.getClass().getSimpleName());
+            Log.e(TAG, e.getMessage() + ", " + e.getClass().getSimpleName());
             callbackContext.error(e.getMessage());
             return false;
         }
@@ -909,6 +961,44 @@ public class CordovaController {
 
     private Promise createPromiseFromCallbackContext(final CallbackContext callbackContext, String methodName, boolean isLoggerActive) {
         return new Promise(callbackContext, hmsLogger, methodName, isLoggerActive);
+    }
+
+    public void onPause(boolean multitasking) {
+        Log.i(TAG, "onPause");
+        for (String ref : moduleReferences) {
+            groupHandler.getCordovaModuleHandler(ref).getInstance().onPause(multitasking);
+        }
+    }
+
+    public void onDestroy() {
+        Log.i(TAG, "onDestroy");
+        for (String ref : moduleReferences)
+            groupHandler.getCordovaModuleHandler(ref).getInstance().onDestroy();
+        groupHandler.clear();
+    }
+
+    public void onReset() {
+        Log.i(TAG, "onReset");
+        for (String ref : moduleReferences)
+            groupHandler.getCordovaModuleHandler(ref).getInstance().onReset();
+    }
+
+    public void onResume(boolean multitasking) {
+        Log.i(TAG, "onResume");
+        for (String ref : moduleReferences)
+            groupHandler.getCordovaModuleHandler(ref).getInstance().onResume(multitasking);
+    }
+
+    public void onStart() {
+        Log.i(TAG, "onStart");
+        for (String ref : moduleReferences)
+            groupHandler.getCordovaModuleHandler(ref).getInstance().onStart();
+    }
+
+    public void onStop() {
+        Log.i(TAG, "onStop");
+        for(String ref : moduleReferences)
+            groupHandler.getCordovaModuleHandler(ref).getInstance().onStop();
     }
 
 }

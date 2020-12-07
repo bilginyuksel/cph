@@ -5,88 +5,88 @@ import "testing"
 func TestParse_ParseSample1(t *testing.T) {
 	content := `
 
-	export enum Color {
-		RED = -65536,
-		DARK_GRAY = -12303292,
-		TRANSPARENT = 0
-	}
+    export enum Color {
+        RED = -65536,
+        DARK_GRAY = -12303292,
+        TRANSPARENT = 0
+    }
 
-	export interface Projection {
-		fromScreenLocation(point: Point): Promise<LatLng>;
-		getVisibleRegion(): Promise<VisibleRegion>;
-		toScreenLocation(latLng: LatLng): Promise<Point>;
-	}
-	//@class This is a base Class represent map object.
-	class HuaweiMapImpl implements HuaweiMap,HuaweiMap2,HuaweiMap3 {
+    export interface Projection {
+        fromScreenLocation(point: Point): Promise<LatLng>;
+        getVisibleRegion(): Promise<VisibleRegion>;
+        toScreenLocation(latLng: LatLng): Promise<Point>;
+    }
+    //@class This is a base Class represent map object.
+    class HuaweiMapImpl implements HuaweiMap,HuaweiMap2,HuaweiMap3 {
 
-		public readonly components: Map<string, any> = new Map<string, any>();
-		private readonly id: number;
-		private readonly uiSettings: UiSettings;
+        public readonly components: Map<string, any> = new Map<string, any>();
+        private readonly id: number;
+        private readonly uiSettings: UiSettings;
 
-		/**
-		* This is an interface.
-		* @param callback callback Function to pass bilmem ne
-		* @return any
-		*/
-		scroll(): void {
-			const mapRect = document.getElementById(this.divId).getBoundingClientRect();
-			this.forceUpdateXAndY(mapRect.x, mapRect.y);
-		}
+        /**
+        * This is an interface.
+        * @param callback callback Function to pass bilmem ne
+        * @return any
+        */
+        scroll(): void {
+            const mapRect = document.getElementById(this.divId).getBoundingClientRect();
+            this.forceUpdateXAndY(mapRect.x, mapRect.y);
+        }
 
-		async hideMap(): Promise<void> {
-			return asyncExec("HMSMap", "hideMap", [this.divId]);
-		}
+        async hideMap(): Promise<void> {
+            return asyncExec("HMSMap", "hideMap", [this.divId]);
+        }
 
-		async on(event: MapEvent, callback: (val: any) => void): Promise<void> {
-			const fixedFunctionNameForJavaScript: string = '${event}_${this.id}';
-			const fixedFunctionNameForJava: string = 'set${event[0].toUpperCase()}${event.substr(1)}Listener';
+        async on(event: MapEvent, callback: (val: any) => void): Promise<void> {
+            const fixedFunctionNameForJavaScript: string = '${event}_${this.id}';
+            const fixedFunctionNameForJava: string = 'set${event[0].toUpperCase()}${event.substr(1)}Listener';
 
-			return asyncExec('HMSMap', 'mapOptions', [this.divId, 'setListener', fixedFunctionNameForJava, {'content': callback.toString()}])
-				.then(Value => {
-					//(<any>window)[fixedFunctionNameForJavaScript] = callback;
-					window.subscribeHMSEvent(fixedFunctionNameForJavaScript, callback);
-				}).catch(err => console.log(err));
-		}
+            return asyncExec('HMSMap', 'mapOptions', [this.divId, 'setListener', fixedFunctionNameForJava, {'content': callback.toString()}])
+                .then(Value => {
+                    //(<any>window)[fixedFunctionNameForJavaScript] = callback;
+                    window.subscribeHMSEvent(fixedFunctionNameForJavaScript, callback);
+                }).catch(err => console.log(err));
+        }
 
-		async addCircle(circleOptions: CircleOptions): Promise<Circle> {
-			if (!circleOptions["center"]) return Promise.reject(ErrorCodes.toString(ErrorCodes.CENTER_PROPERTY_MUST_DEFINED));
-			const componentId = await asyncExec('HMSMap', 'addComponent', [this.divId, "CIRCLE", circleOptions]);
-			const circle: Circle = new CircleImpl(this.divId, this.id, componentId);
-			this.components.set(circle.getId(), circle);
-			return circle;
-		}
-	}
-	function demo(data: string, data1: () => void) {
-		console.log("hello world");
-		return asyncExec('HMSMap', 'ssda', {'dothis':'nottodothis'});
-	}
-	const foo: string
-	const baz: number = 5
+        async addCircle(circleOptions: CircleOptions): Promise<Circle> {
+            if (!circleOptions["center"]) return Promise.reject(ErrorCodes.toString(ErrorCodes.CENTER_PROPERTY_MUST_DEFINED));
+            const componentId = await asyncExec('HMSMap', 'addComponent', [this.divId, "CIRCLE", circleOptions]);
+            const circle: Circle = new CircleImpl(this.divId, this.id, componentId);
+            this.components.set(circle.getId(), circle);
+            return circle;
+        }
+    }
+    function demo(data: string, data1: () => void) {
+        console.log("hello world");
+        return asyncExec('HMSMap', 'ssda', {'dothis':'nottodothis'});
+    }
+    const foo: string
+    const baz: number = 5
 
-	function fooCreator(safa: number = 5): Promise<string> {
-		return "promise<string>";
-	}
-	
-	
-	/**
-	* This is an interface.
-	* @param callback callback Function to pass bilmem ne
-	* @return any
-	*/
-	function considerCase(callback: ()=>void = () => {console.log("hello world")}) {
-	
-	}
+    function fooCreator(safa: number = 5): Promise<string> {
+        return "promise<string>";
+    }
+    
+    
+    /**
+    * This is an interface.
+    * @param callback callback Function to pass bilmem ne
+    * @return any
+    */
+    function considerCase(callback: ()=>void = () => {console.log("hello world")}) {
+    
+    }
 
-	function considerCase2(callback: (data1: string, data2: any) => void = (data1, data2) => {
-		console.log("Hello world");
-		const test = () => {
-			console.log(data1);
-			console.log(data2);
-		}}) {
-	
-	}
+    function considerCase2(callback: (data1: string, data2: any) => void = (data1, data2) => {
+        console.log("Hello world");
+        const test = () => {
+            console.log(data1);
+            console.log(data2);
+        }}) {
+    
+    }
 
-	`
+    `
 	Tokenize(content)
 	given := Parse()
 	expected := &TSFile{

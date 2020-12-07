@@ -1,42 +1,42 @@
-       	                         ____ <docstring>
+                                    ____ <docstring>
                                 |
 <template> ---------- <function> --- <annotation[]>
-					|			|____  <export> <async> function <name>(<param[]>): <return> ;
-					|
-					|___ <method> --- <docstring>
-								|____ <annotation[]>
-								|____ <access-specifier> <abstract|static> <async> <name>(<param[]>): <return>;
+                    |			|____  <export> <async> function <name>(<param[]>): <return> ;
+                    |
+                    |___ <method> --- <docstring>
+                                |____ <annotation[]>
+                                |____ <access-specifier> <abstract|static> <async> <name>(<param[]>): <return>;
  
 ## FILE-LEVEL-FINDER
 
 <annotation?>
 <docstring?>
 <default?>
-		|
-	<export?>
-		| 
-		|____ <abstract?>&class
-		|		    	|___ <class-name>
+        |
+    <export?>
+        | 
+        |____ <abstract?>&class
+        |		    	|___ <class-name>
         |           	|___ <extends?>&class
-  		|		    	|___ <implements?>&[]interfaces
-		|
-		|____ interface
-		|			|___ <interface-name>
-		|			|___ <extends?>&[]interfaces
-		|
-		|____ enum
-		|		 |___ <enum-name>
-		|
-		|
-		|____ <const, let, var>
-		|				  |___ <variable-name>
-		|				  |___ <type|value>|<type&value>
-		|
-		|			
-		|____ <async?>&function
-						  |___ <function-name>
-						  |___ <parameters?>[]parameters
-						  |___ <return?>
+          |		    	|___ <implements?>&[]interfaces
+        |
+        |____ interface
+        |			|___ <interface-name>
+        |			|___ <extends?>&[]interfaces
+        |
+        |____ enum
+        |		 |___ <enum-name>
+        |
+        |
+        |____ <const, let, var>
+        |				  |___ <variable-name>
+        |				  |___ <type|value>|<type&value>
+        |
+        |			
+        |____ <async?>&function
+                          |___ <function-name>
+                          |___ <parameters?>[]parameters
+                          |___ <return?>
 
 
 
@@ -44,12 +44,12 @@
 
 accss = access-specifier
 <accss?> - (empty default)
-	|
-	|____ <variable>
-	|			|___
-	|			|___
-	|
-	|____ <async?>&function
-				|___
-				|___
-				|___
+    |
+    |____ <variable>
+    |			|___
+    |			|___
+    |
+    |____ <async?>&function
+                |___
+                |___
+                |___
