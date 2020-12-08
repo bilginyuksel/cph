@@ -288,7 +288,7 @@ final class HMSLogger {
         hiAnalyticsUtils = HiAnalyticsUtils.getInstance();
         connectivityManager = objectCast(context.getSystemService(Context.CONNECTIVITY_SERVICE),
                 ConnectivityManager.class);
-
+        HiAnalyticsUtils.getInstance().enableLog();
         initHMSBI(HMSBIInitializer.getInstance(context));
         setupEventMap(singleEventMap);
         setupEventMap(periodicEventMap);
