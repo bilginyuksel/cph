@@ -79,7 +79,7 @@ func AddLicenceTo(path string, ignored []string) error {
 // PluginGenerator ...
 func PluginGenerator(project string, include bool, tsutils bool, layoutUtils bool) error {
 	if len(project) > 0 && include {
-		generator.IncludeFramework(project)
+		generator.IncludeFramework(project, false)
 	} else if tsutils {
 		generator.CreateTSUtil()
 	} else if len(project) > 0 && layoutUtils {

@@ -852,11 +852,11 @@ public class CordovaEventRunner {
 
     private String buildJSEventParameters(Object... objects) {
         final String TO_STR_NOT_VALID_ERR = "Sent event parameter value is not valid! Please add toString() method to the object you " +
-                "are passing or do not pass this object as an event parameter. Objects current toString value is %s.";
+                "are passing or do not pass this object as an event parameter.";
         StringBuilder eventParametersBuilder = new StringBuilder();
         for (Object obj : objects) {
             if (!isToStringValueValid(obj))
-                Log.w(TAG, String.format(Locale.ENGLISH, TO_STR_NOT_VALID_ERR, obj.toString()));
+                Log.w(TAG, TO_STR_NOT_VALID_ERR);
             eventParametersBuilder.append(",").append(obj.toString());
         }
         return eventParametersBuilder.toString();

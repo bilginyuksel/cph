@@ -76,7 +76,7 @@ func CreateHMSPlugin(project string) {
 	createFile(fmt.Sprintf("%s/HMS%s.java", javaPrefix, project), fmt.Sprintf(JAVA_MAIN, lowerProjName, lowerProjName, lowerProjName, project))
 	createFile(fmt.Sprintf("%s/Test.java", javaPrefix), fmt.Sprintf(JAVA_EXAMPLE, lowerProjName, lowerProjName, lowerProjName, lowerProjName, lowerProjName, lowerProjName))
 	// createFile(fmt.Sprintf("%s/src/main/java/com/huawei/hms/cordova/"))
-	IncludeFramework(project)
+	IncludeFramework(project, true)
 }
 
 // CreateTSUtil ...
@@ -97,9 +97,14 @@ func CreateLayoutUtilJavaClass(project string) {
 }
 
 // IncludeFramework ...
-func IncludeFramework(project string) {
+func IncludeFramework(project string, isNewProject bool) {
 	lowerProjName := strings.ToLower(project)
-	javaPath := fmt.Sprintf("cordova-plugin-hms-%s/src/android/src/main/java/com/huawei/hms/cordova/%s", lowerProjName, lowerProjName)
+	javaPath := ""
+	if isNewProject {
+		javaPath = fmt.Sprintf("cordova-plugin-hms-%s/src/android/src/main/java/com/huawei/hms/cordova/%s", lowerProjName, lowerProjName)
+	} else {
+		javaPath = fmt.Sprintf("src/android/src/main/java/com/huawei/hms/cordova/%s", lowerProjName)
+	}
 	createDir(fmt.Sprintf("%s/basef", javaPath))
 	createDir(fmt.Sprintf("%s/basef/handler", javaPath))
 
