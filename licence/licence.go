@@ -72,7 +72,7 @@ func Write(filePath string) {
 	content := readFile(filePath)
 	extension := filepath.Ext(filePath)
 	if _, ok := extensions[extension]; !ok {
-		fmt.Printf("Unknown file extension= %s! Can't licence it.", extension)
+		fmt.Printf("Unknown file extension= %s! Can't licence it.\n", extension)
 		return
 	}
 	numberOfComments := findHowManyCommentExists(content, extension)
@@ -88,6 +88,7 @@ func Write(filePath string) {
 
 	content = addTagToLicence(extension) + content
 	ioutil.WriteFile(filePath, []byte(content), 0644)
+	fmt.Printf("File licensed= %s\n", filePath)
 }
 
 type licenceSimilarity struct {
