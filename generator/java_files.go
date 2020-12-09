@@ -35,6 +35,12 @@ public class HMS%s extends CordovaPlugin {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        cordovaController.onActivityResult(requestCode, resultCode, intent);
+    }
+
+    @Override
     public void onPause(boolean multitasking) {
         super.onPause(multitasking);
         cordovaController.onPause(multitasking);
@@ -130,6 +136,7 @@ public abstract class CordovaBaseModule {
     public void onReset(){}
     public void onStart(){}
     public void onStop(){}
+    public void onActivityResult(int requestCode, int resultCode, Intent data){}
 
 
     public String getReference(){
@@ -1022,6 +1029,12 @@ public class CordovaController {
         for(String ref : moduleReferences)
             groupHandler.getCordovaModuleHandler(ref).getInstance().onStop();
     }
+    
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.d(TAG, "onActivityResult");
+		for(String ref : moduleReferences)
+			groupHandler.getCordovaModuleHandler(ref).getInstance().onActivityResult(requestCode, resultCode, data);
+	}
 
 }
 
