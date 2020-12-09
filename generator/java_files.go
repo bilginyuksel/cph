@@ -888,6 +888,10 @@ import java.util.List;
 
 public class CordovaController {
     private static final String TAG = CordovaController.class.getSimpleName();
+    private static final String NOT_CORDOVA_MODULE_ERR = " is not a cordova module. Please check if the given module extends" +
+			" class CordovaBaseModule. If the class extends CordovaBaseModule then check the main cordova class, you have to register the module" +
+			" inside the main cordova class. If everything is okay so far, then please check the action parameter sent from JavaScript." +
+			" If the problem persists then contact the administrator. ";
 
     private CordovaModuleGroupHandler groupHandler;
     private final HMSLogger hmsLogger;
@@ -935,28 +939,47 @@ public class CordovaController {
     }
 
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
-        try {
-            CordovaModuleHandler moduleHandler = groupHandler.getCordovaModuleHandler(action);
-            String methodName = args.getString(0); // JSONException if not exists
-            Method method = moduleHandler.getModuleMethod(methodName);
-            Log.i(TAG, "Method " + methodName + " called of module " + action + ".");
-            args.remove(0);
-            boolean isLoggerActive = false;
-            if (method.isAnnotationPresent(HMSLog.class)) {
-                isLoggerActive = true;
-                hmsLogger.startMethodExecutionTimer(methodName);
-            }
-            CorPack corPack = new CorPack(hmsLogger, cordovaPlugin, eventRunner);
-            Promise promise = createPromiseFromCallbackContext(callbackContext, methodName, isLoggerActive);
-            method.invoke(moduleHandler.getInstance(), corPack, args, promise);
-            return true;
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | JSONException e) {
-            Log.e(TAG, "Error captured when execute method run for reference= " + action);
-            Log.e(TAG, e.getMessage() + ", " + e.getClass().getSimpleName());
-            callbackContext.error(e.getMessage());
-            return false;
-        }
-    }
+		if (!groupHandler.hasCordovaModuleHandler(action)) {
+			Log.e(TAG, action + NOT_CORDOVA_MODULE_ERR);
+			callbackContext.error("Cordova module doesn't exist.");
+			return false;
+		}
+		CordovaModuleHandler moduleHandler = groupHandler.getCordovaModuleHandler(action);
+		if (args.length() == 0 || (args.opt(0).getClass() != String.class) || !moduleHandler.hasModuleMethod(args.optString(0))) {
+			Log.e(TAG, "Please ensure that the first parameter of arguments you have sent from JavaScript is the methodName and the action is the module name.");
+			callbackContext.error("Function name doesn't exist.");
+			return false;
+		}
+		String methodName = args.optString(0);
+		args.remove(0); // Remove the method name after you have it.
+		Method method = moduleHandler.getModuleMethod(methodName);
+		Log.i(TAG, String.format(Locale.ENGLISH, "Method %s is called from module %s.", methodName, action));
+		boolean isLoggerActive = false;
+		if (method.isAnnotationPresent(HMSLog.class)) {
+			isLoggerActive = true;
+			hmsLogger.startMethodExecutionTimer(methodName);
+		}
+		CorPack corPack = new CorPack(hmsLogger, cordovaPlugin, eventRunner);
+		Promise promise = createPromiseFromCallbackContext(callbackContext, methodName, isLoggerActive);
+
+
+		try {
+			method.invoke(moduleHandler.getInstance(), corPack, args, promise);
+			return true;
+		} catch (IllegalAccessException | IllegalArgumentException e) {
+			Log.e(TAG, String.format(Locale.ENGLISH, "Error occurred when method %s in module %s was called." +
+							" Exception class is %s and exception message is %s.",
+					methodName, action, e.getClass().getSimpleName(), e.toString()));
+			promise.error(e.toString());
+		} catch (InvocationTargetException e) {
+			Log.e(TAG, String.format(Locale.ENGLISH, "When method %s in module %s was called 'Invocation Target Exception' occurred." +
+							" Invocation target exception means that called method was failed. Target exception is %s." +
+							" Custom error message of the target exceptions is '%s.'", methodName, action, e.getTargetException().getClass(),
+					e.getTargetException().getMessage()));
+			promise.error(e.getTargetException().toString());
+		}
+		return false;
+	}
 
     private Promise createPromiseFromCallbackContext(final CallbackContext callbackContext, String methodName, boolean isLoggerActive) {
         return new Promise(callbackContext, hmsLogger, methodName, isLoggerActive);

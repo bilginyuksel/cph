@@ -100,6 +100,7 @@ func CreateLayoutUtilJavaClass(project string) {
 func IncludeFramework(project string, isNewProject bool) {
 	lowerProjName := strings.ToLower(project)
 	javaPath := ""
+	doNotChange := "%s"
 	if isNewProject {
 		javaPath = fmt.Sprintf("cordova-plugin-hms-%s/src/android/src/main/java/com/huawei/hms/cordova/%s", lowerProjName, lowerProjName)
 	} else {
@@ -118,7 +119,8 @@ func IncludeFramework(project string, isNewProject bool) {
 	corpack := fmt.Sprintf(JAVAC_CORPACK, lowerProjName)
 	cmh := fmt.Sprintf(JAVAC_CMH, lowerProjName, lowerProjName, lowerProjName, lowerProjName)
 	cmgh := fmt.Sprintf(JAVAC_CMGH, lowerProjName)
-	corController := fmt.Sprintf(JAVAC_CORCONTROLLER, lowerProjName, lowerProjName, lowerProjName)
+	corController := fmt.Sprintf(JAVAC_CORCONTROLLER, lowerProjName, lowerProjName, lowerProjName, doNotChange,
+		doNotChange, doNotChange, doNotChange, doNotChange, doNotChange, doNotChange, doNotChange, doNotChange, doNotChange)
 	corEventRunner := fmt.Sprintf(JAVAC_COREVENTRUNNER, lowerProjName)
 	createFile(fmt.Sprintf("%s/basef/CordovaMethod.java", javaPath), corMethod)
 	createFile(fmt.Sprintf("%s/basef/CordovaEvent.java", javaPath), corEvent)
