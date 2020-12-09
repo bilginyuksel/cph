@@ -15,14 +15,14 @@ import com.huawei.hms.cordova.%s.basef.handler.CordovaController;
 import java.util.Arrays;
 
 public class HMS%s extends CordovaPlugin {
-
+    
+    private static final String SERVICE = "<service-name>";
+    private static final String VERSION = "<version>";
     private CordovaController cordovaController;
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        final String SERVICE = "<service-name>";
-        final String VERSION = "<version>";
         cordovaController = new CordovaController(this, SERVICE, VERSION,
                 Arrays.asList(new CordovaBaseModule[]{
                         new Test(webView.getContext())
@@ -819,7 +819,8 @@ import java.util.Locale;
 
 public class CordovaEventRunner {
     private static final String TAG = CordovaEventRunner.class.getName();
-
+    private static final String TO_STR_NOT_VALID_ERR = "Sent event parameter value is not valid! Please add toString() method to the object you " +
+            "are passing or do not pass this object as an event parameter.";
     private final HMSLogger hmsLogger;
     private final CordovaWebView webView;
     private final Activity activity;
@@ -851,8 +852,6 @@ public class CordovaEventRunner {
     }
 
     private String buildJSEventParameters(Object... objects) {
-        final String TO_STR_NOT_VALID_ERR = "Sent event parameter value is not valid! Please add toString() method to the object you " +
-                "are passing or do not pass this object as an event parameter.";
         StringBuilder eventParametersBuilder = new StringBuilder();
         for (Object obj : objects) {
             if (!isToStringValueValid(obj))
