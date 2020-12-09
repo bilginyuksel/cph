@@ -119,6 +119,7 @@ func IncludeFramework(project string, isNewProject bool) {
 	corpack := fmt.Sprintf(JAVAC_CORPACK, lowerProjName)
 	cmh := fmt.Sprintf(JAVAC_CMH, lowerProjName, lowerProjName, lowerProjName, lowerProjName)
 	cmgh := fmt.Sprintf(JAVAC_CMGH, lowerProjName)
+	corLog := fmt.Sprintf(COR_LOG, lowerProjName)
 	corController := fmt.Sprintf(JAVAC_CORCONTROLLER, lowerProjName, lowerProjName, lowerProjName, doNotChange,
 		doNotChange, doNotChange, doNotChange, doNotChange, doNotChange, doNotChange, doNotChange, doNotChange, doNotChange)
 	corEventRunner := fmt.Sprintf(JAVAC_COREVENTRUNNER, lowerProjName)
@@ -131,6 +132,7 @@ func IncludeFramework(project string, isNewProject bool) {
 	createFile(fmt.Sprintf("%s/basef/handler/NoSuchCordovaModuleException.java", javaPath), nscmException)
 	createFile(fmt.Sprintf("%s/basef/handler/HMSLogger.java", javaPath), hmsLogger)
 	createFile(fmt.Sprintf("%s/basef/handler/CorPack.java", javaPath), corpack)
+	createFile(fmt.Sprintf("%s/basef/handler/CorLog.java", javaPath), corLog)
 	createFile(fmt.Sprintf("%s/basef/handler/CordovaModuleHandler.java", javaPath), cmh)
 	createFile(fmt.Sprintf("%s/basef/handler/CordovaModuleGroupHandler.java", javaPath), cmgh)
 	createFile(fmt.Sprintf("%s/basef/handler/CordovaController.java", javaPath), corController)
