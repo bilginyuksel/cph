@@ -2,6 +2,8 @@ package generator
 
 const JAVA_MAIN = `package com.huawei.hms.cordova.%s;
 
+import android.content.Intent;
+
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -38,6 +40,12 @@ public class HMS%s extends CordovaPlugin {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         cordovaController.onActivityResult(requestCode, resultCode, intent);
+    }
+
+    @Override
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionResult(requestCode, permissions, grantResults);
+        cordovaController.onRequestPermissionResult(requestCode, permissions, grantResults);
     }
 
     @Override
@@ -124,6 +132,8 @@ public @interface %s {
 
 const JAVAC_CORBASE_MODULE = `package com.huawei.hms.cordova.%s.basef;
 
+import android.content.Intent;
+
 public abstract class CordovaBaseModule {
     private final String reference;
 
@@ -137,6 +147,7 @@ public abstract class CordovaBaseModule {
     public void onStart(){}
     public void onStop(){}
     public void onActivityResult(int requestCode, int resultCode, Intent data){}
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults){}
 
 
     public String getReference(){
@@ -756,9 +767,12 @@ class CordovaModuleHandler<T extends CordovaBaseModule> {
         }
     }
 
-    Method getModuleMethod(String action) throws NoSuchMethodException {
-        if(!lookupTable.containsKey(action)) throw new NoSuchMethodException();
+    Method getModuleMethod(String action)  {
         return lookupTable.get(action);
+    }
+
+    boolean hasModuleMethod(String action) {
+        return lookupTable.containsKey(action);
     }
 
     List<Method> getEventCache() {
@@ -776,6 +790,7 @@ class CordovaModuleHandler<T extends CordovaBaseModule> {
         lookupTable.clear();
     }
 }
+
 `
 const JAVAC_CMGH = `package com.huawei.hms.cordova.%s.basef.handler;
 
@@ -802,8 +817,7 @@ class CordovaModuleGroupHandler {
         return lookupTable.containsKey(reference);
     }
 
-    CordovaModuleHandler getCordovaModuleHandler(String reference) throws NoSuchCordovaModuleException {
-        if(!hasCordovaModuleHandler(reference)) throw new NoSuchCordovaModuleException();
+    CordovaModuleHandler getCordovaModuleHandler(String reference)  {
         return lookupTable.get(reference);
     }
 
@@ -814,6 +828,7 @@ class CordovaModuleGroupHandler {
         cordovaModuleHandlers.clear();
     }
 }
+
 `
 const JAVAC_COREVENTRUNNER = `package com.huawei.hms.cordova.%s.basef.handler;
 
@@ -822,62 +837,62 @@ import android.util.Log;
 
 import org.apache.cordova.CordovaWebView;
 
-import java.util.Locale;
-
 public class CordovaEventRunner {
-    private static final String TAG = CordovaEventRunner.class.getName();
-    private static final String TO_STR_NOT_VALID_ERR = "Sent event parameter value is not valid! Please add toString() method to the object you " +
-            "are passing or do not pass this object as an event parameter.";
-    private final HMSLogger hmsLogger;
-    private final CordovaWebView webView;
-    private final Activity activity;
+	private static final String TAG = CordovaEventRunner.class.getName();
+	private static final String TO_STR_NOT_VALID_ERR = "Sent event parameter value is not valid! Please add toString() method to the object you " +
+			"are passing or do not pass this object as an event parameter.";
+	private final HMSLogger hmsLogger;
+	private final CordovaWebView webView;
+	private final Activity activity;
 
-    CordovaEventRunner(final CordovaWebView cordovaWebView, final Activity activity, final HMSLogger hmsLogger) {
-        this.hmsLogger = hmsLogger;
-        this.webView = cordovaWebView;
-        this.activity = activity;
-    }
+	CordovaEventRunner(final CordovaWebView cordovaWebView, final Activity activity, final HMSLogger hmsLogger) {
+		this.hmsLogger = hmsLogger;
+		this.webView = cordovaWebView;
+		this.activity = activity;
+	}
 
-    public void sendEvent(String event, Object... params) {
-        hmsLogger.sendPeriodicEvent(event);
-        sendEventToJS(event, params);
-    }
+	public void sendEvent(String event, Object... params) {
+		hmsLogger.sendPeriodicEvent(event);
+		sendEventToJS(event, params);
+	}
 
-    public void sendEvent(String event) {
-        hmsLogger.sendPeriodicEvent(event);
-        sendEventToJS(event);
-    }
+	public void sendEvent(String event) {
+		hmsLogger.sendPeriodicEvent(event);
+		sendEventToJS(event);
+	}
 
-    private void sendEventToJS(String event, Object... objects) {
-        Log.i(TAG, "Periodic event " + event + " captured and event " + event + " is sending to JS.");
-        StringBuilder jsFunctionBuilder = new StringBuilder();
-        jsFunctionBuilder.append("javascript:");
-        jsFunctionBuilder.append("window.runHMSEvent('").append(event).append("'");
-        if (objects.length > 0) jsFunctionBuilder.append(buildJSEventParameters(objects));
-        jsFunctionBuilder.append(");");
-        activity.runOnUiThread(() -> webView.loadUrl(jsFunctionBuilder.toString()));
-    }
+	private void sendEventToJS(String event, Object... objects) {
+		Log.i(TAG, "Periodic event " + event + " captured and event " + event + " is sending to JS.");
+		StringBuilder jsFunctionBuilder = new StringBuilder();
+		jsFunctionBuilder.append("javascript:");
+		jsFunctionBuilder.append("window.runHMSEvent('").append(event).append("'");
+		if (objects.length > 0) jsFunctionBuilder.append(buildJSEventParameters(objects));
+		jsFunctionBuilder.append(");");
+		activity.runOnUiThread(() -> webView.loadUrl(jsFunctionBuilder.toString()));
+	}
 
-    private String buildJSEventParameters(Object... objects) {
-        StringBuilder eventParametersBuilder = new StringBuilder();
-        for (Object obj : objects) {
-            if (!isToStringValueValid(obj))
-                Log.w(TAG, TO_STR_NOT_VALID_ERR);
-            eventParametersBuilder.append(",").append(obj.toString());
-        }
-        return eventParametersBuilder.toString();
-    }
+	private String buildJSEventParameters(Object... objects) {
+		StringBuilder eventParametersBuilder = new StringBuilder();
+		for (Object obj : objects) {
+			if (!isToStringValueValid(obj))
+				Log.w(TAG, TO_STR_NOT_VALID_ERR);
+			eventParametersBuilder.append(",").append(obj.toString());
+		}
+		return eventParametersBuilder.toString();
+	}
 
-    private boolean isToStringValueValid(Object object) {
-        String originalToStr = object.getClass().getSimpleName() + "@" + Integer.toHexString(object.hashCode());
-        String currentToStr = object.toString();
-        return originalToStr.equals(currentToStr);
-    }
+	private boolean isToStringValueValid(Object object) {
+		String originalToStr = object.getClass().getSimpleName() + "@" + Integer.toHexString(object.hashCode());
+		String currentToStr = object.toString();
+		return originalToStr.equals(currentToStr);
+	}
 }
+
 
 `
 const JAVAC_CORCONTROLLER = `package com.huawei.hms.cordova.%s.basef.handler;
 
+import android.content.Intent;
 import android.util.Log;
 
 import com.huawei.hms.cordova.%s.basef.CordovaBaseModule;
@@ -886,66 +901,67 @@ import com.huawei.hms.cordova.%s.basef.HMSLog;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class CordovaController {
-    private static final String TAG = CordovaController.class.getSimpleName();
-    private static final String NOT_CORDOVA_MODULE_ERR = " is not a cordova module. Please check if the given module extends" +
+	private static final String TAG = CordovaController.class.getSimpleName();
+	private static final String NOT_CORDOVA_MODULE_ERR = " is not a cordova module. Please check if the given module extends" +
 			" class CordovaBaseModule. If the class extends CordovaBaseModule then check the main cordova class, you have to register the module" +
-			" inside the main cordova class. If everything is okay so far, then please check the action parameter sent from JavaScript." +
-			" If the problem persists then contact the administrator. ";
+			" inside the main cordova class. If everything is okay so far, then please check the action parameter sent from JavaScript and ensure that" +
+			" exported cordova method in java is public. If the problem persists then contact the administrator. ";
 
-    private CordovaModuleGroupHandler groupHandler;
-    private final HMSLogger hmsLogger;
-    private final CordovaEventRunner eventRunner;
-    private final CordovaPlugin cordovaPlugin;
-    private final List<String> moduleReferences = new ArrayList<>();
+	private CordovaModuleGroupHandler groupHandler;
+	private final HMSLogger hmsLogger;
+	private final CordovaEventRunner eventRunner;
+	private final CordovaPlugin cordovaPlugin;
+	private final List<String> moduleReferences = new ArrayList<>();
 
-    public <T extends CordovaBaseModule> CordovaController(CordovaPlugin cordovaPlugin, String service, String version, List<T> cordovaModules) {
-        List<CordovaModuleHandler> moduleHandlerList = new ArrayList<>();
-        for (T cordovaModule : cordovaModules) {
-            CordovaModuleHandler moduleHandler = new CordovaModuleHandler(cordovaModule);
-            moduleHandlerList.add(moduleHandler);
-            moduleReferences.add(cordovaModule.getReference());
-        }
-        this.cordovaPlugin = cordovaPlugin;
-        this.groupHandler = new CordovaModuleGroupHandler(moduleHandlerList);
-        this.hmsLogger = HMSLogger.getInstance(cordovaPlugin.webView.getContext(), service, version);
-        this.eventRunner = new CordovaEventRunner(cordovaPlugin.webView, cordovaPlugin.cordova.getActivity(), hmsLogger);
+	public <T extends CordovaBaseModule> CordovaController(CordovaPlugin cordovaPlugin, String service, String version, List<T> cordovaModules) {
+		List<CordovaModuleHandler> moduleHandlerList = new ArrayList<>();
+		for (T cordovaModule : cordovaModules) {
+			CordovaModuleHandler moduleHandler = new CordovaModuleHandler(cordovaModule);
+			moduleHandlerList.add(moduleHandler);
+			moduleReferences.add(cordovaModule.getReference());
+		}
+		this.cordovaPlugin = cordovaPlugin;
+		this.groupHandler = new CordovaModuleGroupHandler(moduleHandlerList);
+		this.hmsLogger = HMSLogger.getInstance(cordovaPlugin.webView.getContext(), service, version);
+		this.eventRunner = new CordovaEventRunner(cordovaPlugin.webView, cordovaPlugin.cordova.getActivity(), hmsLogger);
 
-        prepareEvents();
-        clearEventCache();
-    }
+		prepareEvents();
+		clearEventCache();
+	}
 
-    private void prepareEvents() {
-        for (String ref : moduleReferences) {
-            List<Method> eventCache = groupHandler.getCordovaModuleHandler(ref).getEventCache();
-            runAllEventMethods(groupHandler.getCordovaModuleHandler(ref).getInstance(), eventCache);
-        }
-    }
+	private void prepareEvents() {
+		for (String ref : moduleReferences) {
+			List eventCache = groupHandler.getCordovaModuleHandler(ref).getEventCache();
+			runAllEventMethods(groupHandler.getCordovaModuleHandler(ref).getInstance(), eventCache);
+		}
+	}
 
-    private <T> void runAllEventMethods(T instance, List<Method> eventCache) {
-        for (Method method : eventCache) {
-            try {
-                method.invoke(instance, new CorPack(hmsLogger, cordovaPlugin, eventRunner));
-                Log.i(TAG, "Event " + method.getName() + " is ready.");
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                Log.e(TAG, "Event couldn't initialized. " + e.getMessage());
-            }
-        }
-    }
+	private <T> void runAllEventMethods(T instance, List<Method> eventCache) {
+		for (Method method : eventCache) {
+			try {
+				method.invoke(instance, new CorPack(hmsLogger, cordovaPlugin, eventRunner));
+				Log.i(TAG, "Event " + method.getName() + " is ready.");
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				Log.e(TAG, "Event couldn't initialized. " + e.getMessage());
+			}
+		}
+	}
 
-    private void clearEventCache() {
-        for (String ref : moduleReferences)
-            groupHandler.getCordovaModuleHandler(ref).getEventCache().clear();
-    }
+	private void clearEventCache() {
+		for (String ref : moduleReferences)
+			groupHandler.getCordovaModuleHandler(ref).getEventCache().clear();
+	}
 
-    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
+	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
 		if (!groupHandler.hasCordovaModuleHandler(action)) {
 			Log.e(TAG, action + NOT_CORDOVA_MODULE_ERR);
 			callbackContext.error("Cordova module doesn't exist.");
@@ -988,54 +1004,59 @@ public class CordovaController {
 		return false;
 	}
 
-    private Promise createPromiseFromCallbackContext(final CallbackContext callbackContext, String methodName, boolean isLoggerActive) {
-        return new Promise(callbackContext, hmsLogger, methodName, isLoggerActive);
-    }
+	private Promise createPromiseFromCallbackContext(final CallbackContext callbackContext, String methodName, boolean isLoggerActive) {
+		return new Promise(callbackContext, hmsLogger, methodName, isLoggerActive);
+	}
 
-    public void onPause(boolean multitasking) {
-        Log.i(TAG, "onPause");
-        for (String ref : moduleReferences) {
-            groupHandler.getCordovaModuleHandler(ref).getInstance().onPause(multitasking);
-        }
-    }
+	public void onPause(boolean multitasking) {
+		Log.d(TAG, "onPause");
+		for (String ref : moduleReferences) {
+			groupHandler.getCordovaModuleHandler(ref).getInstance().onPause(multitasking);
+		}
+	}
 
-    public void onDestroy() {
-        Log.i(TAG, "onDestroy");
-        for (String ref : moduleReferences)
-            groupHandler.getCordovaModuleHandler(ref).getInstance().onDestroy();
-        groupHandler.clear();
-    }
+	public void onDestroy() {
+		Log.d(TAG, "onDestroy");
+		for (String ref : moduleReferences)
+			groupHandler.getCordovaModuleHandler(ref).getInstance().onDestroy();
+		groupHandler.clear();
+	}
 
-    public void onReset() {
-        Log.i(TAG, "onReset");
-        for (String ref : moduleReferences)
-            groupHandler.getCordovaModuleHandler(ref).getInstance().onReset();
-    }
+	public void onReset() {
+		Log.d(TAG, "onReset");
+		for (String ref : moduleReferences)
+			groupHandler.getCordovaModuleHandler(ref).getInstance().onReset();
+	}
 
-    public void onResume(boolean multitasking) {
-        Log.i(TAG, "onResume");
-        for (String ref : moduleReferences)
-            groupHandler.getCordovaModuleHandler(ref).getInstance().onResume(multitasking);
-    }
+	public void onResume(boolean multitasking) {
+		Log.d(TAG, "onResume");
+		for (String ref : moduleReferences)
+			groupHandler.getCordovaModuleHandler(ref).getInstance().onResume(multitasking);
+	}
 
-    public void onStart() {
-        Log.i(TAG, "onStart");
-        for (String ref : moduleReferences)
-            groupHandler.getCordovaModuleHandler(ref).getInstance().onStart();
-    }
+	public void onStart() {
+		Log.d(TAG, "onStart");
+		for (String ref : moduleReferences)
+			groupHandler.getCordovaModuleHandler(ref).getInstance().onStart();
+	}
 
-    public void onStop() {
-        Log.i(TAG, "onStop");
-        for(String ref : moduleReferences)
-            groupHandler.getCordovaModuleHandler(ref).getInstance().onStop();
-    }
-    
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onStop() {
+		Log.d(TAG, "onStop");
+		for (String ref : moduleReferences)
+			groupHandler.getCordovaModuleHandler(ref).getInstance().onStop();
+	}
+
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		Log.d(TAG, "onActivityResult");
 		for(String ref : moduleReferences)
 			groupHandler.getCordovaModuleHandler(ref).getInstance().onActivityResult(requestCode, resultCode, data);
 	}
 
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionResult");
+		for(String ref : moduleReferences)
+			groupHandler.getCordovaModuleHandler(ref).getInstance().onRequestPermissionResult(requestCode, permissions, grantResults);
+    }
 }
 
 `

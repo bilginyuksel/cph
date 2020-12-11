@@ -72,8 +72,7 @@ const APP_DEFINE = `{
     },
     "files": [
         "hooks",
-        "src/android/src/main/java",
-        "src/android/plugin.gradle",
+        "src",
         "types",
         "www",
         "LICENCE",
