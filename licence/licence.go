@@ -68,7 +68,7 @@ func isCommentEndingFound(content string, startIdx int, endTag string) bool {
 
 // Write ...
 func Write(filePath string) {
-
+	fmt.Println(filePath)
 	content := readFile(filePath)
 	extension := filepath.Ext(filePath)
 	if _, ok := extensions[extension]; !ok {
@@ -107,6 +107,9 @@ func deleteInvalidLicence(content string, startIdx int, endIdx int) string {
 }
 
 func isStartOfBlockComment(content string, startIdx int, tag string) bool {
+	if startIdx-len(tag)+1 < 0 {
+		return false
+	}
 	return content[startIdx-len(tag)+1:startIdx+1] == tag
 }
 
