@@ -7,21 +7,26 @@ import (
 	"strings"
 )
 
-func getRootDir(path string) string {
-	parts := strings.Split(path, string(os.PathSeparator))
-	return parts[0]
-}
-
-// FilePathWalkDir ...
-func FilePathWalkDir(root string, ignored []string) ([]string, error) {
+func isIgnored(path string, ignored []string) bool {
 	ignoredMap := make(map[string]bool)
 	for _, value := range ignored {
 		ignoredMap[value] = true
 	}
+	folders := strings.Split(path, "\\")
+	for _, folder := range folders {
+		if _, ok := ignoredMap[folder]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+// FilePathWalkDir ...
+func FilePathWalkDir(root string, ignored []string) ([]string, error) {
+
 	var files []string
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		rootDir := getRootDir(path)
-		if _, ok := ignoredMap[rootDir]; ok {
+		if isIgnored(path, ignored) {
 			return nil
 		}
 		if err != nil {
